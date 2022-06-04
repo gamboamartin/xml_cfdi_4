@@ -7,7 +7,6 @@ use DOMException;
 use DOMNode;
 use gamboamartin\errores\errores;
 
-use phpDocumentor\Reflection\Types\This;
 use stdClass;
 
 class xml{
@@ -17,9 +16,7 @@ class xml{
     private validacion $valida;
     private errores $error;
 
-    /**
-     * @throws DOMException
-     */
+
     public function __construct(){
         $this->valida = new validacion();
         $this->error = new errores();
@@ -41,6 +38,9 @@ class xml{
         $this->cfdi->comprobante->version = "4.0";
         $this->cfdi->comprobante->namespace = new stdClass();
         $this->cfdi->comprobante->namespace->w3 = 'http://www.w3.org/2000/xmlns/';
+
+        $this->cfdi->emisor = new stdClass();
+        $this->cfdi->receptor = new stdClass();
 
 
 
@@ -75,6 +75,50 @@ class xml{
         $complemento = (new complementos())->aplica_complemento_cfdi_comprobante(comprobante: $comprobante, xml: $this);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al inicializar complementos', data: $complemento);
+        }
+
+        return $this->dom->saveXML();
+    }
+
+    /**
+     */
+    public function cfdi_emisor(stdClass $emisor): bool|string|array
+    {
+        $keys = array('rfc','nombre','regimen_fiscal');
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $emisor);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar $emisor', data: $valida);
+        }
+
+        if(!isset($this->xml)){
+            return $this->error->error(mensaje: 'Error no esta inicializado el xml', data: $this);
+        }
+
+
+        $data_nodo = (new dom_xml())->nodo(keys: $keys, local_name: 'cfdi:Emisor', nodo_key: 'emisor',object:  $emisor,xml:  $this);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al setear $emisor', data: $data_nodo);
+        }
+
+
+        return $this->dom->saveXML();
+    }
+
+    public function cfdi_receptor(stdClass $receptor): bool|string|array
+    {
+        $keys = array('rfc','nombre','domicilio_fiscal_receptor','regimen_fiscal_receptor','uso_cfdi');
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $receptor);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar $receptor', data: $valida);
+        }
+
+        if(!isset($this->xml)){
+            return $this->error->error(mensaje: 'Error no esta inicializado el xml', data: $this);
+        }
+
+        $data_nodo = (new dom_xml())->nodo(keys: $keys, local_name: 'cfdi:Receptor', nodo_key: 'receptor',object:  $receptor,xml:  $this);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al setear $receptor', data: $data_nodo);
         }
 
         return $this->dom->saveXML();

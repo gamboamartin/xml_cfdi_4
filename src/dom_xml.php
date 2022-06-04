@@ -81,6 +81,20 @@ class dom_xml{
         return $cfdi_comprobante_pago;
     }
 
+    private function genera_attrs(array $keys, DOMElement $nodo, string $nodo_key, stdClass $object, xml $xml): array|DOMElement
+    {
+        $data_nodo = (new init())->asigna_datos_para_nodo(keys: $keys, nodo_key: $nodo_key,objetc:  $object,xml:  $xml);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al asignar '.$nodo_key, data: $data_nodo);
+        }
+
+        $setea = $this->setea_attr(keys: $keys,nodo:  $nodo,nodo_key:  $nodo_key, xml: $xml);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al setear '.$nodo_key, data: $setea);
+        }
+        return $setea;
+    }
+
     private function inicializa_comprobante(stdClass $comprobante, xml $xml): bool|array|DOMElement
     {
         $data_comprobante = (new init())->inicializa_valores_comprobante(comprobante: $comprobante, xml: $xml);
@@ -104,6 +118,31 @@ class dom_xml{
         $nodo->setAttribute('Fecha', $xml->cfdi->comprobante->fecha);
         $nodo->setAttribute('Folio', $xml->cfdi->comprobante->folio);
         $nodo->setAttribute('Version', $xml->cfdi->comprobante->version);
+        return $nodo;
+    }
+
+    public function nodo(array $keys, string $local_name, string $nodo_key, stdClass $object, xml $xml): array|DOMElement
+    {
+
+        $nodo = $xml->dom->createElement($local_name);
+        $xml->xml->appendChild($nodo);
+
+        $setea = $this->genera_attrs(keys: $keys,nodo:  $nodo,nodo_key:  $nodo_key, object: $object, xml: $xml);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al setear '.$nodo_key, data: $setea);
+        }
+        return $setea;
+    }
+
+    private function setea_attr(array $keys, DOMElement $nodo, string $nodo_key, xml $xml): DOMElement
+    {
+        foreach ($keys as $key){
+            $key_nodo_xml = str_replace('_', ' ', $key);
+            $key_nodo_xml = ucwords($key_nodo_xml);
+            $key_nodo_xml = str_replace(' ', '', $key_nodo_xml);
+            $nodo->setAttribute($key_nodo_xml, $xml->cfdi->$nodo_key->$key);
+        }
+
         return $nodo;
     }
 }
