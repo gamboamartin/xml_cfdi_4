@@ -35,6 +35,7 @@ class xmlTest extends test {
         $comprobante->folio = '01';
 
         $resultado = $xml->cfdi_comprobante($comprobante);
+        $resultado = $resultado->saveXML();
 
         $this->assertNotTrue(errores::$error);
         $this->assertIsString($resultado);
@@ -99,6 +100,7 @@ class xmlTest extends test {
         $emisor->regimen_fiscal = 'a';
 
         $resultado = $xml->cfdi_emisor(emisor: $emisor);
+        $resultado = $resultado->saveXML();
         $this->assertNotTrue(errores::$error);
         $this->assertIsString($resultado);
         $this->assertStringContainsStringIgnoringCase('<?xml version="1.0" encoding="utf-8"?>',$resultado);

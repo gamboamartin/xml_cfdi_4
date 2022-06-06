@@ -1,12 +1,16 @@
 <?php
 namespace gamboamartin\xml_cfdi_4;
+use DOMElement;
+use DOMException;
 use gamboamartin\errores\errores;
 use stdClass;
 
 class complementos{
     private errores  $error;
+    private validacion $valida;
     public function __construct(){
         $this->error = new errores();
+        $this->valida = new validacion();
     }
 
     /**
@@ -26,4 +30,60 @@ class complementos{
         }
         return $xml;
     }
+
+    public function comprobante_complemento_pago(stdClass $comprobante): stdClass
+    {
+        $comprobante->tipo_de_comprobante = 'P';
+        $comprobante->moneda = 'XXX';
+        $comprobante->total = '0';
+        $comprobante->exportacion = '01';
+        $comprobante->sub_total = '0';
+        return $comprobante;
+    }
+
+    private function conceptos_complemento_pago(): array
+    {
+        $conceptos = array();
+        $conceptos[0] = new stdClass();
+        $conceptos[0]->clave_prod_serv = '84111506';
+        $conceptos[0]->cantidad = '1';
+        $conceptos[0]->clave_unidad = 'ACT';
+        $conceptos[0]->descripcion = 'Pago';
+        $conceptos[0]->valor_unitario = '0';
+        $conceptos[0]->importe = '0';
+        $conceptos[0]->objeto_imp = '01';
+        $conceptos[0]->impuestos = array();
+        return $conceptos;
+    }
+
+    /**
+     * @throws DOMException
+     */
+    public function conceptos_complemento_pago_dom(xml $xml): bool|array|string
+    {
+        $conceptos = $this->conceptos_complemento_pago();
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al obtener conceptos', data: $conceptos);
+        }
+
+        $dom = $xml->cfdi_conceptos(conceptos: $conceptos);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al generar receptor', data: $dom);
+        }
+        return $dom;
+    }
+
+    /**
+     * @throws DOMException
+     */
+    public function nodo_complemento(xml $xml): bool|DOMElement
+    {
+        $nodo_complemento = $xml->dom->createElement('cfdi:Complemento');
+        $xml->xml->appendChild($nodo_complemento);
+        return $nodo_complemento;
+    }
+
+
+
+
 }

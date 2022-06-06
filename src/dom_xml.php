@@ -88,9 +88,12 @@ class dom_xml{
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al validar concepto', data: $valida);
         }
-
         $nodo_concepto->setAttribute('ClaveProdServ', $concepto->clave_prod_serv);
-        $nodo_concepto->setAttribute('NoIdentificacion', $concepto->no_identificacion);
+
+        if(isset($concepto->no_identificacion) && $concepto->no_identificacion!==''){
+            $nodo_concepto->setAttribute('NoIdentificacion', $concepto->no_identificacion);
+        }
+
         $nodo_concepto->setAttribute('Cantidad', $concepto->cantidad);
         $nodo_concepto->setAttribute('ClaveUnidad', $concepto->clave_unidad);
         $nodo_concepto->setAttribute('Descripcion', $concepto->descripcion);

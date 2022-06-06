@@ -49,7 +49,7 @@ class xml{
 
     }
 
-    public function cfdi_comprobante(stdClass $comprobante): bool|string|array
+    public function cfdi_comprobante(stdClass $comprobante): DOMDocument|array
     {
 
         $keys = array('tipo_de_comprobante','moneda','total', 'exportacion','sub_total','lugar_expedicion',
@@ -78,7 +78,7 @@ class xml{
             return $this->error->error(mensaje: 'Error al inicializar complementos', data: $complemento);
         }
 
-        return $this->dom->saveXML();
+        return $this->dom;
     }
 
     /**
@@ -106,7 +106,7 @@ class xml{
 
     /**
      */
-    public function cfdi_emisor(stdClass $emisor): bool|string|array
+    public function cfdi_emisor(stdClass $emisor): DOMDocument|array
     {
         $keys = array('rfc','nombre','regimen_fiscal');
         $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $emisor);
@@ -125,7 +125,7 @@ class xml{
         }
 
 
-        return $this->dom->saveXML();
+        return $this->dom;
     }
 
     /**
