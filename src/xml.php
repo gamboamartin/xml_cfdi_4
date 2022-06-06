@@ -42,6 +42,7 @@ class xml{
         $this->cfdi->emisor = new stdClass();
         $this->cfdi->receptor = new stdClass();
         $this->cfdi->conceptos = array();
+        $this->cfdi->impuestos = new stdClass();
 
 
         $this->dom = new DOMDocument('1.0', 'utf-8');
@@ -122,6 +123,75 @@ class xml{
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al setear $emisor', data: $data_nodo);
         }
+
+
+        return $this->dom->saveXML();
+    }
+
+    /**
+     * @throws DOMException
+     */
+    public function cfdi_impuestos(stdClass $impuestos): bool|array|string
+    {
+        $keys = array('total_impuestos_trasladados');
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $impuestos);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar $receptor', data: $valida);
+        }
+        if(!isset($this->xml)){
+            return $this->error->error(mensaje: 'Error no esta inicializado el xml', data: $this);
+        }
+
+        if(!isset($this->xml)){
+            return $this->error->error(mensaje: 'Error no esta inicializado el xml', data: $this);
+        }
+
+        $data_nodo = (new dom_xml())->nodo(keys: $keys, local_name: 'cfdi:Impuestos', nodo_key: 'impuestos',
+            object:  $impuestos,xml:  $this);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al setear $emisor', data: $data_nodo);
+        }
+
+        if(!isset($impuestos->traslados)){
+            return $this->error->error(mensaje: 'Error no existe traslados en impuestos', data: $impuestos);
+        }
+        if(!is_array($impuestos->traslados)){
+            return $this->error->error(mensaje: 'Error traslados en impuestos debe ser un array', data: $impuestos);
+        }
+        if(count($impuestos->traslados)>0){
+            $nodo_traslados = $this->dom->createElement('cfdi:Traslados');
+            $data_nodo->appendChild($nodo_traslados);
+            foreach ($impuestos->traslados as $traslado){
+
+                $keys = array('base','impuesto','tipo_factor','tasa_o_cuota','importe');
+                $valida = $this->valida->valida_existencia_keys(keys: $keys,registro:  $traslado);
+                if(errores::$error){
+                    return $this->error->error(mensaje: 'Error al validar traspaso', data: $valida);
+                }
+                $keys = array('base','tasa_o_cuota','importe');
+                $valida = $this->valida->valida_numerics(keys: $keys,row:  $traslado);
+                if(errores::$error){
+                    return $this->error->error(mensaje: 'Error al validar traspaso', data: $valida);
+                }
+
+                if(!is_object($traslado)){
+                    return $this->error->error(mensaje: 'Error traslado en impuestos debe ser un objeto', data: $impuestos);
+                }
+
+                $nodo_traslado = $this->dom->createElement('cfdi:Traslado');
+                $nodo_traslados->appendChild($nodo_traslado);
+
+                $nodo_traslado->setAttribute('Base', $traslado->base);
+                $nodo_traslado->setAttribute('Impuesto', $traslado->impuesto);
+                $nodo_traslado->setAttribute('TipoFactor', $traslado->tipo_factor);
+                $nodo_traslado->setAttribute('TasaOCuota', $traslado->tasa_o_cuota);
+                $nodo_traslado->setAttribute('Importe', $traslado->importe);
+
+            }
+        }
+
+
+
 
 
         return $this->dom->saveXML();

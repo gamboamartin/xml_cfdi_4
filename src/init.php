@@ -9,8 +9,13 @@ class init{
     public function __construct(){
         $this->error = new errores();
     }
-    public function asigna_datos_para_nodo(array $keys, string $nodo_key, stdClass $objetc, xml $xml){
+    public function asigna_datos_para_nodo(array $keys, string $nodo_key, stdClass $objetc, xml $xml): array|stdClass
+    {
         foreach ($keys as $key){
+            if(!isset($xml->cfdi->$nodo_key)){
+                return $this->error->error(mensaje: 'Error no esta inicializado $xml->cfdi->'.$nodo_key,
+                    data: $xml->cfdi);
+            }
             $xml->cfdi->$nodo_key->$key = $objetc->$key;
         }
         return $xml->cfdi->$nodo_key;

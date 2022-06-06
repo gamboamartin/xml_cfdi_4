@@ -1,0 +1,90 @@
+<?php
+namespace tests\controllers;
+
+use DOMException;
+use gamboamartin\errores\errores;
+use gamboamartin\test\liberator;
+use gamboamartin\test\test;
+use gamboamartin\xml_cfdi_4\complementos;
+use gamboamartin\xml_cfdi_4\dom_xml;
+use gamboamartin\xml_cfdi_4\xml;
+use stdClass;
+
+class complementosTest extends test {
+    public errores $errores;
+
+    public function __construct(?string $name = null, array $data = [], $dataName = '')
+    {
+        parent::__construct($name, $data, $dataName);
+        $this->errores = new errores();
+
+    }
+
+    public function test_aplica_complemento_cfdi_comprobante(): void
+    {
+        errores::$error = false;
+
+        $com = new complementos();
+        //$com = new liberator($com);
+
+
+        $comprobante = new stdClass();
+        $xml = new xml();
+        $resultado = $com->aplica_complemento_cfdi_comprobante($comprobante,$xml);
+
+
+        $this->assertNotTrue(errores::$error);
+        $this->assertIsObject($resultado);
+
+        errores::$error = false;
+
+        $com = new complementos();
+        //$com = new liberator($com);
+        $comprobante = new stdClass();
+        $xml = new xml();
+        $xml->cfdi->comprobante->tipo_de_comprobante = 'P';
+        $resultado = $com->aplica_complemento_cfdi_comprobante($comprobante,$xml);
+        $this->assertTrue(errores::$error);
+        $this->assertIsArray($resultado);
+        $this->assertStringContainsStringIgnoringCase('Error al inicializar dom pago',$resultado['mensaje']);
+
+        errores::$error = false;
+
+        $com = new complementos();
+        //$com = new liberator($com);
+        $comprobante = new stdClass();
+        $xml = new xml();
+
+
+        $comprobante = new stdClass();
+        $comprobante->tipo_de_comprobante = 'P';
+        $comprobante->moneda = 'XXX';
+        $comprobante->exportacion = '01';
+        $comprobante->total = 0;
+        $comprobante->sub_total = 0;
+        $comprobante->lugar_expedicion = 44110;
+        $comprobante->fecha = '2021-01-01';
+        $comprobante->folio = '01';
+
+        $comprobante = $xml->cfdi_comprobante($comprobante);
+        if(errores::$error){
+            $error = (new errores())->error(mensaje: 'Error al generar comprobante', data: $comprobante);
+            print_r($error);
+            exit;
+        }
+        $comprobante = new stdClass();
+        $xml->cfdi->comprobante->tipo_de_comprobante = 'P';
+        $xml->cfdi->comprobante->moneda = 'XXX';
+        $resultado = $com->aplica_complemento_cfdi_comprobante($comprobante,$xml);
+        $this->assertNotTrue(errores::$error);
+        $this->assertIsObject($resultado);
+
+
+        errores::$error = false;
+    }
+
+
+
+
+}
+

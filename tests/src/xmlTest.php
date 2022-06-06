@@ -233,6 +233,45 @@ class xmlTest extends test {
         errores::$error = false;
     }
 
+    public function test_cfdi_impuestos(): void
+    {
+        errores::$error = false;
+
+        $xml = new xml();
+        //$modelo = new liberator($modelo);
+
+        $comprobante = new stdClass();
+        $comprobante->tipo_de_comprobante = 'I';
+        $comprobante->moneda = 'XXX';
+        $comprobante->exportacion = '01';
+        $comprobante->total = 0;
+        $comprobante->sub_total = 0;
+        $comprobante->lugar_expedicion = 44110;
+        $comprobante->fecha = '2021-01-01';
+        $comprobante->folio = '01';
+        $comprobante = $xml->cfdi_comprobante($comprobante);
+        if(errores::$error){
+            $error = (new errores())->error(mensaje: 'Error al generar comprobante', data: $comprobante);
+            print_r($error);
+            exit;
+        }
+
+        $impuestos = new stdClass();
+        $impuestos->total_impuestos_trasladados = 'x';
+        $impuestos->traslados = array();
+        $impuestos->traslados[0] = new stdClass();
+        $impuestos->traslados[0]->base = '0';
+        $impuestos->traslados[0]->impuesto = '0';
+        $impuestos->traslados[0]->tipo_factor = '0';
+        $impuestos->traslados[0]->tasa_o_cuota = '0';
+        $impuestos->traslados[0]->importe = '0';
+        $resultado = $xml->cfdi_impuestos($impuestos);
+        $this->assertNotTrue(errores::$error);
+        $this->assertIsString($resultado);
+        $this->assertStringContainsStringIgnoringCase('<cfdi:Impuestos TotalImpuestosTrasladados="x"',$resultado);
+
+    }
+
     /**
      */
     public function test_cfdi_receptor(): void

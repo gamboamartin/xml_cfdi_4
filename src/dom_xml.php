@@ -210,6 +210,10 @@ class dom_xml{
      */
     public function comprobante_pago(stdClass $comprobante, xml $xml): DOMNode|array
     {
+        if(!isset($xml->xml)){
+            return $this->error->error(mensaje: 'Error no esta inicializado el xml', data: $this);
+        }
+
         $valida = $this->valida->complemento_pago_comprobante(comprobante: $comprobante,xml:  $xml);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al validar complemento pago dom pago', data: $valida);
@@ -294,6 +298,11 @@ class dom_xml{
 
     private function genera_attrs(array $keys, DOMElement $nodo, string $nodo_key, stdClass $object, xml $xml): array|DOMElement
     {
+        if(!isset($xml->cfdi->$nodo_key)){
+            return $this->error->error(mensaje: 'Error no esta inicializado $xml->cfdi->'.$nodo_key,
+                data: $xml->cfdi);
+        }
+
         $data_nodo = (new init())->asigna_datos_para_nodo(keys: $keys, nodo_key: $nodo_key,objetc:  $object,xml:  $xml);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al asignar '.$nodo_key, data: $data_nodo);
@@ -352,6 +361,10 @@ class dom_xml{
 
     public function nodo(array $keys, string $local_name, string $nodo_key, stdClass $object, xml $xml): array|DOMElement
     {
+        if(!isset($xml->cfdi->$nodo_key)){
+            return $this->error->error(mensaje: 'Error no esta inicializado $xml->cfdi->'.$nodo_key,
+                data: $xml->cfdi);
+        }
 
         $nodo = $xml->dom->createElement($local_name);
         $xml->xml->appendChild($nodo);
@@ -360,7 +373,7 @@ class dom_xml{
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al setear '.$nodo_key, data: $setea);
         }
-        return $setea;
+        return $nodo;
     }
 
     private function setea_attr(array $keys, DOMElement $nodo, string $nodo_key, xml $xml): DOMElement
