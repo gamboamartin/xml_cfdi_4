@@ -127,7 +127,7 @@ class xmlTest extends test {
 
         $conceptos = array();
 
-        $comprobante = $xml->cfdi_comprobante($comprobante,$conceptos );
+        $comprobante = $xml->cfdi_comprobante($comprobante );
         if(errores::$error){
             $error = (new errores())->error(mensaje: 'Error al generar comprobante', data: $comprobante);
             print_r($error);
@@ -144,6 +144,7 @@ class xmlTest extends test {
         $conceptos[0]->objeto_imp = 'f';
         $conceptos[0]->no_identificacion = 'f';
         $conceptos[0]->clave_unidad = 'f';
+        $conceptos[0]->impuestos = array();
 
         $conceptos[1] = new stdClass();
         $conceptos[1]->clave_prod_serv = '1';
@@ -154,6 +155,9 @@ class xmlTest extends test {
         $conceptos[1]->objeto_imp = 'f';
         $conceptos[1]->no_identificacion = 'f';
         $conceptos[1]->clave_unidad = 'f';
+        $conceptos[1]->impuestos = array();
+
+
 
         $resultado = $xml->cfdi_conceptos($conceptos);
         $this->assertNotTrue(errores::$error);
@@ -171,6 +175,60 @@ class xmlTest extends test {
         $this->assertStringContainsStringIgnoringCase('NoIdentificacion="f" Cantidad="0" ClaveUnidad="f" Descripcion="c" Valo',$resultado);
         $this->assertStringContainsStringIgnoringCase('ValorUnitario="0" Importe="0" ObjetoImp="f"/></cfdi:Co',$resultado);
         $this->assertStringContainsStringIgnoringCase('oImp="f"/></cfdi:Conceptos></cfdi:Comprobante>',$resultado);
+
+
+        errores::$error = false;
+
+        $xml = new xml();
+        //$modelo = new liberator($modelo);
+
+        $comprobante = new stdClass();
+        $comprobante->tipo_de_comprobante = 'I';
+        $comprobante->moneda = 'XXX';
+        $comprobante->exportacion = '01';
+        $comprobante->total = 0;
+        $comprobante->sub_total = 0;
+        $comprobante->lugar_expedicion = 44110;
+        $comprobante->fecha = '2021-01-01';
+        $comprobante->folio = '01';
+
+
+        $comprobante = $xml->cfdi_comprobante($comprobante );
+        if(errores::$error){
+            $error = (new errores())->error(mensaje: 'Error al generar comprobante', data: $comprobante);
+            print_r($error);
+            exit;
+        }
+
+        $conceptos = array();
+        $conceptos[0] = new stdClass();
+        $conceptos[0]->clave_prod_serv = '1';
+        $conceptos[0]->cantidad = '0';
+        $conceptos[0]->descripcion = 'c';
+        $conceptos[0]->valor_unitario = '0';
+        $conceptos[0]->importe = '0';
+        $conceptos[0]->objeto_imp = 'f';
+        $conceptos[0]->no_identificacion = 'f';
+        $conceptos[0]->clave_unidad = 'f';
+        $conceptos[0]->impuestos = array();
+        $conceptos[0]->impuestos[0] = new stdClass();
+        $conceptos[0]->impuestos[0]->traslados = array();
+        $conceptos[0]->impuestos[0]->traslados[0] = new stdClass();
+        $conceptos[0]->impuestos[0]->traslados[0]->base = '0';
+        $conceptos[0]->impuestos[0]->traslados[0]->impuesto = 'b';
+        $conceptos[0]->impuestos[0]->traslados[0]->tipo_factor = 'c';
+        $conceptos[0]->impuestos[0]->traslados[0]->tasa_o_cuota = '1';
+        $conceptos[0]->impuestos[0]->traslados[0]->importe = '2';
+
+
+        $resultado = $xml->cfdi_conceptos($conceptos);
+        $this->assertNotTrue(errores::$error);
+        $this->assertIsString($resultado);
+        $this->assertStringContainsStringIgnoringCase('<cfdi:Comprobante xmlns:cfdi="http://www.sat.gob.mx/cfd/4"',$resultado);
+        $this->assertStringContainsStringIgnoringCase('Moneda="XXX" Total="0" Exportacion="01" TipoDeComproba',$resultado);
+        $this->assertStringContainsStringIgnoringCase('Folio="01" Version="4.0"><cfdi:Conceptos><cfdi:Con',$resultado);
+        $this->assertStringContainsStringIgnoringCase('f" Cantidad="0" ClaveUnidad="f" Descripcion="c" ValorUnitar',$resultado);
+        $this->assertStringContainsStringIgnoringCase('di:Impuestos><cfdi:Traslados><cfdi:Traslado Base="0" Impuesto="b" TipoFactor="c" TasaOCuo',$resultado);
 
         errores::$error = false;
     }

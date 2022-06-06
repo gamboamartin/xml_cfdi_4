@@ -18,6 +18,10 @@ class validacion extends \gamboamartin\validacion\validacion{
             return $this->error->error(mensaje:'Error cuando tipo_de_comprobante sea P el total debe ser 0',
                 data: $comprobante);
         }
+        if((string)$xml->cfdi->comprobante->moneda !== 'XXX'){
+            return $this->error->error(mensaje:'Error cuando tipo_de_comprobante sea P la moneda  debe ser XXX',
+                data: $comprobante);
+        }
         return true;
     }
 
@@ -34,8 +38,8 @@ class validacion extends \gamboamartin\validacion\validacion{
 
     public function valida_data_concepto(mixed $concepto): bool|array
     {
-        $keys = array('clave_prod_serv','cantidad','clave_unidad','descripcion','no_identificacion','valor_unitario',
-            'objeto_imp');
+        $keys = array('clave_prod_serv','cantidad','importe','clave_unidad','descripcion','no_identificacion',
+            'valor_unitario', 'objeto_imp');
         $valida = $this->valida_existencia_keys(keys: $keys, registro: $concepto);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al validar $concepto', data: $valida);
@@ -45,7 +49,7 @@ class validacion extends \gamboamartin\validacion\validacion{
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al validar $concepto', data: $valida);
         }
-        $keys_numerics = array('clave_prod_serv','cantidad','valor_unitario');
+        $keys_numerics = array('clave_prod_serv','cantidad','valor_unitario','importe');
         $valida = $this->valida_numerics(keys: $keys_numerics, row: $concepto);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al validar $concepto', data: $valida);
@@ -65,6 +69,20 @@ class validacion extends \gamboamartin\validacion\validacion{
         $valida = $this->valida_numerics(keys: $keys_numerics, row: $concepto);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al validar $concepto', data: $valida);
+        }
+        return true;
+    }
+
+    public function valida_data_impuestos(mixed $impuesto): bool|array
+    {
+        if(!is_object($impuesto)){
+            return $this->error->error(mensaje: 'Error $impuesto debe ser un objeto', data: $impuesto);
+        }
+        if(!isset($impuesto->traslados)){
+            return $this->error->error(mensaje: 'Error $impuesto->traslados debe existir', data: $impuesto);
+        }
+        if(!is_array($impuesto->traslados)){
+            return $this->error->error(mensaje: 'Error $impuesto->traslados debe ser un array', data: $impuesto);
         }
         return true;
     }

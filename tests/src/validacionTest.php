@@ -27,7 +27,9 @@ class validacionTest extends test {
 
         $comprobante = new stdClass();
         $xml = new xml();
+        $xml->cfdi->comprobante->moneda = 'XXX';
         $resultado = $val->complemento_pago_comprobante($comprobante, $xml);
+        print_r($resultado);
 
         $this->assertNotTrue(errores::$error);
         $this->assertTrue($resultado);

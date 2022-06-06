@@ -51,7 +51,6 @@ class xml{
     public function cfdi_comprobante(stdClass $comprobante): bool|string|array
     {
 
-
         $keys = array('tipo_de_comprobante','moneda','total', 'exportacion','sub_total','lugar_expedicion',
             'folio');
         $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $comprobante);
@@ -93,10 +92,10 @@ class xml{
             return $this->error->error(mensaje: 'Error los conceptos no pueden ir vacios', data: $conceptos);
         }
 
-        $nodo = $this->dom->createElement('cfdi:Conceptos');
-        $this->xml->appendChild($nodo);
+        $nodo_conceptos = $this->dom->createElement('cfdi:Conceptos');
+        $this->xml->appendChild($nodo_conceptos);
 
-        $elementos_concepto = (new dom_xml())->carga_conceptos(conceptos: $conceptos,nodo:  $nodo,xml:  $this);
+        $elementos_concepto = (new dom_xml())->carga_conceptos(conceptos: $conceptos,nodo_conceptos: $nodo_conceptos,xml:  $this);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al asignar atributos', data: $elementos_concepto);
         }

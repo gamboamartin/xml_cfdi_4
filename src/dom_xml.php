@@ -37,8 +37,18 @@ class dom_xml{
         return $xml->xml;
     }
 
-    private function attr_ns(xml $xml): xml
+    /**
+     * Se asignan atributos en comprobante para location base
+     * @param xml $xml Obj de cfdi en ejecucion
+     * @return xml|array
+     * @version 0.3.0
+     */
+    PUBLIC function attr_ns(xml $xml): xml|array
     {
+        if(!isset($xml->xml)){
+            return $this->error->error(mensaje: 'Error no esta inicializado el xml', data: $this);
+        }
+
         $xml->xml->setAttributeNS($xml->cfdi->comprobante->namespace->w3, 'xmlns:xsi',
             $xml->cfdi->comprobante->xmlns_xsi);
 
@@ -48,33 +58,115 @@ class dom_xml{
         return $xml;
     }
 
-    private function attrs_concepto(stdClass $concepto, DOMElement $elemento_concepto): DOMElement
+    private function attrs_concepto(stdClass $concepto, DOMElement $nodo_concepto): DOMElement|array
     {
-        $elemento_concepto->setAttribute('ClaveProdServ', $concepto->clave_prod_serv);
-        $elemento_concepto->setAttribute('NoIdentificacion', $concepto->no_identificacion);
-        $elemento_concepto->setAttribute('Cantidad', $concepto->cantidad);
-        $elemento_concepto->setAttribute('ClaveUnidad', $concepto->clave_unidad);
-        $elemento_concepto->setAttribute('Descripcion', $concepto->descripcion);
-        $elemento_concepto->setAttribute('ValorUnitario', $concepto->valor_unitario);
-        $elemento_concepto->setAttribute('Importe', $concepto->importe);
-        $elemento_concepto->setAttribute('ObjetoImp', $concepto->objeto_imp);
+        $valida = $this->valida->valida_data_concepto(concepto: $concepto);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar concepto', data: $valida);
+        }
 
-        return $elemento_concepto;
+        $nodo_concepto->setAttribute('ClaveProdServ', $concepto->clave_prod_serv);
+        $nodo_concepto->setAttribute('NoIdentificacion', $concepto->no_identificacion);
+        $nodo_concepto->setAttribute('Cantidad', $concepto->cantidad);
+        $nodo_concepto->setAttribute('ClaveUnidad', $concepto->clave_unidad);
+        $nodo_concepto->setAttribute('Descripcion', $concepto->descripcion);
+        $nodo_concepto->setAttribute('ValorUnitario', $concepto->valor_unitario);
+        $nodo_concepto->setAttribute('Importe', $concepto->importe);
+        $nodo_concepto->setAttribute('ObjetoImp', $concepto->objeto_imp);
+
+        return $nodo_concepto;
+    }
+
+    private function attrs_concepto_traslado(DOMElement $nodo_traslado, stdClass $traslado): DOMElement|array
+    {
+        $keys = array('base','impuesto','tipo_factor','tasa_o_cuota','importe');
+        $valida = $this->valida->valida_existencia_keys(keys: $keys,registro:  $traslado);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar traslado', data: $valida);
+        }
+        $keys = array('base','tasa_o_cuota','importe');
+        $valida = $this->valida->valida_numerics(keys:$keys, row: $traslado);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar traslado', data: $valida);
+        }
+
+        $nodo_traslado->setAttribute('Base', $traslado->base);
+        $nodo_traslado->setAttribute('Impuesto', $traslado->impuesto);
+        $nodo_traslado->setAttribute('TipoFactor', $traslado->tipo_factor);
+        $nodo_traslado->setAttribute('TasaOCuota', $traslado->tasa_o_cuota);
+        $nodo_traslado->setAttribute('Importe', $traslado->importe);
+        return $nodo_traslado;
     }
 
     /**
      * @throws DOMException
      */
-    public function carga_conceptos(array $conceptos, DOMElement $nodo, xml $xml): xml|array
+    public function carga_conceptos(array $conceptos, DOMElement $nodo_conceptos, xml $xml): xml|array
     {
         foreach ($conceptos as $concepto){
 
-            $elementos_concepto = (new dom_xml())->elementos_concepto(concepto: $concepto, nodo: $nodo,xml:  $xml);
+            $elementos_concepto = (new dom_xml())->elementos_concepto(concepto: $concepto, nodo_conceptos: $nodo_conceptos,xml:  $xml);
             if(errores::$error){
                 return $this->error->error(mensaje: 'Error al asignar atributos', data: $elementos_concepto);
             }
         }
         return $xml;
+    }
+
+    /**
+     * @throws DOMException
+     */
+    private function carga_nodo_concepto_impuestos(array $impuestos, DOMElement $nodo_impuestos, xml $xml): array|DOMElement
+    {
+        foreach ($impuestos as $impuesto){
+
+            $valida = $this->valida->valida_data_impuestos(impuesto: $impuesto);
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error al validar $impuesto', data: $valida);
+            }
+
+            if(count($impuesto->traslados)>0){
+
+                $nodo_traslados = $this->concepto_traslados(nodo_impuestos: $nodo_impuestos,
+                    traslados: $impuesto->traslados,xml: $xml);
+                if(errores::$error){
+                    return $this->error->error(mensaje: 'Error al asignar atributos', data: $nodo_traslados);
+                }
+            }
+
+        }
+        return $nodo_impuestos;
+    }
+
+    /**
+     * @throws DOMException
+     */
+    private function carga_nodo_traslado(DOMElement $nodo_traslados, stdClass $traslado, xml $xml): array|DOMElement
+    {
+        $nodo_traslado = $xml->dom->createElement('cfdi:Traslado');
+        $nodo_traslados->appendChild($nodo_traslado);
+        $nodo_traslado = $this->attrs_concepto_traslado(nodo_traslado: $nodo_traslado,traslado: $traslado);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al asignar atributos', data: $nodo_traslado);
+        }
+        return $nodo_traslado;
+    }
+
+    /**
+     * @throws DOMException
+     */
+    private function carga_nodos_traslado(DOMElement $nodo_traslados, array $traslados, XML $xml): array|DOMElement
+    {
+        foreach ($traslados as $traslado){
+            if(!is_object($traslado)){
+                return $this->error->error(mensaje: 'Error $traslado debe ser un objeto', data: $traslado);
+            }
+            $nodo_traslado = $this->carga_nodo_traslado(nodo_traslados: $nodo_traslados,traslado: $traslado,xml: $xml);
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error al asignar atributos', data: $nodo_traslado);
+            }
+        }
+        return $nodo_traslados;
     }
 
     public function comprobante(stdClass $comprobante, xml $xml): array|stdClass
@@ -109,6 +201,13 @@ class dom_xml{
         return $xml->cfdi;
     }
 
+    /**
+     * Se valida y se integra lo necesario en en nodo comprobante referente al complemento de pago
+     * @version 0.3.0
+     * @param stdClass $comprobante
+     * @param xml $xml
+     * @return DOMNode|array
+     */
     public function comprobante_pago(stdClass $comprobante, xml $xml): DOMNode|array
     {
         $valida = $this->valida->complemento_pago_comprobante(comprobante: $comprobante,xml:  $xml);
@@ -125,22 +224,56 @@ class dom_xml{
     /**
      * @throws DOMException
      */
-    private function elemento_concepto(stdClass $concepto, DOMElement $nodo, xml $xml): array|DOMElement
+    private function concepto_traslados(DOMElement $nodo_impuestos, array $traslados, xml $xml): array|DOMElement
     {
-        $elemento_concepto = $xml->dom->createElement('cfdi:Concepto');
-        $nodo->appendChild($elemento_concepto);
-
-        $elemento_concepto = $this->attrs_concepto(concepto: $concepto, elemento_concepto: $elemento_concepto);
+        $nodo_traslados = $xml->dom->createElement('cfdi:Traslados');
+        $nodo_impuestos->appendChild($nodo_traslados);
+        $nodo_traslados = $this->carga_nodos_traslado(nodo_traslados: $nodo_traslados,traslados: $traslados, xml: $xml);
         if(errores::$error){
-            return $this->error->error(mensaje: 'Error al asignar atributos', data: $elemento_concepto);
+            return $this->error->error(mensaje: 'Error al asignar atributos', data: $nodo_traslados);
         }
-        return $elemento_concepto;
+        return $nodo_traslados;
     }
 
     /**
      * @throws DOMException
      */
-    private function elementos_concepto(stdClass $concepto, DOMElement $nodo, xml $xml): xml|array
+    PUBLIC function elemento_concepto(stdClass $concepto, DOMElement $nodo_conceptos, xml $xml): array|DOMElement
+    {
+        $valida = $this->valida->valida_data_concepto(concepto: $concepto);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar concepto', data: $valida);
+        }
+
+        if(!isset($concepto->impuestos)){
+            return $this->error->error(mensaje: 'Error debe existir impuestos en concepto', data: $concepto);
+        }
+        if(!is_array($concepto->impuestos)){
+            return $this->error->error(mensaje: 'Error impuestos debe ser un array de objetos', data: $concepto);
+        }
+        $nodo_concepto = $xml->dom->createElement('cfdi:Concepto');
+        $nodo_conceptos->appendChild($nodo_concepto);
+
+        $nodo_concepto = $this->attrs_concepto(concepto: $concepto, nodo_concepto: $nodo_concepto);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al asignar atributos', data: $nodo_concepto);
+        }
+
+
+        $nodo_impuestos = $this->genera_nodo_concepto_impuestos(impuestos: $concepto->impuestos,
+            nodo_concepto: $nodo_concepto,xml: $xml);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al cargar nodo impuestos', data: $nodo_impuestos);
+        }
+
+
+        return $nodo_conceptos;
+    }
+
+    /**
+     * @throws DOMException
+     */
+    private function elementos_concepto(stdClass $concepto, DOMElement $nodo_conceptos, xml $xml): xml|array
     {
         $xml->cfdi->conceptos[] = new stdClass();
         $valida = $this->valida->valida_concepto(concepto: $concepto);
@@ -152,7 +285,7 @@ class dom_xml{
             return $this->error->error(mensaje: 'Error al validar $concepto', data: $valida);
         }
 
-        $elemento_concepto = $this->elemento_concepto(concepto: $concepto, nodo: $nodo,xml:  $xml);
+        $elemento_concepto = $this->elemento_concepto(concepto: $concepto, nodo_conceptos: $nodo_conceptos,xml:  $xml);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al asignar atributos', data: $elemento_concepto);
         }
@@ -171,6 +304,24 @@ class dom_xml{
             return $this->error->error(mensaje: 'Error al setear '.$nodo_key, data: $setea);
         }
         return $setea;
+    }
+
+    /**
+     * @throws DOMException
+     */
+    private function genera_nodo_concepto_impuestos(array $impuestos, DOMElement $nodo_concepto, xml $xml): array|DOMElement
+    {
+
+        if(count($impuestos)>0){
+            $nodo_impuestos = $xml->dom->createElement('cfdi:Impuestos');
+            $nodo_concepto->appendChild($nodo_impuestos);
+
+            $nodo_impuestos = $this->carga_nodo_concepto_impuestos(impuestos: $impuestos,nodo_impuestos: $nodo_impuestos,xml: $xml);
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error al cargar nodo impuestos', data: $nodo_impuestos);
+            }
+        }
+        return $nodo_concepto;
     }
 
     private function inicializa_comprobante(stdClass $comprobante, xml $xml): bool|array|DOMElement
