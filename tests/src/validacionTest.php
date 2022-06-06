@@ -29,7 +29,7 @@ class validacionTest extends test {
         $xml = new xml();
         $xml->cfdi->comprobante->moneda = 'XXX';
         $resultado = $val->complemento_pago_comprobante($comprobante, $xml);
-        print_r($resultado);
+
 
         $this->assertNotTrue(errores::$error);
         $this->assertTrue($resultado);
@@ -47,6 +47,36 @@ class validacionTest extends test {
 
 
         errores::$error = false;
+    }
+
+    public function test_valida_nodo_traslado(){
+        errores::$error = false;
+
+        $val = new validacion();
+        //$val = new liberator($val);
+
+        $traslado = new stdClass();
+
+        $resultado = $val->valida_nodo_traslado($traslado);
+        $this->assertTrue(errores::$error);
+        $this->assertIsArray($resultado);
+        $this->assertStringContainsStringIgnoringCase('Error al validar traspaso',$resultado['mensaje']);
+
+        errores::$error = false;
+
+        $traslado = new stdClass();
+        $traslado->base = 1;
+        $traslado->impuesto = 1;
+        $traslado->tipo_factor = 1;
+        $traslado->tasa_o_cuota = 1;
+        $traslado->importe = 1;
+
+        $resultado = $val->valida_nodo_traslado($traslado);
+        $this->assertNotTrue(errores::$error);
+        $this->assertIsBool($resultado);
+        $this->assertTrue($resultado);
+        errores::$error = false;
+
     }
 }
 

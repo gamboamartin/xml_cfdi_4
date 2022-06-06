@@ -17,6 +17,30 @@ class dom_xml{
     }
 
     /**
+     * @throws DOMException
+     */
+    public function anexa_traslados(DOMElement $data_nodo, stdClass $impuestos, xml $xml): array|DOMElement
+    {
+        if(!isset($impuestos->traslados)){
+            return $this->error->error(mensaje: 'Error no existe traslados en impuestos', data: $impuestos);
+        }
+        if(!is_array($impuestos->traslados)){
+            return $this->error->error(mensaje: 'Error traslados en impuestos debe ser un array', data: $impuestos);
+        }
+        if(count($impuestos->traslados)>0){
+            $nodo_traslados = $xml->dom->createElement('cfdi:Traslados');
+            $data_nodo->appendChild($nodo_traslados);
+
+            $nodo_traslados = $this->carga_traslados(impuestos: $impuestos,nodo_traslados:  $nodo_traslados, xml: $xml);
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error al generar nodo', data: $nodo_traslados);
+            }
+
+        }
+        return $data_nodo;
+    }
+
+    /**
      * Asigna los atributos xsi para complemento de pago
      * @version 0.2.0
      * @param xml $xml Objeto de ejecucion de xml
@@ -155,6 +179,23 @@ class dom_xml{
     /**
      * @throws DOMException
      */
+    private function carga_nodo_traslado_comprobante(DOMElement $nodo_traslados, stdClass $traslado, xml $xml): array|DOMElement
+    {
+        $nodo_traslado = $this->crea_nodo_traslado(nodo_traslados: $nodo_traslados, xml: $xml);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al generar nodo', data: $nodo_traslado);
+        }
+
+        $nodo_traslado = $this->nodo_traslado(nodo_traslado: $nodo_traslado,traslado:  $traslado);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al generar nodo', data: $nodo_traslado);
+        }
+        return $nodo_traslado;
+    }
+
+    /**
+     * @throws DOMException
+     */
     private function carga_nodos_traslado(DOMElement $nodo_traslados, array $traslados, XML $xml): array|DOMElement
     {
         foreach ($traslados as $traslado){
@@ -165,6 +206,28 @@ class dom_xml{
             if(errores::$error){
                 return $this->error->error(mensaje: 'Error al asignar atributos', data: $nodo_traslado);
             }
+        }
+        return $nodo_traslados;
+    }
+
+    /**
+     * @throws DOMException
+     */
+    private function carga_traslados(stdClass $impuestos, DOMElement $nodo_traslados, xml $xml): array|DOMElement
+    {
+        foreach ($impuestos->traslados as $traslado){
+
+            $valida = $this->valida->valida_nodo_traslado(traslado: $traslado);
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error al validar traspaso', data: $valida);
+            }
+
+            $nodo_traslado = $this->carga_nodo_traslado_comprobante(nodo_traslados: $nodo_traslados,
+                traslado:  $traslado,xml:  $xml);
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error al generar nodo', data: $nodo_traslado);
+            }
+
         }
         return $nodo_traslados;
     }
@@ -237,6 +300,16 @@ class dom_xml{
             return $this->error->error(mensaje: 'Error al asignar atributos', data: $nodo_traslados);
         }
         return $nodo_traslados;
+    }
+
+    /**
+     * @throws DOMException
+     */
+    private function crea_nodo_traslado(DOMElement $nodo_traslados, xml $xml): bool|DOMElement
+    {
+        $nodo_traslado = $xml->dom->createElement('cfdi:Traslado');
+        $nodo_traslados->appendChild($nodo_traslado);
+        return $nodo_traslado;
     }
 
     /**
@@ -374,6 +447,16 @@ class dom_xml{
             return $this->error->error(mensaje: 'Error al setear '.$nodo_key, data: $setea);
         }
         return $nodo;
+    }
+
+    private function nodo_traslado(DOMElement $nodo_traslado, stdClass $traslado): DOMElement
+    {
+        $nodo_traslado->setAttribute('Base', $traslado->base);
+        $nodo_traslado->setAttribute('Impuesto', $traslado->impuesto);
+        $nodo_traslado->setAttribute('TipoFactor', $traslado->tipo_factor);
+        $nodo_traslado->setAttribute('TasaOCuota', $traslado->tasa_o_cuota);
+        $nodo_traslado->setAttribute('Importe', $traslado->importe);
+        return $nodo_traslado;
     }
 
     private function setea_attr(array $keys, DOMElement $nodo, string $nodo_key, xml $xml): DOMElement

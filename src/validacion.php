@@ -86,4 +86,28 @@ class validacion extends \gamboamartin\validacion\validacion{
         }
         return true;
     }
+
+    /**
+     * Verifica que los datos enviados de un traslado sean correctos en tipo de dato
+     * @version 0.5.0
+     * @param mixed $traslado Obj de tipo traslado
+     * @return bool|array
+     */
+    public function valida_nodo_traslado(mixed $traslado): bool|array
+    {
+        if(!is_object($traslado)){
+            return $this->error->error(mensaje: 'Error traslado en $traslado debe ser un objeto', data: $traslado);
+        }
+        $keys = array('base','impuesto','tipo_factor','tasa_o_cuota','importe');
+        $valida = $this->valida_existencia_keys(keys: $keys,registro:  $traslado);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar traspaso', data: $valida);
+        }
+        $keys = array('base','tasa_o_cuota','importe');
+        $valida = $this->valida_numerics(keys: $keys,row:  $traslado);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar traspaso', data: $valida);
+        }
+        return true;
+    }
 }
