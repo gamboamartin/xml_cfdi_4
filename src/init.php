@@ -1,14 +1,34 @@
 <?php
 namespace gamboamartin\xml_cfdi_4;
+use gamboamartin\errores\errores;
 use stdClass;
 
 class init{
+    private errores $error;
+
+    public function __construct(){
+        $this->error = new errores();
+    }
     public function asigna_datos_para_nodo(array $keys, string $nodo_key, stdClass $objetc, xml $xml){
         foreach ($keys as $key){
             $xml->cfdi->$nodo_key->$key = $objetc->$key;
         }
         return $xml->cfdi->$nodo_key;
     }
+
+
+    private function asigna_valor_unitario_concepto(stdClass $concepto): array|stdClass
+    {
+        $valor_unitario = (new parser())->concepto_valor_unitario(valor_unitario: $concepto->valor_unitario);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al ajustar $valor_unitario', data: $valor_unitario);
+        }
+
+        $concepto->valor_unitario = $valor_unitario;
+        return $concepto;
+    }
+
+
 
     public function inicializa_valores_comprobante(stdClass $comprobante, xml $xml){
         $xml->cfdi->comprobante->tipo_de_comprobante = $comprobante->tipo_de_comprobante;

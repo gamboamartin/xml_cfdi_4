@@ -22,6 +22,7 @@
         "gamboa.martin/errores": "^1.0.0",
         "gamboa.martin/test": "dev-main",
         "gamboa.martin/validacion": "dev-main",
+        "gamboa.martin/calculo": "dev-main",
       "ext-dom": "*"
     },
     "require-dev": {

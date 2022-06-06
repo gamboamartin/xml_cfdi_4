@@ -108,6 +108,73 @@ class xmlTest extends test {
         $this->assertStringContainsStringIgnoringCase('a" RegimenFiscal="a"/></cfdi:Comprobante>',$resultado);
     }
 
+    public function test_cfdi_conceptos(): void
+    {
+        errores::$error = false;
+
+        $xml = new xml();
+        //$modelo = new liberator($modelo);
+
+        $comprobante = new stdClass();
+        $comprobante->tipo_de_comprobante = 'I';
+        $comprobante->moneda = 'XXX';
+        $comprobante->exportacion = '01';
+        $comprobante->total = 0;
+        $comprobante->sub_total = 0;
+        $comprobante->lugar_expedicion = 44110;
+        $comprobante->fecha = '2021-01-01';
+        $comprobante->folio = '01';
+
+        $conceptos = array();
+
+        $comprobante = $xml->cfdi_comprobante($comprobante,$conceptos );
+        if(errores::$error){
+            $error = (new errores())->error(mensaje: 'Error al generar comprobante', data: $comprobante);
+            print_r($error);
+            exit;
+        }
+
+        $conceptos = array();
+        $conceptos[0] = new stdClass();
+        $conceptos[0]->clave_prod_serv = '1';
+        $conceptos[0]->cantidad = '0';
+        $conceptos[0]->descripcion = 'c';
+        $conceptos[0]->valor_unitario = '0';
+        $conceptos[0]->importe = '0';
+        $conceptos[0]->objeto_imp = 'f';
+        $conceptos[0]->no_identificacion = 'f';
+        $conceptos[0]->clave_unidad = 'f';
+
+        $conceptos[1] = new stdClass();
+        $conceptos[1]->clave_prod_serv = '1';
+        $conceptos[1]->cantidad = '0';
+        $conceptos[1]->descripcion = 'c';
+        $conceptos[1]->valor_unitario = '0';
+        $conceptos[1]->importe = '0';
+        $conceptos[1]->objeto_imp = 'f';
+        $conceptos[1]->no_identificacion = 'f';
+        $conceptos[1]->clave_unidad = 'f';
+
+        $resultado = $xml->cfdi_conceptos($conceptos);
+        $this->assertNotTrue(errores::$error);
+        $this->assertIsString($resultado);
+        $this->assertStringContainsStringIgnoringCase('<cfdi:Comprobante xmlns:cfdi="http://www.sat.gob.mx/cfd/4"',$resultado);
+        $this->assertStringContainsStringIgnoringCase('"http://www.sat.gob.mx/cfd/4" xmlns:xsi="http://www.w3.',$resultado);
+        $this->assertStringContainsStringIgnoringCase('si="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://ww',$resultado);
+        $this->assertStringContainsStringIgnoringCase('Location="http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd " Mo',$resultado);
+        $this->assertStringContainsStringIgnoringCase('da="XXX" Total="0" Exportacion="01" TipoDeComprobante="I" SubTotal="0"',$resultado);
+        $this->assertStringContainsStringIgnoringCase('l="0" LugarExpedicion="44110" Fecha="2',$resultado);
+        $this->assertStringContainsStringIgnoringCase('" Folio="01" Version="4.0"><cfdi:Co',$resultado);
+        $this->assertStringContainsStringIgnoringCase('i:Conceptos><cfdi:Concepto ClaveProdServ="1" NoIdent',$resultado);
+        $this->assertStringContainsStringIgnoringCase('NoIdentificacion="f" Cantidad="0" ClaveUnidad="f" Descripcion="c" ValorUnitario="0" Im',$resultado);
+        $this->assertStringContainsStringIgnoringCase('nitario="0" Importe="0" ObjetoImp="f"/><cfdi:Concepto ClaveProdServ="1" NoIdent',$resultado);
+        $this->assertStringContainsStringIgnoringCase('NoIdentificacion="f" Cantidad="0" ClaveUnidad="f" Descripcion="c" Valo',$resultado);
+        $this->assertStringContainsStringIgnoringCase('ValorUnitario="0" Importe="0" ObjetoImp="f"/></cfdi:Co',$resultado);
+        $this->assertStringContainsStringIgnoringCase('oImp="f"/></cfdi:Conceptos></cfdi:Comprobante>',$resultado);
+
+        errores::$error = false;
+    }
+
     /**
      */
     public function test_cfdi_receptor(): void

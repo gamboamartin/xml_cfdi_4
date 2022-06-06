@@ -31,7 +31,7 @@ class xml{
         $this->cfdi->comprobante->xsi_schemaLocation .= "http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd ";
         $this->cfdi->comprobante->exportacion = "";
         $this->cfdi->comprobante->tipo_de_comprobante = "";
-        $this->cfdi->comprobante->sub_total = "0";
+        $this->cfdi->comprobante->sub_total = 0;
         $this->cfdi->comprobante->lugar_expedicion = "";
         $this->cfdi->comprobante->fecha = "";
         $this->cfdi->comprobante->folio = "";
@@ -41,7 +41,7 @@ class xml{
 
         $this->cfdi->emisor = new stdClass();
         $this->cfdi->receptor = new stdClass();
-
+        $this->cfdi->conceptos = array();
 
 
         $this->dom = new DOMDocument('1.0', 'utf-8');
@@ -50,6 +50,7 @@ class xml{
 
     public function cfdi_comprobante(stdClass $comprobante): bool|string|array
     {
+
 
         $keys = array('tipo_de_comprobante','moneda','total', 'exportacion','sub_total','lugar_expedicion',
             'folio');
@@ -80,6 +81,49 @@ class xml{
         return $this->dom->saveXML();
     }
 
+    public function cfdi_conceptos(array $conceptos): bool|string|array
+    {
+        if(!isset($this->xml)){
+            return $this->error->error(mensaje: 'Error no esta inicializado el xml', data: $this);
+        }
+        if(count($conceptos) === 0){
+            return $this->error->error(mensaje: 'Error los conceptos no pueden ir vacios', data: $conceptos);
+        }
+
+        $nodo = $this->dom->createElement('cfdi:Conceptos');
+        $this->xml->appendChild($nodo);
+
+        foreach ($conceptos as $concepto){
+            $this->cfdi->conceptos[] = new stdClass();
+            $valida = $this->valida->valida_concepto(concepto: $concepto);
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error al validar $concepto', data: $valida);
+            }
+            $valida = $this->valida->valida_data_concepto(concepto: $concepto);
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error al validar $concepto', data: $valida);
+            }
+
+            $elemento_concepto = $this->dom->createElement('cfdi:Concepto');
+            $nodo->appendChild($elemento_concepto);
+
+            $elemento_concepto->setAttribute('ClaveProdServ', $concepto->clave_prod_serv);
+            $elemento_concepto->setAttribute('NoIdentificacion', $concepto->no_identificacion);
+            $elemento_concepto->setAttribute('Cantidad', $concepto->cantidad);
+            $elemento_concepto->setAttribute('ClaveUnidad', $concepto->clave_unidad);
+            $elemento_concepto->setAttribute('Descripcion', $concepto->descripcion);
+            $elemento_concepto->setAttribute('ValorUnitario', $concepto->valor_unitario);
+            $elemento_concepto->setAttribute('Importe', $concepto->importe);
+            $elemento_concepto->setAttribute('ObjetoImp', $concepto->objeto_imp);
+
+
+
+        }
+
+
+        return $this->dom->saveXML();
+    }
+
     /**
      */
     public function cfdi_emisor(stdClass $emisor): bool|string|array
@@ -94,8 +138,8 @@ class xml{
             return $this->error->error(mensaje: 'Error no esta inicializado el xml', data: $this);
         }
 
-
-        $data_nodo = (new dom_xml())->nodo(keys: $keys, local_name: 'cfdi:Emisor', nodo_key: 'emisor',object:  $emisor,xml:  $this);
+        $data_nodo = (new dom_xml())->nodo(keys: $keys, local_name: 'cfdi:Emisor', nodo_key: 'emisor',
+            object:  $emisor,xml:  $this);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al setear $emisor', data: $data_nodo);
         }
