@@ -81,6 +81,9 @@ class xml{
         return $this->dom->saveXML();
     }
 
+    /**
+     * @throws DOMException
+     */
     public function cfdi_conceptos(array $conceptos): bool|string|array
     {
         if(!isset($this->xml)){
@@ -93,33 +96,10 @@ class xml{
         $nodo = $this->dom->createElement('cfdi:Conceptos');
         $this->xml->appendChild($nodo);
 
-        foreach ($conceptos as $concepto){
-            $this->cfdi->conceptos[] = new stdClass();
-            $valida = $this->valida->valida_concepto(concepto: $concepto);
-            if(errores::$error){
-                return $this->error->error(mensaje: 'Error al validar $concepto', data: $valida);
-            }
-            $valida = $this->valida->valida_data_concepto(concepto: $concepto);
-            if(errores::$error){
-                return $this->error->error(mensaje: 'Error al validar $concepto', data: $valida);
-            }
-
-            $elemento_concepto = $this->dom->createElement('cfdi:Concepto');
-            $nodo->appendChild($elemento_concepto);
-
-            $elemento_concepto->setAttribute('ClaveProdServ', $concepto->clave_prod_serv);
-            $elemento_concepto->setAttribute('NoIdentificacion', $concepto->no_identificacion);
-            $elemento_concepto->setAttribute('Cantidad', $concepto->cantidad);
-            $elemento_concepto->setAttribute('ClaveUnidad', $concepto->clave_unidad);
-            $elemento_concepto->setAttribute('Descripcion', $concepto->descripcion);
-            $elemento_concepto->setAttribute('ValorUnitario', $concepto->valor_unitario);
-            $elemento_concepto->setAttribute('Importe', $concepto->importe);
-            $elemento_concepto->setAttribute('ObjetoImp', $concepto->objeto_imp);
-
-
-
+        $elementos_concepto = (new dom_xml())->carga_conceptos(conceptos: $conceptos,nodo:  $nodo,xml:  $this);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al asignar atributos', data: $elementos_concepto);
         }
-
 
         return $this->dom->saveXML();
     }

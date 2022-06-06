@@ -7,6 +7,7 @@ use stdClass;
 class validacion extends \gamboamartin\validacion\validacion{
     /**
      * Valida parametros de un complemento de pago
+     * @version 0.1.0
      * @param stdClass $comprobante objeto con los datos del comprobante
      * @param xml $xml Objeto donde se genera el cfdi
      * @return bool|array

@@ -2,6 +2,7 @@
 namespace gamboamartin\xml_cfdi_4;
 
 use DOMElement;
+use DOMException;
 use DOMNode;
 use gamboamartin\errores\errores;
 use PhpParser\Builder\Function_;
@@ -14,8 +15,19 @@ class dom_xml{
         $this->valida = new validacion();
         $this->error = new errores();
     }
-    private function asigna_cfdi_comprobante_pago(xml $xml): DOMNode
+
+    /**
+     * Asigna los atributos xsi para complemento de pago
+     * @version 0.2.0
+     * @param xml $xml Objeto de ejecucion de xml
+     * @return DOMNode|array
+     */
+    private function asigna_cfdi_comprobante_pago(xml $xml): DOMNode|array
     {
+
+        if(!isset($xml->xml)){
+            return $this->error->error(mensaje: 'Error no esta inicializado el xml', data: $this);
+        }
 
         $xml->xml->setAttributeNS($xml->cfdi->comprobante->namespace->w3, 'xmlns:pago20',
             $xml->cfdi->comprobante->xmlns_pago20);
@@ -33,6 +45,35 @@ class dom_xml{
         $xml->xml->setAttributeNS($xml->cfdi->comprobante->xmlns_xsi, 'xsi:schemaLocation',
             $xml->cfdi->comprobante->xsi_schemaLocation);
 
+        return $xml;
+    }
+
+    private function attrs_concepto(stdClass $concepto, DOMElement $elemento_concepto): DOMElement
+    {
+        $elemento_concepto->setAttribute('ClaveProdServ', $concepto->clave_prod_serv);
+        $elemento_concepto->setAttribute('NoIdentificacion', $concepto->no_identificacion);
+        $elemento_concepto->setAttribute('Cantidad', $concepto->cantidad);
+        $elemento_concepto->setAttribute('ClaveUnidad', $concepto->clave_unidad);
+        $elemento_concepto->setAttribute('Descripcion', $concepto->descripcion);
+        $elemento_concepto->setAttribute('ValorUnitario', $concepto->valor_unitario);
+        $elemento_concepto->setAttribute('Importe', $concepto->importe);
+        $elemento_concepto->setAttribute('ObjetoImp', $concepto->objeto_imp);
+
+        return $elemento_concepto;
+    }
+
+    /**
+     * @throws DOMException
+     */
+    public function carga_conceptos(array $conceptos, DOMElement $nodo, xml $xml): xml|array
+    {
+        foreach ($conceptos as $concepto){
+
+            $elementos_concepto = (new dom_xml())->elementos_concepto(concepto: $concepto, nodo: $nodo,xml:  $xml);
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error al asignar atributos', data: $elementos_concepto);
+            }
+        }
         return $xml;
     }
 
@@ -79,6 +120,43 @@ class dom_xml{
             return $this->error->error(mensaje: 'Error al inicializar dom pago', data: $cfdi_comprobante_pago);
         }
         return $cfdi_comprobante_pago;
+    }
+
+    /**
+     * @throws DOMException
+     */
+    private function elemento_concepto(stdClass $concepto, DOMElement $nodo, xml $xml): array|DOMElement
+    {
+        $elemento_concepto = $xml->dom->createElement('cfdi:Concepto');
+        $nodo->appendChild($elemento_concepto);
+
+        $elemento_concepto = $this->attrs_concepto(concepto: $concepto, elemento_concepto: $elemento_concepto);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al asignar atributos', data: $elemento_concepto);
+        }
+        return $elemento_concepto;
+    }
+
+    /**
+     * @throws DOMException
+     */
+    private function elementos_concepto(stdClass $concepto, DOMElement $nodo, xml $xml): xml|array
+    {
+        $xml->cfdi->conceptos[] = new stdClass();
+        $valida = $this->valida->valida_concepto(concepto: $concepto);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar $concepto', data: $valida);
+        }
+        $valida = $this->valida->valida_data_concepto(concepto: $concepto);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar $concepto', data: $valida);
+        }
+
+        $elemento_concepto = $this->elemento_concepto(concepto: $concepto, nodo: $nodo,xml:  $xml);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al asignar atributos', data: $elemento_concepto);
+        }
+        return $xml;
     }
 
     private function genera_attrs(array $keys, DOMElement $nodo, string $nodo_key, stdClass $object, xml $xml): array|DOMElement

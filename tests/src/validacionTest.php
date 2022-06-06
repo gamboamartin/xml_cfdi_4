@@ -19,7 +19,7 @@ class validacionTest extends test {
 
     }
 
-    public function test_fecha_cfdi_vacia(){
+    public function test_complemento_pago_comprobante(){
         errores::$error = false;
 
         $val = new validacion();
