@@ -83,6 +83,27 @@ class complementosTest extends test {
         errores::$error = false;
     }
 
+    public function test_comprobante_complemento_pago(): void
+    {
+        errores::$error = false;
+
+        $com = new complementos();
+        //$com = new liberator($com);
+
+
+        $comprobante = new stdClass();
+
+        $resultado = $com->comprobante_complemento_pago($comprobante);
+        $this->assertNotTrue(errores::$error);
+        $this->assertIsObject($resultado);
+        $this->assertEquals('P',$resultado->tipo_de_comprobante);
+        $this->assertEquals('XXX',$resultado->moneda);
+        $this->assertEquals('0',$resultado->total);
+        $this->assertEquals('01',$resultado->exportacion);
+        $this->assertEquals('0',$resultado->sub_total);
+        errores::$error = false;
+    }
+
 
 
 

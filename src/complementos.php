@@ -31,6 +31,11 @@ class complementos{
         return $xml;
     }
 
+    /**
+     * Se precarga la info base de un complemento de pago
+     * @param stdClass $comprobante
+     * @return stdClass
+     */
     public function comprobante_complemento_pago(stdClass $comprobante): stdClass
     {
         $comprobante->tipo_de_comprobante = 'P';

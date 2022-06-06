@@ -1,5 +1,6 @@
 <?php
 namespace gamboamartin\xml_cfdi_4;
+use DOMException;
 use gamboamartin\errores\errores;
 use stdClass;
 
@@ -14,9 +15,10 @@ class cfdis{
     }
 
     /**
-     * @throws \DOMException
+     * @throws DOMException
      */
-    public function complemento_pago(stdClass $comprobante, stdClass $emisor, stdClass $pagos, stdClass $receptor): bool|array|string
+    public function complemento_pago(stdClass $comprobante, stdClass $emisor, stdClass $pagos,
+                                     stdClass $receptor): bool|array|string
     {
         $keys = array('lugar_expedicion', 'folio');
         $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $comprobante);
