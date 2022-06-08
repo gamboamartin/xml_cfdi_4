@@ -14,17 +14,36 @@ class pago{
         $this->error = new errores();
     }
 
-    private function attr_docto_relacionado(stdClass $docto_relacionado, DOMElement $nodo_docto_relacionado): DOMElement
+    /**
+     * @param stdClass|array $docto_relacionado
+     * @param DOMElement $nodo_docto_relacionado
+     * @return DOMElement|array
+     */
+    private function attr_docto_relacionado(stdClass|array $docto_relacionado,
+                                            DOMElement $nodo_docto_relacionado): DOMElement|array
     {
-        $nodo_docto_relacionado->setAttribute('IdDocumento', $docto_relacionado->id_documento);
-        $nodo_docto_relacionado->setAttribute('Folio', $docto_relacionado->folio);
-        $nodo_docto_relacionado->setAttribute('MonedaDR', $docto_relacionado->moneda_dr);
-        $nodo_docto_relacionado->setAttribute('EquivalenciaDR', $docto_relacionado->equivalencia_dr);
-        $nodo_docto_relacionado->setAttribute('NumParcialidad', $docto_relacionado->num_parcialidad);
-        $nodo_docto_relacionado->setAttribute('ImpSaldoAnt', $docto_relacionado->imp_saldo_ant);
-        $nodo_docto_relacionado->setAttribute('ImpPagado', $docto_relacionado->imp_pagado);
-        $nodo_docto_relacionado->setAttribute('ImpSaldoInsoluto', $docto_relacionado->imp_saldo_insoluto);
-        $nodo_docto_relacionado->setAttribute('ObjetoImpDR', $docto_relacionado->objeto_imp_dr);
+        $docto_relacionado_ = $docto_relacionado;
+        if(is_array($docto_relacionado)){
+            $docto_relacionado_ = (object)$docto_relacionado;
+        }
+
+        if((float)$docto_relacionado_->equivalencia_dr === 1.0){
+            $docto_relacionado_ = $this->equivalencia_dr_1(docto_relacionado: $docto_relacionado_);
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error al ajustar equivalencia_dr ', data: $docto_relacionado_);
+            }
+
+        }
+
+        $nodo_docto_relacionado->setAttribute('IdDocumento', $docto_relacionado_->id_documento);
+        $nodo_docto_relacionado->setAttribute('Folio', $docto_relacionado_->folio);
+        $nodo_docto_relacionado->setAttribute('MonedaDR', $docto_relacionado_->moneda_dr);
+        $nodo_docto_relacionado->setAttribute('EquivalenciaDR', $docto_relacionado_->equivalencia_dr);
+        $nodo_docto_relacionado->setAttribute('NumParcialidad', $docto_relacionado_->num_parcialidad);
+        $nodo_docto_relacionado->setAttribute('ImpSaldoAnt', $docto_relacionado_->imp_saldo_ant);
+        $nodo_docto_relacionado->setAttribute('ImpPagado', $docto_relacionado_->imp_pagado);
+        $nodo_docto_relacionado->setAttribute('ImpSaldoInsoluto', $docto_relacionado_->imp_saldo_insoluto);
+        $nodo_docto_relacionado->setAttribute('ObjetoImpDR', $docto_relacionado_->objeto_imp_dr);
         return $nodo_docto_relacionado;
     }
 
@@ -37,6 +56,41 @@ class pago{
         $nodo_pago->setAttribute('Monto', $pago->monto);
 
         return $nodo_pago;
+    }
+
+    /**
+     * Si la equivalencia dr es 1.0 o 1.00 asigna a 1
+     * @param stdClass|array $docto_relacionado Documento relacionado de pago
+     * @return stdClass|array
+     */
+    private function equivalencia_dr_1(stdClass|array $docto_relacionado): stdClass|array
+    {
+        $docto_relacionado_ = $docto_relacionado;
+        if(is_array($docto_relacionado)){
+            $docto_relacionado_ = (object)$docto_relacionado;
+        }
+
+        $keys = array('equivalencia_dr');
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $docto_relacionado);
+        if(errores::$error){
+            $fix = 'Favor de integrar equivalencia_dr al objeto $docto_relacionado ej';
+            $fix.= ' $docto_relacionado->equivalencia_dr = 1 o $docto_relacionado[equivalencia_dr] = 1 ';
+            $fix.= ' donde equivalencia_dr debe ser un numero en 1 o  1.0 o 1.000000';
+            return $this->error->error(mensaje: 'Error al validar $docto_relacionado', data: $valida, fix: $fix);
+        }
+
+        if((float)$docto_relacionado_->equivalencia_dr!==1.0){
+            $fix = 'Favor de integrar equivalencia_dr al objeto $docto_relacionado ej';
+            $fix.= ' $docto_relacionado->equivalencia_dr = 1 o $docto_relacionado[equivalencia_dr] = 1 ';
+            $fix.= ' donde equivalencia_dr debe ser un numero en 1 o  1.0 o 1.000000';
+            return $this->error->error(mensaje: 'Error equivalencia_dr debe ser un 1 como flotante o entero',
+                data: $valida, fix: $fix);
+        }
+
+        $docto_relacionado_->equivalencia_dr = round($docto_relacionado_->equivalencia_dr);
+        $docto_relacionado_->equivalencia_dr = (int)$docto_relacionado_->equivalencia_dr;
+        $docto_relacionado_->equivalencia_dr = number_format($docto_relacionado_->equivalencia_dr);
+        return $docto_relacionado_;
     }
 
     private function integra_traslados_p(DOMElement $nodo_traslados_p,  stdClass $traslados_p, xml $xml): array|DOMElement

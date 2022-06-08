@@ -12,9 +12,9 @@ class fechas{
     }
 
     /**
-     * CON FIX
+     * CON FIX Funcion que ajusta la fecha de un cfdi a formato T
      * @param string $fecha Fecha en formato YYYY-mm-dd
-     * @param string $hora
+     * @param string $hora Hora de emision del cfdi
      * @return array|string
      */
     private function fecha_base(string $fecha, string $hora): array|string

@@ -18,9 +18,10 @@ class cfdis{
                                      stdClass|array $receptor): bool|array|string
     {
 
+        $comprobante_ = $comprobante;
 
-        if(is_array($comprobante)){
-            $comprobante = (object) $comprobante;
+        if(is_array($comprobante_)){
+            $comprobante_ = (object) $comprobante_;
         }
         if(is_array($emisor)){
             $emisor = (object) $emisor;
@@ -35,7 +36,7 @@ class cfdis{
 
 
         $keys = array('lugar_expedicion', 'folio');
-        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $comprobante);
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $comprobante_);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al validar comprobante de pago', data: $valida);
         }
@@ -54,7 +55,7 @@ class cfdis{
 
         $xml = new xml();
 
-        $comprobante_cp = (new complementos())->comprobante_complemento_pago(comprobante: $comprobante);
+        $comprobante_cp = (new complementos())->comprobante_complemento_pago(comprobante: $comprobante_);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al obtener comprobante', data: $comprobante_cp);
         }
