@@ -453,6 +453,37 @@ class dom_xml{
         return $nodo;
     }
 
+    private function key_especial_attr(string $key, string $key_nodo_xml,  array $keys_especial){
+        foreach ($keys_especial as $key_val=>$key_especial){
+            if($key_val === $key) {
+                $key_nodo_xml = $key_especial;
+                break;
+            }
+        }
+        return $key_nodo_xml;
+    }
+
+    private function key_nodo_base(string $key): array|string
+    {
+        $key_nodo_xml = str_replace('_', ' ', $key);
+        $key_nodo_xml = ucwords($key_nodo_xml);
+        return str_replace(' ', '', $key_nodo_xml);
+    }
+
+    private function key_nodo_xml(string $key, array $keys_especial){
+        $key_nodo_xml = $this->key_nodo_base(key: $key);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al setear $key_nodo_xml'.$key, data: $key_nodo_xml);
+        }
+
+        $key_nodo_xml = $this->key_especial_attr(key: $key,key_nodo_xml: $key_nodo_xml,
+            keys_especial: $keys_especial);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al setear $key_nodo_xml'.$key, data: $key_nodo_xml);
+        }
+        return $key_nodo_xml;
+    }
+
     public function nodo(array $keys, array $keys_especial, string $local_name, string $nodo_key,
                          stdClass $object, xml $xml): array|DOMElement
     {
@@ -460,8 +491,12 @@ class dom_xml{
             return $this->error->error(mensaje: 'Error no esta inicializado $xml->cfdi->'.$nodo_key,
                 data: $xml->cfdi);
         }
-        
-        $nodo = $xml->dom->createElement($local_name);
+        try {
+            $nodo = $xml->dom->createElement($local_name);
+        }
+        catch (Throwable $e){
+            return $this->error->error(mensaje: 'Error al cargar elemento '.$local_name, data: $e);
+        }
         $xml->xml->appendChild($nodo);
 
         $setea = $this->genera_attrs(keys: $keys, keys_especial: $keys_especial,nodo:  $nodo,nodo_key:  $nodo_key,
@@ -486,16 +521,10 @@ class dom_xml{
                                 string $nodo_key, xml $xml): DOMElement
     {
         foreach ($keys as $key){
-            $key_nodo_xml = str_replace('_', ' ', $key);
-            $key_nodo_xml = ucwords($key_nodo_xml);
-            $key_nodo_xml = str_replace(' ', '', $key_nodo_xml);
 
-
-            foreach ($keys_especial as $key_val=>$key_especial){
-                if($key_val === $key) {
-                    $key_nodo_xml = $key_especial;
-                    break;
-                }
+            $key_nodo_xml = $this->key_nodo_xml(key: $key,keys_especial: $keys_especial);
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error al setear $key_nodo_xml'.$key, data: $key_nodo_xml);
             }
 
             $nodo->setAttribute($key_nodo_xml, $xml->cfdi->$nodo_key->$key);

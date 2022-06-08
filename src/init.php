@@ -58,6 +58,14 @@ class init{
         return $traslado_p_r;
     }
 
+    /**
+     * Asigna los elementos al xml->cfdi
+     * @param array $keys Conjunto de elementos para asignar sus valores
+     * @param string $nodo_key Nodo al que se le asignara el valor de xml
+     * @param stdClass $objetc Objeto de xml
+     * @param xml $xml XML en ejecucion
+     * @return array|stdClass
+     */
     public function asigna_datos_para_nodo(array $keys, string $nodo_key, stdClass $objetc, xml $xml): array|stdClass
     {
         foreach ($keys as $key){
