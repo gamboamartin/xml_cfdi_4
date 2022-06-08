@@ -17,6 +17,7 @@ class fechasTest extends test {
         $this->errores = new errores();
 
     }
+    
 
     public function test_fecha_cfdi_vacia(){
         errores::$error = false;
