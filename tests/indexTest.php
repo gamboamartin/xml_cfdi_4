@@ -77,6 +77,7 @@ class indexTest extends test {
         $data = json_decode($data,true);
 
         $this->assertStringContainsStringIgnoringCase('<cfdi:Comprobante xmlns:cfdi="http://www.sat.gob.mx/cfd/4" ',$data['xml']);
+        $this->assertStringContainsStringIgnoringCase('DomicilioFiscalReceptor="26015" RegimenFiscalReceptor="603" UsoCfdi="CP01"',$data['xml']);
 
 
 
