@@ -197,18 +197,18 @@ class xml{
             return $this->error->error(mensaje: 'Error no esta inicializado el xml', data: $this);
         }
 
+        $data_nodo = (new dom_xml())->nodo(keys: $keys, keys_especial: array(), local_name: 'cfdi:CfdiRelacionados',
+            nodo_key: 'relacionados', object:  $relacionados, xml:  $this);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al setear $relacionados', data: $data_nodo);
+        }
+
         foreach ($relacionados->relaciones  as $relacion){
             $keys = array('uuid');
             $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $relacion);
             if(errores::$error){
                 return $this->error->error(mensaje: 'Error al validar $relacionados', data: $valida);
             }
-        }
-
-        $data_nodo = (new dom_xml())->nodo(keys: $keys, local_name: 'cfdi:CfdiRelacionados', nodo_key: 'relacionados',
-            object:  $relacionados, xml:  $this);
-        if(errores::$error){
-            return $this->error->error(mensaje: 'Error al setear $relacionados', data: $data_nodo);
         }
 
         if(!isset($relacionados->relaciones)){
@@ -219,7 +219,9 @@ class xml{
         }
         if(count($relacionados->relaciones)>0){
             foreach ($relacionados->relaciones  as $relacion){
-
+                $nodo_relacionado = $this->dom->createElement('cfdi:CfdiRelacionado');
+                $data_nodo->appendChild($nodo_relacionado);
+                $nodo_relacionado->setAttribute('UUID', $relacion->uuid);
             }
         }
 
