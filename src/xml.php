@@ -123,8 +123,8 @@ class xml{
             return $this->error->error(mensaje: 'Error no esta inicializado el xml', data: $this);
         }
 
-        $data_nodo = (new dom_xml())->nodo(keys: $keys, local_name: 'cfdi:Emisor', nodo_key: 'emisor',
-            object:  $emisor,xml:  $this);
+        $data_nodo = (new dom_xml())->nodo(keys: $keys, keys_especial: array(), local_name: 'cfdi:Emisor',
+            nodo_key: 'emisor', object:  $emisor,xml:  $this);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al setear $emisor', data: $data_nodo);
         }
@@ -147,8 +147,8 @@ class xml{
             return $this->error->error(mensaje: 'Error no esta inicializado el xml', data: $this);
         }
 
-        $data_nodo = (new dom_xml())->nodo(keys: $keys, local_name: 'cfdi:Impuestos', nodo_key: 'impuestos',
-            object:  $impuestos,xml:  $this);
+        $data_nodo = (new dom_xml())->nodo(keys: $keys, keys_especial: array(),
+            local_name: 'cfdi:Impuestos', nodo_key: 'impuestos', object:  $impuestos,xml:  $this);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al setear $emisor', data: $data_nodo);
         }
@@ -173,7 +173,10 @@ class xml{
             return $this->error->error(mensaje: 'Error no esta inicializado el xml', data: $this);
         }
 
-        $data_nodo = (new dom_xml())->nodo(keys: $keys, local_name: 'cfdi:Receptor', nodo_key: 'receptor',object:  $receptor,xml:  $this);
+        $keys_especial = array('uso_cfdi'=>'UsoCFDI');
+
+        $data_nodo = (new dom_xml())->nodo(keys: $keys, keys_especial: $keys_especial,
+            local_name: 'cfdi:Receptor', nodo_key: 'receptor', object:  $receptor,xml:  $this);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al setear $receptor', data: $data_nodo);
         }

@@ -380,7 +380,8 @@ class dom_xml{
         return $xml;
     }
 
-    private function genera_attrs(array $keys, DOMElement $nodo, string $nodo_key, stdClass $object, xml $xml): array|DOMElement
+    private function genera_attrs(array $keys, array $keys_especial, DOMElement $nodo, string $nodo_key,
+                                  stdClass $object, xml $xml): array|DOMElement
     {
         if(!isset($xml->cfdi->$nodo_key)){
             return $this->error->error(mensaje: 'Error no esta inicializado $xml->cfdi->'.$nodo_key,
@@ -392,7 +393,8 @@ class dom_xml{
             return $this->error->error(mensaje: 'Error al asignar '.$nodo_key, data: $data_nodo);
         }
 
-        $setea = $this->setea_attr(keys: $keys,nodo:  $nodo,nodo_key:  $nodo_key, xml: $xml);
+        $setea = $this->setea_attr(keys: $keys, keys_especial: $keys_especial,nodo:  $nodo,
+            nodo_key:  $nodo_key, xml: $xml);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al setear '.$nodo_key, data: $setea);
         }
@@ -451,17 +453,19 @@ class dom_xml{
         return $nodo;
     }
 
-    public function nodo(array $keys, string $local_name, string $nodo_key, stdClass $object, xml $xml): array|DOMElement
+    public function nodo(array $keys, array $keys_especial, string $local_name, string $nodo_key,
+                         stdClass $object, xml $xml): array|DOMElement
     {
         if(!isset($xml->cfdi->$nodo_key)){
             return $this->error->error(mensaje: 'Error no esta inicializado $xml->cfdi->'.$nodo_key,
                 data: $xml->cfdi);
         }
-
+        
         $nodo = $xml->dom->createElement($local_name);
         $xml->xml->appendChild($nodo);
 
-        $setea = $this->genera_attrs(keys: $keys,nodo:  $nodo,nodo_key:  $nodo_key, object: $object, xml: $xml);
+        $setea = $this->genera_attrs(keys: $keys, keys_especial: $keys_especial,nodo:  $nodo,nodo_key:  $nodo_key,
+            object: $object, xml: $xml);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al setear '.$nodo_key, data: $setea);
         }
@@ -478,12 +482,22 @@ class dom_xml{
         return $nodo_traslado;
     }
 
-    private function setea_attr(array $keys, DOMElement $nodo, string $nodo_key, xml $xml): DOMElement
+    private function setea_attr(array $keys, array $keys_especial, DOMElement $nodo,
+                                string $nodo_key, xml $xml): DOMElement
     {
         foreach ($keys as $key){
             $key_nodo_xml = str_replace('_', ' ', $key);
             $key_nodo_xml = ucwords($key_nodo_xml);
             $key_nodo_xml = str_replace(' ', '', $key_nodo_xml);
+
+
+            foreach ($keys_especial as $key_val=>$key_especial){
+                if($key_val === $key) {
+                    $key_nodo_xml = $key_especial;
+                    break;
+                }
+            }
+
             $nodo->setAttribute($key_nodo_xml, $xml->cfdi->$nodo_key->$key);
         }
 
