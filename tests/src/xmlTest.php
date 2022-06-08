@@ -62,7 +62,7 @@ class xmlTest extends test {
         $this->assertStringContainsStringIgnoringCase('go20="http://www.sat.gob.mx/Pagos20" xsi:schemaLoc', $resultado);
         $this->assertStringContainsStringIgnoringCase('on="http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd " Moneda="XXX"', $resultado);
         $this->assertStringContainsStringIgnoringCase('eda="XXX" Total="0" Exportacion="01" TipoDeComprobante="P" SubTotal="0" ', $resultado);
-        $this->assertStringContainsStringIgnoringCase('" Folio="01" Version="4.0"/>', $resultado);
+        $this->assertStringContainsStringIgnoringCase('" Folio="01" Version="4.0" Serie="NCV4.0"/>', $resultado);
 
         errores::$error = false;
     }

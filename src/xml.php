@@ -36,6 +36,7 @@ class xml{
         $this->cfdi->comprobante->lugar_expedicion = "";
         $this->cfdi->comprobante->fecha = "";
         $this->cfdi->comprobante->folio = "";
+        $this->cfdi->comprobante->serie = "";
         $this->cfdi->comprobante->version = "4.0";
         $this->cfdi->comprobante->namespace = new stdClass();
         $this->cfdi->comprobante->namespace->w3 = 'http://www.w3.org/2000/xmlns/';
