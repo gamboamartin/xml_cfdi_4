@@ -45,6 +45,7 @@ class xml{
         $this->cfdi->receptor = new stdClass();
         $this->cfdi->conceptos = array();
         $this->cfdi->impuestos = new stdClass();
+        $this->cfdi->relacionados = new stdClass();
 
 
         $this->dom = new DOMDocument('1.0', 'utf-8');
@@ -179,6 +180,52 @@ class xml{
             local_name: 'cfdi:Receptor', nodo_key: 'receptor', object:  $receptor,xml:  $this);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al setear $receptor', data: $data_nodo);
+        }
+
+        return $this->dom->saveXML();
+    }
+
+    /**
+     * @param stdClass $relacionados
+     * @return bool|array|string
+     * @throws DOMException
+     */
+    public function cfdi_relacionados(stdClass $relacionados): bool|array|string
+    {
+        $keys = array('tipo_relacion');
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $relacionados);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar $relacionados', data: $valida);
+        }
+
+        if(!isset($this->xml)){
+            return $this->error->error(mensaje: 'Error no esta inicializado el xml', data: $this);
+        }
+
+        $data_nodo = (new dom_xml())->nodo(keys: $keys, keys_especial: array(), local_name: 'cfdi:CfdiRelacionados',
+            nodo_key: 'relacionados', object:  $relacionados, xml:  $this);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al setear $relacionados', data: $data_nodo);
+        }
+
+        if(!isset($relacionados->relaciones)){
+            return $this->error->error(mensaje: 'Error no existe traslados en impuestos', data: $relacionados);
+        }
+        if(!is_array($relacionados->relaciones)){
+            return $this->error->error(mensaje: 'Error traslados en impuestos debe ser un array', data: $relacionados);
+        }
+        if(count($relacionados->relaciones)>0){
+            foreach ($relacionados->relaciones  as $relacion){
+                $keys = array('uuid');
+                $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $relacion);
+                if(errores::$error){
+                    return $this->error->error(mensaje: 'Error al validar $relacionados', data: $valida);
+                }
+
+                $nodo_relacionado = $this->dom->createElement('cfdi:CfdiRelacionado');
+                $data_nodo->appendChild($nodo_relacionado);
+                $nodo_relacionado->setAttribute('UUID', $relacion->uuid);
+            }
         }
 
         return $this->dom->saveXML();

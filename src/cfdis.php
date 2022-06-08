@@ -133,4 +133,54 @@ class cfdis{
 
         return $xml->dom->saveXML();
     }
+
+    /**
+     * @throws DOMException
+     */
+    public function  completo_nota_credito(stdClass|array $comprobante, stdClass|array $emisor,
+                                           stdClass|array $relacionados, stdClass|array $receptor): bool|array|string
+    {
+        if(is_array($comprobante)){
+            $comprobante = (object) $comprobante;
+        }
+        if(is_array($relacionados)){
+            $relacionados = (object) $relacionados;
+        }
+        if(is_array($emisor)){
+            $emisor = (object) $emisor;
+        }
+        if(is_array($receptor)){
+            $receptor = (object) $receptor;
+        }
+
+        $xml = new xml();
+
+        $comprobante_cp = (new complementos())->comprobante_complemento_pago(comprobante: $comprobante);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al obtener comprobante', data: $comprobante_cp);
+        }
+
+        $dom = $xml->cfdi_comprobante(comprobante: $comprobante_cp);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al generar comprobante', data: $dom);
+        }
+
+        $dom = $xml->cfdi_relacionados(relacionados:  $relacionados);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al generar emisor', data: $dom);
+        }
+
+        $dom = $xml->cfdi_emisor(emisor:  $emisor);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al generar emisor', data: $dom);
+        }
+
+        $receptor->uso_cfdi = 'G01';
+        $dom = $xml->cfdi_receptor(receptor:  $receptor);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al generar receptor', data: $dom);
+        }
+
+        return $xml->dom->saveXML();
+    }
 }
