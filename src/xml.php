@@ -185,6 +185,11 @@ class xml{
         return $this->dom->saveXML();
     }
 
+    /**
+     * @param stdClass $relacionados
+     * @return bool|array|string
+     * @throws DOMException
+     */
     public function cfdi_relacionados(stdClass $relacionados): bool|array|string
     {
         $keys = array('tipo_relacion');
