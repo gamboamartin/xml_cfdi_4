@@ -57,6 +57,10 @@ class dom_xml{
             $nodo_concepto->setAttribute('NoIdentificacion', $concepto->no_identificacion);
         }
 
+        if(isset($concepto->unidad) && $concepto->unidad!==''){
+            $nodo_concepto->setAttribute('Unidad', $concepto->unidad);
+        }
+
         $nodo_concepto->setAttribute('Cantidad', $concepto->cantidad);
         $nodo_concepto->setAttribute('ClaveUnidad', $concepto->clave_unidad);
         $nodo_concepto->setAttribute('Descripcion', $concepto->descripcion);
@@ -379,7 +383,7 @@ class dom_xml{
     }
 
 
-    private function genera_nodo_concepto_impuestos(array $impuestos, DOMElement $nodo_concepto, xml $xml): array|DOMElement
+    private function    genera_nodo_concepto_impuestos(array $impuestos, DOMElement $nodo_concepto, xml $xml): array|DOMElement
     {
 
         if(count($impuestos)>0){
@@ -427,6 +431,12 @@ class dom_xml{
         $nodo->setAttribute('Version', $xml->cfdi->comprobante->version);
         if(isset($xml->cfdi->comprobante->serie) && (string)$xml->cfdi->comprobante->serie !== ''){
             $nodo->setAttribute('Serie', $xml->cfdi->comprobante->serie);
+        }
+        if(isset($xml->cfdi->comprobante->forma_pago) && (string)$xml->cfdi->comprobante->forma_pago !== ''){
+            $nodo->setAttribute('FormaPago', $xml->cfdi->comprobante->forma_pago);
+        }
+        if(isset($xml->cfdi->comprobante->metodo_pago) && (string)$xml->cfdi->comprobante->metodo_pago !== ''){
+            $nodo->setAttribute('MetodoPago', $xml->cfdi->comprobante->metodo_pago);
         }
 
         return $nodo;

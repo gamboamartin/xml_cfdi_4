@@ -101,6 +101,12 @@ class init{
         if(isset($comprobante->serie) && (string)$comprobante->serie !== ''){
             $xml->cfdi->comprobante->serie = $comprobante->serie;
         }
+        if(isset($comprobante->forma_pago) && (string)$comprobante->forma_pago !== ''){
+            $xml->cfdi->comprobante->forma_pago = $comprobante->forma_pago;
+        }
+        if(isset($comprobante->metodo_pago) && (string)$comprobante->metodo_pago !== ''){
+            $xml->cfdi->comprobante->metodo_pago = $comprobante->metodo_pago;
+        }
 
         return $xml->cfdi->comprobante;
     }

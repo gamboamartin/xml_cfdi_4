@@ -137,8 +137,9 @@ class cfdis{
     /**
      * @throws DOMException
      */
-    public function  completo_nota_credito(stdClass|array $comprobante, stdClass|array $emisor,
-                                           stdClass|array $receptor, stdClass|array $relacionados): bool|array|string
+    public function  completo_nota_credito(stdClass|array $comprobante, stdClass|array $conceptos,
+                                           stdClass|array $emisor, stdClass|array $impuestos, stdClass|array $receptor,
+                                           stdClass|array $relacionados): bool|array|string
     {
         if(is_array($comprobante)){
             $comprobante = (object) $comprobante;
@@ -167,7 +168,7 @@ class cfdis{
 
         $dom = $xml->cfdi_relacionados(relacionados:  $relacionados);
         if(errores::$error){
-            return $this->error->error(mensaje: 'Error al generar emisor', data: $dom);
+            return $this->error->error(mensaje: 'Error al generar relacionados', data: $dom);
         }
 
         $dom = $xml->cfdi_emisor(emisor:  $emisor);
@@ -178,6 +179,16 @@ class cfdis{
         $dom = $xml->cfdi_receptor(receptor:  $receptor);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al generar receptor', data: $dom);
+        }
+
+        $dom = $xml->cfdi_conceptos(conceptos: $conceptos);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al generar conceptos', data: $dom);
+        }
+
+        $dom = $xml->cfdi_impuestos(impuestos: $impuestos);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al generar impuestos', data: $dom);
         }
 
         return $xml->dom->saveXML();

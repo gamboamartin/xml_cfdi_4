@@ -51,12 +51,8 @@ class complementos{
     public function comprobante_nota_credito(stdClass $comprobante): stdClass
     {
         $comprobante->metodo_pago = 'PUE';
-        $comprobante->forma_pago = '01';
         $comprobante->tipo_de_comprobante = 'E';
-        $comprobante->moneda = 'XXX';
-        $comprobante->total = '0';
         $comprobante->exportacion = '01';
-        $comprobante->sub_total = '0';
         return $comprobante;
     }
 

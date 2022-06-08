@@ -36,6 +36,8 @@ class xml{
         $this->cfdi->comprobante->lugar_expedicion = "";
         $this->cfdi->comprobante->fecha = "";
         $this->cfdi->comprobante->folio = "";
+        $this->cfdi->comprobante->forma_pago = "";
+        $this->cfdi->comprobante->metodo_pago = "";
         $this->cfdi->comprobante->serie = "";
         $this->cfdi->comprobante->version = "4.0";
         $this->cfdi->comprobante->namespace = new stdClass();
