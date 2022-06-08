@@ -17,32 +17,31 @@ class cfdis{
     public function complemento_pago(stdClass|array $comprobante, stdClass|array $emisor, stdClass|array $pagos,
                                      stdClass|array $receptor): bool|array|string
     {
-        $comprobante_ = $comprobante;
-        $emisor_ = $emisor;
-        $receptor_ = $receptor;
-        $pagos_ = $pagos;
+
+
         if(is_array($comprobante)){
-            $comprobante_ = (object) $comprobante;
+            $comprobante = (object) $comprobante;
         }
         if(is_array($emisor)){
-            $emisor_ = (object) $emisor;
+            $emisor = (object) $emisor;
         }
         if(is_array($receptor)){
-            $receptor_ = (object) $receptor;
+            $receptor = (object) $receptor;
         }
+
         if(is_array($pagos)){
-            $pagos_ = (object) $pagos;
+            $pagos = (object) $pagos;
         }
 
 
         $keys = array('lugar_expedicion', 'folio');
-        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $comprobante_);
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $comprobante);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al validar comprobante de pago', data: $valida);
         }
 
         $keys = array('rfc','nombre','regimen_fiscal');
-        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $emisor_);
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $emisor);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al validar $emisor', data: $valida);
         }
@@ -55,7 +54,7 @@ class cfdis{
 
         $xml = new xml();
 
-        $comprobante_cp = (new complementos())->comprobante_complemento_pago(comprobante: $comprobante_);
+        $comprobante_cp = (new complementos())->comprobante_complemento_pago(comprobante: $comprobante);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al obtener comprobante', data: $comprobante_cp);
         }
@@ -65,16 +64,17 @@ class cfdis{
             return $this->error->error(mensaje: 'Error al generar comprobante', data: $dom);
         }
 
-        $dom = $xml->cfdi_emisor(emisor:  $emisor_);
+        $dom = $xml->cfdi_emisor(emisor:  $emisor);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al generar emisor', data: $dom);
         }
 
-        $receptor_->uso_cfdi = 'CP01';
-        $dom = $xml->cfdi_receptor(receptor:  $receptor_);
+        $receptor->uso_cfdi = 'CP01';
+        $dom = $xml->cfdi_receptor(receptor:  $receptor);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al generar receptor', data: $dom);
         }
+
 
         $dom = (new complementos())->conceptos_complemento_pago_dom(xml: $xml);
         if(errores::$error){
@@ -97,17 +97,17 @@ class cfdis{
         }
 
 
-        $nodo_totales = (new pago())->nodo_totales(nodo_pagos: $nodo_pagos, pagos: $pagos_,xml:  $xml);
+        $nodo_totales = (new pago())->nodo_totales(nodo_pagos: $nodo_pagos, pagos: $pagos,xml:  $xml);
         if (errores::$error) {
             return $this->error->error(mensaje: 'Error al asignar nodo', data: $nodo_totales);
         }
 
-        $valida = $this->valida->valida_tipo_dato_pago(pagos: $pagos_);
+        $valida = $this->valida->valida_tipo_dato_pago(pagos: $pagos);
         if (errores::$error) {
             return $this->error->error(mensaje: 'Error al validar pagos', data: $valida);
         }
 
-        foreach($pagos_->pagos as $pago){
+        foreach($pagos->pagos as $pago){
 
             if(is_array($pago)){
                 $pago = (object)$pago;

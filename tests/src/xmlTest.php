@@ -323,6 +323,8 @@ class xmlTest extends test {
         $receptor->regimen_fiscal_receptor = 'd';
         $receptor->uso_cfdi = 'f';
         $resultado = $xml->cfdi_receptor(receptor: $receptor);
+
+
         $this->assertNotTrue(errores::$error);
         $this->assertIsString($resultado);
         $this->assertStringContainsStringIgnoringCase('xsi:schemaLocation="http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd "',$resultado);
@@ -330,6 +332,7 @@ class xmlTest extends test {
         $this->assertStringContainsStringIgnoringCase('<cfdi:Receptor Rfc="a" Nombre="b"',$resultado);
         $this->assertStringContainsStringIgnoringCase('DomicilioFiscalReceptor="c" RegimenFis',$resultado);
         $this->assertStringContainsStringIgnoringCase('FiscalReceptor="d" UsoCfdi="f"/>',$resultado);
+        $this->assertStringContainsString('FiscalReceptor="d" UsoCFDI="f"/>',$resultado);
     }
 }
 
