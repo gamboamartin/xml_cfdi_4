@@ -17,9 +17,24 @@ class cfdis{
     /**
      * @throws DOMException
      */
-    public function complemento_pago(stdClass $comprobante, stdClass $emisor, stdClass $pagos,
-                                     stdClass $receptor): bool|array|string
+    public function complemento_pago(stdClass|array $comprobante, stdClass|array $emisor, stdClass|array $pagos,
+                                     stdClass|array $receptor): bool|array|string
     {
+
+        if(is_array($comprobante)){
+            $comprobante = (object) $comprobante;
+        }
+        if(is_array($emisor)){
+            $emisor = (object) $emisor;
+        }
+        if(is_array($receptor)){
+            $receptor = (object) $receptor;
+        }
+        if(is_array($pagos)){
+            $pagos = (object) $pagos;
+        }
+
+
         $keys = array('lugar_expedicion', 'folio');
         $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $comprobante);
         if(errores::$error){
@@ -94,6 +109,11 @@ class cfdis{
 
         foreach($pagos->pagos as $pago){
 
+            if(is_array($pago)){
+                $pago = (object)$pago;
+            }
+
+
             $nodo_pago = (new pago())->nodo_pago(nodo_pagos: $nodo_pagos, pago: $pago,xml:  $xml);
             if (errores::$error) {
                 return $this->error->error(mensaje: 'Error al asignar pago', data: $nodo_pago);
@@ -112,8 +132,6 @@ class cfdis{
 
 
         }
-
-
 
         return $xml->dom->saveXML();
     }

@@ -94,6 +94,8 @@ class cfdisTest extends test {
 
 
         $resultado = $cfdis->complemento_pago(comprobante: $comprobante,emisor:  $emisor, pagos: $pagos, receptor: $receptor);
+        
+
 
         $this->assertNotTrue(errores::$error);
         $this->assertIsString($resultado);

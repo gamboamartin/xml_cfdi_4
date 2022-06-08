@@ -38,7 +38,7 @@ class pago{
         return $nodo_pago;
     }
 
-    private function integra_traslados_p(DOMElement $nodo_traslados_p,  $traslados_p, xml $xml): array|DOMElement
+    private function integra_traslados_p(DOMElement $nodo_traslados_p,  stdClass $traslados_p, xml $xml): array|DOMElement
     {
         if(!isset($traslados_p->traslado_p)){
             return $this->error->error(mensaje: 'Error debe existir traslado_p en pago', data: $traslados_p);
@@ -48,6 +48,10 @@ class pago{
         }
 
         foreach ($traslados_p->traslado_p as $traslado_p) {
+
+            if(is_array($traslado_p)){
+                $traslado_p = (object)$traslado_p;
+            }
 
             $nodo_traslado_p = $this->nodo_traslado_p(nodo_traslados_p: $nodo_traslados_p,
                 traslado_p:  $traslado_p,xml:  $xml);
@@ -91,12 +95,16 @@ class pago{
     public function nodo_doctos_rel(DOMElement $nodo_pago, stdClass $pago, xml $xml): array|DOMElement
     {
         if(!isset($pago->docto_relacionado)){
-            return $this->error->error(mensaje: 'Error debe existir docto_relacionado en pago', data: $pagos);
+            return $this->error->error(mensaje: 'Error debe existir docto_relacionado en pago', data: $pago);
         }
         if(empty($pago->docto_relacionado)){
-            return $this->error->error(mensaje: 'Error  docto_relacionado en pago esta vacio', data: $pagos);
+            return $this->error->error(mensaje: 'Error  docto_relacionado en pago esta vacio', data: $pago);
         }
         foreach ($pago->docto_relacionado as $docto_relacionado){
+
+            if(is_array($docto_relacionado)){
+                $docto_relacionado = (object)$docto_relacionado;
+            }
 
             $nodo_docto_relacionado = $this->nodo_docto_relacionado(docto_relacionado: $docto_relacionado, nodo_pago: $nodo_pago,xml:  $xml);
             if(errores::$error){
@@ -129,6 +137,9 @@ class pago{
             $nodo_impuestos_dr = $xml->dom->createElement('pago20:ImpuestosDR');
             $nodo_docto_relacionado->appendChild($nodo_impuestos_dr);
 
+            if(is_array($impuesto_dr)){
+                $impuesto_dr = (object)$impuesto_dr;
+            }
 
             if(!isset($impuesto_dr->traslados_dr)){
                 return $this->error->error(mensaje: 'Error debe existir traslados_dr en docto rel', data: $impuesto_dr);
@@ -137,6 +148,10 @@ class pago{
                 return $this->error->error(mensaje: 'Error  traslados_dr en pago esta docto rel', data: $impuesto_dr);
             }
             foreach ($impuesto_dr->traslados_dr as $traslados_dr){
+
+                if(is_array($traslados_dr)){
+                    $traslados_dr = (object)$traslados_dr;
+                }
 
                 $nodo_traslados_dr = $this->nodo_traslados_dr(nodo_impuestos_dr: $nodo_impuestos_dr,
                     traslados_dr: $traslados_dr,xml:  $xml);
@@ -165,6 +180,10 @@ class pago{
             $nodo_impuestos_p = $xml->dom->createElement('pago20:ImpuestosP');
             $nodo_pago->appendChild($nodo_impuestos_p);
 
+            if(is_array($impuesto_p)){
+                $impuesto_p = (object)$impuesto_p;
+            }
+
             if(!isset($impuesto_p->traslados_p)){
                 return $this->error->error(mensaje: 'Error debe existir traslados_p en pago', data: $pago);
             }
@@ -173,7 +192,9 @@ class pago{
             }
 
             foreach ($impuesto_p->traslados_p as $traslados_p) {
-
+                if(is_array($traslados_p)){
+                    $traslados_p = (object)$traslados_p;
+                }
                 $nodo_traslados_p = $this->nodos_traslados_p(nodo_impuestos_p: $nodo_impuestos_p,
                     traslados_p:  $traslados_p,xml:  $xml);
                 if(errores::$error){
@@ -217,9 +238,11 @@ class pago{
      */
     public function nodo_pagos(DOMElement $nodo_complemento, xml $xml): bool|DOMElement
     {
+
         $nodo_pagos = $xml->dom->createElementNS($xml->cfdi->comprobante->xmlns_pago20, 'pago20:Pagos');
         $nodo_complemento->appendChild($nodo_pagos);
 
+        $nodo_pagos->setAttribute('xmlns:pago20', $xml->cfdi->comprobante->xmlns_pago20);
         $nodo_pagos->setAttribute('Version', '2.0');
         return $nodo_pagos;
     }
@@ -257,7 +280,6 @@ class pago{
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al validar $traslado_dr', data: $valida);
         }
-
 
         $traslado_dr_r = (new init())->ajusta_montos_traslado(traslado_dr: $traslado_dr);
         if(errores::$error){
@@ -308,6 +330,8 @@ class pago{
         $nodo_traslados_dr = $xml->dom->createElement('pago20:TrasladosDR');
         $nodo_impuestos_dr->appendChild($nodo_traslados_dr);
 
+
+
         if(!isset($traslados_dr->traslado_dr)){
             return $this->error->error(mensaje: 'Error debe existir $traslado_dr en docto rel', data: $traslados_dr);
         }
@@ -328,7 +352,9 @@ class pago{
     private function nodos_traslados_dr(DOMElement $nodo_traslados_dr, stdClass $traslados_dr, xml $xml): array|DOMElement
     {
         foreach ($traslados_dr->traslado_dr as $traslado_dr) {
-
+            if(is_array($traslado_dr)){
+                $traslado_dr = (object)$traslado_dr;
+            }
             $nodo_traslado_dr = $this->nodo_traslado_dr(nodo_traslados_dr: $nodo_traslados_dr,
                 traslado_dr:  $traslado_dr, xml: $xml);
             if(errores::$error){

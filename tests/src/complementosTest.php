@@ -1,12 +1,9 @@
 <?php
 namespace tests\controllers;
 
-use DOMException;
 use gamboamartin\errores\errores;
-use gamboamartin\test\liberator;
 use gamboamartin\test\test;
 use gamboamartin\xml_cfdi_4\complementos;
-use gamboamartin\xml_cfdi_4\dom_xml;
 use gamboamartin\xml_cfdi_4\xml;
 use stdClass;
 
