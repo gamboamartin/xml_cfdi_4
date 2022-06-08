@@ -48,6 +48,23 @@ class xmlTest extends test {
         $this->assertStringContainsStringIgnoringCase('" Folio="01" Version="4.0"/>', $resultado);
 
         errores::$error = false;
+
+        $comprobante->serie = 'NCV4.0';
+
+        $resultado = $xml->cfdi_comprobante($comprobante);
+        $resultado = $resultado->saveXML();
+
+        $this->assertNotTrue(errores::$error);
+        $this->assertIsString($resultado);
+        $this->assertStringContainsStringIgnoringCase('<?xml version="1.0" encoding="utf-8"?>', $resultado);
+        $this->assertStringContainsStringIgnoringCase('<cfdi:Comprobante xmlns:cfdi="http://www.sat.gob.mx/cfd/4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"', $resultado);
+        $this->assertStringContainsStringIgnoringCase('xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:pago20', $resultado);
+        $this->assertStringContainsStringIgnoringCase('go20="http://www.sat.gob.mx/Pagos20" xsi:schemaLoc', $resultado);
+        $this->assertStringContainsStringIgnoringCase('on="http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd " Moneda="XXX"', $resultado);
+        $this->assertStringContainsStringIgnoringCase('eda="XXX" Total="0" Exportacion="01" TipoDeComprobante="P" SubTotal="0" ', $resultado);
+        $this->assertStringContainsStringIgnoringCase('" Folio="01" Version="4.0"/>', $resultado);
+
+        errores::$error = false;
     }
 
     /**

@@ -90,6 +90,9 @@ class init{
         $xml->cfdi->comprobante->lugar_expedicion = $comprobante->lugar_expedicion;
         $xml->cfdi->comprobante->fecha = $comprobante->fecha;
         $xml->cfdi->comprobante->folio = $comprobante->folio;
+        if(isset($comprobante->serie) && (string)$comprobante->serie !== ''){
+            $xml->cfdi->comprobante->serie = $comprobante->serie;
+        }
 
         return $xml->cfdi->comprobante;
     }
