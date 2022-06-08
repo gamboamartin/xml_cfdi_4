@@ -138,7 +138,7 @@ class cfdis{
      * @throws DOMException
      */
     public function  completo_nota_credito(stdClass|array $comprobante, stdClass|array $emisor,
-                                           stdClass|array $relacionados, stdClass|array $receptor): bool|array|string
+                                           stdClass|array $receptor, stdClass|array $relacionados): bool|array|string
     {
         if(is_array($comprobante)){
             $comprobante = (object) $comprobante;
@@ -155,7 +155,7 @@ class cfdis{
 
         $xml = new xml();
 
-        $comprobante_cp = (new complementos())->comprobante_complemento_pago(comprobante: $comprobante);
+        $comprobante_cp = (new complementos())->comprobante_nota_credito(comprobante: $comprobante);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al obtener comprobante', data: $comprobante_cp);
         }
@@ -175,7 +175,6 @@ class cfdis{
             return $this->error->error(mensaje: 'Error al generar emisor', data: $dom);
         }
 
-        $receptor->uso_cfdi = 'G01';
         $dom = $xml->cfdi_receptor(receptor:  $receptor);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al generar receptor', data: $dom);

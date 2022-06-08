@@ -228,6 +228,10 @@ class dom_xml{
             $nodo->setAttribute('xmlns:cfdi', 'http://www.sat.gob.mx/cfd/4');
             $nodo->setAttribute('xsi:schemaLocation', 'http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd http://www.sat.gob.mx/Pagos20 http://www.sat.gob.mx/sitio_internet/cfd/Pagos/Pagos20.xsd');
         }
+        if($tipo_de_comprobante === 'E') {
+            $nodo->setAttribute('xmlns:cfdi', 'http://www.sat.gob.mx/cfd/4');
+            $nodo->setAttribute('xsi:schemaLocation', 'http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd');
+        }
         if($tipo_de_comprobante === 'I') {
             $nodo->setAttribute('xmlns:cfdi', 'http://www.sat.gob.mx/cfd/4');
             $nodo->setAttribute('xsi:schemaLocation', 'http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd');

@@ -115,8 +115,45 @@ class cfdisTest extends test {
         errores::$error = false;
     }
 
+    /**
+     * @throws \DOMException
+     */
+    public function test_completo_nota_credito(){
+        errores::$error = false;
+
+        $cfdis = new cfdis();
+        //$com = new liberator($com);
+        $comprobante = new stdClass();
+        $comprobante->lugar_expedicion  = 29960;
+        $comprobante->folio  = 922;
+        $comprobante->tipo_comprobante  = 'E';
+        $comprobante->serie  = 'NCV4.0';
+
+        $emisor = new stdClass();
+        $emisor->rfc = 'IIA040805DZ4';
+        $emisor->nombre = 'INDISTRIA ILUMINADORA DE ALMACENES';
+        $emisor->regimen_fiscal = '626';
+
+        $receptor = new stdClass();
+        $receptor->rfc = 'EKU9003173C9';
+        $receptor->nombre = 'ESCUELA KEMPER URGATE';
+        $receptor->domicilio_fiscal_receptor = '26015';
+        $receptor->regimen_fiscal_receptor = '603';
+        $receptor->uso_cfdi = 'G01';
 
 
+        $relacionados = new stdClass();
+        $relacionados->tipo_relacion = '01';
+
+        $relacionados->relaciones = array();
+        $relacionados->relaciones[0] = new stdClass();
+        $relacionados->relaciones[0]->uuid = '7945A043-3073-4295-BC0B-C17AFB6697A5';
+
+        $resultado = $cfdis->completo_nota_credito(comprobante: $comprobante,emisor:  $emisor, receptor: $receptor,
+            relacionados: $relacionados);
+
+        errores::$error = false;
+    }
 
 }
 
