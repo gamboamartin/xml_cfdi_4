@@ -208,14 +208,6 @@ class xml{
             return $this->error->error(mensaje: 'Error al setear $relacionados', data: $data_nodo);
         }
 
-        foreach ($relacionados->relaciones  as $relacion){
-            $keys = array('uuid');
-            $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $relacion);
-            if(errores::$error){
-                return $this->error->error(mensaje: 'Error al validar $relacionados', data: $valida);
-            }
-        }
-
         if(!isset($relacionados->relaciones)){
             return $this->error->error(mensaje: 'Error no existe traslados en impuestos', data: $relacionados);
         }
@@ -224,6 +216,12 @@ class xml{
         }
         if(count($relacionados->relaciones)>0){
             foreach ($relacionados->relaciones  as $relacion){
+                $keys = array('uuid');
+                $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $relacion);
+                if(errores::$error){
+                    return $this->error->error(mensaje: 'Error al validar $relacionados', data: $valida);
+                }
+
                 $nodo_relacionado = $this->dom->createElement('cfdi:CfdiRelacionado');
                 $data_nodo->appendChild($nodo_relacionado);
                 $nodo_relacionado->setAttribute('UUID', $relacion->uuid);
