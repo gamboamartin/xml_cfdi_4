@@ -444,6 +444,10 @@ class dom_xml{
         $nodo->setAttribute('Fecha', $xml->cfdi->comprobante->fecha);
         $nodo->setAttribute('Folio', $xml->cfdi->comprobante->folio);
         $nodo->setAttribute('Version', $xml->cfdi->comprobante->version);
+        if(isset($xml->cfdi->comprobante->serie) && (string)$xml->cfdi->comprobante->serie !== ''){
+            $nodo->setAttribute('Serie', $xml->cfdi->comprobante->serie);
+        }
+
         return $nodo;
     }
 
