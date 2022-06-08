@@ -4,6 +4,7 @@ use DOMElement;
 use DOMException;
 use gamboamartin\errores\errores;
 use stdClass;
+use Throwable;
 
 class pago{
     private validacion $valida;
@@ -63,9 +64,7 @@ class pago{
         return $nodo_traslados_p;
     }
 
-    /**
-     * @throws DOMException
-     */
+
     private function nodo_docto_relacionado(stdClass $docto_relacionado, DOMElement $nodo_pago, xml $xml): array|DOMElement
     {
         $valida = $this->valida->valida_docto_relacionado(docto_relacionado: $docto_relacionado);
@@ -78,7 +77,12 @@ class pago{
             return $this->error->error(mensaje: 'Error al ajustar $docto_relacionado', data: $docto_relacionado_r);
         }
 
-        $nodo_docto_relacionado = $xml->dom->createElement('pago20:DoctoRelacionado');
+        try {
+            $nodo_docto_relacionado = $xml->dom->createElement('pago20:DoctoRelacionado');
+        }
+        catch (Throwable $e){
+            return $this->error->error(mensaje: 'Error al crear el elemento pago20:DoctoRelacionado', data: $e);
+        }
         $nodo_pago->appendChild($nodo_docto_relacionado);
 
         $nodo_docto_relacionado = $this->attr_docto_relacionado(docto_relacionado: $docto_relacionado_r,
@@ -89,9 +93,7 @@ class pago{
         return $nodo_docto_relacionado;
     }
 
-    /**
-     * @throws DOMException
-     */
+
     public function nodo_doctos_rel(DOMElement $nodo_pago, stdClass $pago, xml $xml): array|DOMElement
     {
         if(!isset($pago->docto_relacionado)){
@@ -128,13 +130,16 @@ class pago{
         return $nodo_pago;
     }
 
-    /**
-     * @throws DOMException
-     */
+
     private function nodo_impuestos_dr(stdClass $docto_relacionado, DOMElement $nodo_docto_relacionado, xml $xml): array|DOMElement
     {
         foreach ($docto_relacionado->impuestos_dr as $impuesto_dr){
-            $nodo_impuestos_dr = $xml->dom->createElement('pago20:ImpuestosDR');
+            try {
+                $nodo_impuestos_dr = $xml->dom->createElement('pago20:ImpuestosDR');
+            }
+            catch (Throwable $e){
+                return $this->error->error(mensaje: 'Error al crear el elemento pago20:ImpuestosDR', data: $e);
+            }
             $nodo_docto_relacionado->appendChild($nodo_impuestos_dr);
 
             if(is_array($impuesto_dr)){
@@ -164,9 +169,7 @@ class pago{
         return $nodo_docto_relacionado;
     }
 
-    /**
-     * @throws DOMException
-     */
+
     public function nodo_impuestos_p(DOMElement $nodo_pago, stdClass $pago, xml $xml): array|DOMElement
     {
         if(!isset($pago->impuestos_p)){
@@ -177,7 +180,12 @@ class pago{
         }
 
         foreach ($pago->impuestos_p as $impuesto_p){
-            $nodo_impuestos_p = $xml->dom->createElement('pago20:ImpuestosP');
+            try {
+                $nodo_impuestos_p = $xml->dom->createElement('pago20:ImpuestosP');
+            }
+            catch (Throwable $e){
+                return $this->error->error(mensaje: 'Error al crear el elemento pago20:ImpuestosP', data: $e);
+            }
             $nodo_pago->appendChild($nodo_impuestos_p);
 
             if(is_array($impuesto_p)){
@@ -207,9 +215,7 @@ class pago{
         return $nodo_pago;
     }
 
-    /**
-     * @throws DOMException
-     */
+
     public function nodo_pago(DOMElement $nodo_pagos, stdClass $pago, xml $xml): array|DOMElement
     {
         $valida = $this->valida->valida_data_pago(pago: $pago);
@@ -223,7 +229,13 @@ class pago{
             return $this->error->error(mensaje: 'Error al ajustar pago', data: $pago_r);
         }
 
-        $nodo_pago  = $xml->dom->createElement('pago20:Pago');
+        try {
+            $nodo_pago  = $xml->dom->createElement('pago20:Pago');
+        }
+        catch (Throwable $e){
+            return $this->error->error(mensaje: 'Error al crear el elemento pago20:Pago', data: $e);
+        }
+
         $nodo_pagos->appendChild($nodo_pago);
 
         $nodo_pago = $this->attr_pago(nodo_pago: $nodo_pago, pago: $pago_r);
@@ -233,25 +245,31 @@ class pago{
         return $nodo_pago;
     }
 
-    /**
-     * @throws DOMException
-     */
-    public function nodo_pagos(DOMElement $nodo_complemento, xml $xml): bool|DOMElement
-    {
 
-        $nodo_pagos = $xml->dom->createElementNS($xml->cfdi->comprobante->xmlns_pago20, 'pago20:Pagos');
+    public function nodo_pagos(DOMElement $nodo_complemento, xml $xml): bool|DOMElement|array
+    {
+        try {
+            $nodo_pagos = $xml->dom->createElementNS($xml->cfdi->comprobante->xmlns_pago20, 'pago20:Pagos');
+        }
+        catch (Throwable $e){
+            return $this->error->error(mensaje: 'Error al crear el elemento pago20:Pagos', data: $e);
+        }
+
         $nodo_complemento->appendChild($nodo_pagos);
 
         $nodo_pagos->setAttribute('xmlns:pago20', $xml->cfdi->comprobante->xmlns_pago20);
         $nodo_pagos->setAttribute('Version', '2.0');
         return $nodo_pagos;
     }
-    /**
-     * @throws DOMException
-     */
+
     public function nodo_totales(DOMElement $nodo_pagos, stdClass $pagos, xml $xml): array|DOMElement
     {
-        $nodo_totales = $xml->dom->createElement('pago20:Totales');
+        try {
+            $nodo_totales = $xml->dom->createElement('pago20:Totales');
+        }
+        catch (Throwable $e){
+            return $this->error->error(mensaje: 'Error al crear el elemento pago20:Totales', data: $e);
+        }
         $nodo_pagos->appendChild($nodo_totales);
 
         $keys = array('total_traslados_base_iva_16','total_traslados_impuesto_iva_16','monto_total_pagos');
@@ -271,9 +289,7 @@ class pago{
         return $nodo_totales;
     }
 
-    /**
-     * @throws DOMException
-     */
+
     private function nodo_traslado_dr(DOMElement $nodo_traslados_dr, stdClass $traslado_dr, xml $xml): bool|array|DOMElement
     {
         $valida = $this->valida->valida_traslado(traslado_dr: $traslado_dr);
@@ -286,7 +302,12 @@ class pago{
             return $this->error->error(mensaje: 'Error al validar $traslado_dr', data: $traslado_dr_r);
         }
 
-        $nodo_traslado_dr = $xml->dom->createElement('pago20:TrasladoDR');
+        try {
+            $nodo_traslado_dr = $xml->dom->createElement('pago20:TrasladoDR');
+        }
+        catch (Throwable $e){
+            return $this->error->error(mensaje: 'Error al crear el elemento pago20:TrasladoDR', data: $e);
+        }
         $nodo_traslados_dr->appendChild($nodo_traslado_dr);
 
         $nodo_traslado_dr->setAttribute('BaseDR', $traslado_dr_r->base_dr);
@@ -322,12 +343,15 @@ class pago{
         return $nodo_traslado_p;
     }
 
-    /**
-     * @throws DOMException
-     */
+
     private function nodo_traslados_dr(DOMElement $nodo_impuestos_dr, stdClass $traslados_dr, xml $xml): array|DOMElement
     {
-        $nodo_traslados_dr = $xml->dom->createElement('pago20:TrasladosDR');
+        try {
+            $nodo_traslados_dr = $xml->dom->createElement('pago20:TrasladosDR');
+        }
+        catch (Throwable $e){
+            return $this->error->error(mensaje: 'Error al crear el elemento pago20:TrasladosDR', data: $e);
+        }
         $nodo_impuestos_dr->appendChild($nodo_traslados_dr);
 
 
@@ -339,16 +363,15 @@ class pago{
             return $this->error->error(mensaje: 'Error  $traslado_dr en pago esta docto rel', data: $traslados_dr);
         }
 
-        $nodos_traslado_dr = $this->nodos_traslados_dr(nodo_traslados_dr: $nodo_traslados_dr, traslados_dr: $traslados_dr, xml: $xml);
+        $nodos_traslado_dr = $this->nodos_traslados_dr(nodo_traslados_dr: $nodo_traslados_dr,
+            traslados_dr: $traslados_dr, xml: $xml);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al validar $traslado_dr', data: $nodos_traslado_dr);
         }
         return $nodos_traslado_dr;
     }
 
-    /**
-     * @throws DOMException
-     */
+
     private function nodos_traslados_dr(DOMElement $nodo_traslados_dr, stdClass $traslados_dr, xml $xml): array|DOMElement
     {
         foreach ($traslados_dr->traslado_dr as $traslado_dr) {
@@ -365,12 +388,15 @@ class pago{
         return $nodo_traslados_dr;
     }
 
-    /**
-     * @throws DOMException
-     */
+
     private function nodos_traslados_p(DOMElement $nodo_impuestos_p, stdClass $traslados_p, xml $xml): bool|array|DOMElement
     {
-        $nodo_traslados_p = $xml->dom->createElement('pago20:TrasladosP');
+        try {
+            $nodo_traslados_p = $xml->dom->createElement('pago20:TrasladosP');
+        }
+        catch (Throwable $e){
+            return $this->error->error(mensaje: 'Error al crear el elemento pago20:TrasladosP', data: $e);
+        }
         $nodo_impuestos_p->appendChild($nodo_traslados_p);
 
         $nodo_traslado_p = $this->integra_traslados_p(nodo_traslados_p: $nodo_traslados_p,

@@ -8,6 +8,7 @@ use DOMNode;
 use gamboamartin\errores\errores;
 
 use stdClass;
+use Throwable;
 
 class xml{
     public DOMDocument $dom;
@@ -81,9 +82,7 @@ class xml{
         return $this->dom;
     }
 
-    /**
-     * @throws DOMException
-     */
+
     public function cfdi_conceptos(array $conceptos): bool|string|array
     {
         if(!isset($this->xml)){
@@ -92,11 +91,16 @@ class xml{
         if(count($conceptos) === 0){
             return $this->error->error(mensaje: 'Error los conceptos no pueden ir vacios', data: $conceptos);
         }
-
-        $nodo_conceptos = $this->dom->createElement('cfdi:Conceptos');
+        try {
+            $nodo_conceptos = $this->dom->createElement('cfdi:Conceptos');
+        }
+        catch (Throwable $e){
+            return $this->error->error(mensaje: 'Error al crear el elemento cfdi:Conceptos', data: $e);
+        }
         $this->xml->appendChild($nodo_conceptos);
 
-        $elementos_concepto = (new dom_xml())->carga_conceptos(conceptos: $conceptos,nodo_conceptos: $nodo_conceptos,xml:  $this);
+        $elementos_concepto = (new dom_xml())->carga_conceptos(conceptos: $conceptos,
+            nodo_conceptos: $nodo_conceptos,xml:  $this);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al asignar atributos', data: $elementos_concepto);
         }

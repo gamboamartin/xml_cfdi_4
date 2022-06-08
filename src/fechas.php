@@ -10,12 +10,24 @@ class fechas{
         $this->valida = new validacion();
         $this->error = new errores();
     }
+
+    /**
+     * CON FIX
+     * @param string $fecha Fecha en formato YYYY-mm-dd
+     * @param string $hora
+     * @return array|string
+     */
     private function fecha_base(string $fecha, string $hora): array|string
     {
         $fecha_cfdi = $fecha;
         $es_fecha_base = $this->valida->valida_pattern(key:'fecha', txt: $fecha);
         if(errores::$error){
-            return $this->error->error(mensaje: 'Error al validar fecha', data: $es_fecha_base);
+            $fix = 'Es necesario enviar la fecha con el siguiente formato YYYY-mm-dd donde YYYY Es un año valido ';
+            $fix .= 'a 4 digitos ej 2020 mm corresponde al mes a dos digitos 01 = enero 11 = noviembre';
+            $fix .= ' dd corresponde al dia a 2 digitos ejemplo 01 igual al primero 0 dia 12 o 31';
+            $fix .= ' entonces fecha puede ser 2020-01-01 donde se representa primero de enero del año 2020';
+            $fix .= ' o 2022-06-08 donde se representa el 8 de junio de 2022';
+            return $this->error->error(mensaje: 'Error al validar fecha', data: $es_fecha_base, fix: $fix);
         }
         if($es_fecha_base) {
             $fecha_cfdi = $fecha . 'T' . $hora;
@@ -62,6 +74,7 @@ class fechas{
 
     /**
      * Obtiene la fecha en formato T actual
+     * @version 0.9.0
      * @return string
      */
     private function fecha_cfdi_vacia(): string

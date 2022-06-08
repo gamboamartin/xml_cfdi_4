@@ -14,35 +14,35 @@ class cfdis{
 
     }
 
-    /**
-     * @throws DOMException
-     */
     public function complemento_pago(stdClass|array $comprobante, stdClass|array $emisor, stdClass|array $pagos,
                                      stdClass|array $receptor): bool|array|string
     {
-
+        $comprobante_ = $comprobante;
+        $emisor_ = $emisor;
+        $receptor_ = $receptor;
+        $pagos_ = $pagos;
         if(is_array($comprobante)){
-            $comprobante = (object) $comprobante;
+            $comprobante_ = (object) $comprobante;
         }
         if(is_array($emisor)){
-            $emisor = (object) $emisor;
+            $emisor_ = (object) $emisor;
         }
         if(is_array($receptor)){
-            $receptor = (object) $receptor;
+            $receptor_ = (object) $receptor;
         }
         if(is_array($pagos)){
-            $pagos = (object) $pagos;
+            $pagos_ = (object) $pagos;
         }
 
 
         $keys = array('lugar_expedicion', 'folio');
-        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $comprobante);
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $comprobante_);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al validar comprobante de pago', data: $valida);
         }
 
         $keys = array('rfc','nombre','regimen_fiscal');
-        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $emisor);
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $emisor_);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al validar $emisor', data: $valida);
         }
@@ -55,7 +55,7 @@ class cfdis{
 
         $xml = new xml();
 
-        $comprobante_cp = (new complementos())->comprobante_complemento_pago(comprobante: $comprobante);
+        $comprobante_cp = (new complementos())->comprobante_complemento_pago(comprobante: $comprobante_);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al obtener comprobante', data: $comprobante_cp);
         }
@@ -65,13 +65,13 @@ class cfdis{
             return $this->error->error(mensaje: 'Error al generar comprobante', data: $dom);
         }
 
-        $dom = $xml->cfdi_emisor(emisor:  $emisor);
+        $dom = $xml->cfdi_emisor(emisor:  $emisor_);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al generar emisor', data: $dom);
         }
 
-        $receptor->uso_cfdi = 'CP01';
-        $dom = $xml->cfdi_receptor(receptor:  $receptor);
+        $receptor_->uso_cfdi = 'CP01';
+        $dom = $xml->cfdi_receptor(receptor:  $receptor_);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al generar receptor', data: $dom);
         }
@@ -97,28 +97,26 @@ class cfdis{
         }
 
 
-        $nodo_totales = (new pago())->nodo_totales(nodo_pagos: $nodo_pagos, pagos: $pagos,xml:  $xml);
+        $nodo_totales = (new pago())->nodo_totales(nodo_pagos: $nodo_pagos, pagos: $pagos_,xml:  $xml);
         if (errores::$error) {
             return $this->error->error(mensaje: 'Error al asignar nodo', data: $nodo_totales);
         }
 
-        $valida = $this->valida->valida_tipo_dato_pago(pagos: $pagos);
+        $valida = $this->valida->valida_tipo_dato_pago(pagos: $pagos_);
         if (errores::$error) {
             return $this->error->error(mensaje: 'Error al validar pagos', data: $valida);
         }
 
-        foreach($pagos->pagos as $pago){
+        foreach($pagos_->pagos as $pago){
 
             if(is_array($pago)){
                 $pago = (object)$pago;
             }
 
-
             $nodo_pago = (new pago())->nodo_pago(nodo_pagos: $nodo_pagos, pago: $pago,xml:  $xml);
             if (errores::$error) {
                 return $this->error->error(mensaje: 'Error al asignar pago', data: $nodo_pago);
             }
-
 
             $nodo_docto_relacionado = (new pago())->nodo_doctos_rel(nodo_pago: $nodo_pago,pago:  $pago,xml:  $xml);
             if(errores::$error){

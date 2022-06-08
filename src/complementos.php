@@ -4,6 +4,7 @@ use DOMElement;
 use DOMException;
 use gamboamartin\errores\errores;
 use stdClass;
+use Throwable;
 
 class complementos{
     private errores  $error;
@@ -33,6 +34,7 @@ class complementos{
 
     /**
      * Se precarga la info base de un complemento de pago
+     * @version 0.9.0
      * @param stdClass $comprobante
      * @return stdClass
      */
@@ -61,9 +63,7 @@ class complementos{
         return $conceptos;
     }
 
-    /**
-     * @throws DOMException
-     */
+
     public function conceptos_complemento_pago_dom(xml $xml): bool|array|string
     {
         $conceptos = $this->conceptos_complemento_pago();
@@ -78,12 +78,15 @@ class complementos{
         return $dom;
     }
 
-    /**
-     * @throws DOMException
-     */
-    public function nodo_complemento(xml $xml): bool|DOMElement
+
+    public function nodo_complemento(xml $xml): bool|DOMElement|array
     {
-        $nodo_complemento = $xml->dom->createElement('cfdi:Complemento');
+        try {
+            $nodo_complemento = $xml->dom->createElement('cfdi:Complemento');
+        }
+        catch (Throwable $e){
+            return $this->error->error(mensaje: 'Error al crear el elemento cfdi:Complemento', data: $e);
+        }
         $xml->xml->appendChild($nodo_complemento);
         return $nodo_complemento;
     }
