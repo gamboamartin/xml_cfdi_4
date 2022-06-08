@@ -19,86 +19,7 @@ class dom_xmlTest extends test {
 
     }
 
-    public function test_asigna_cfdi_comprobante_pago(): void
-    {
-        errores::$error = false;
 
-        $dom = new dom_xml();
-        $dom = new liberator($dom);
-
-        $xml = new xml();
-        $comprobante = new stdClass();
-        $comprobante->tipo_de_comprobante = 'P';
-        $comprobante->moneda = 'XXX';
-        $comprobante->exportacion = '01';
-        $comprobante->total = 0;
-        $comprobante->sub_total = 0;
-        $comprobante->lugar_expedicion = 44110;
-        $comprobante->fecha = '2021-01-01';
-        $comprobante->folio = '01';
-        $comprobante = $xml->cfdi_comprobante($comprobante);
-        if(errores::$error){
-            $error = (new errores())->error(mensaje: 'Error al generar comprobante', data: $comprobante);
-            print_r($error);
-            exit;
-        }
-
-        $resultado = $dom->asigna_cfdi_comprobante_pago($xml);
-
-
-        $this->assertNotTrue(errores::$error);
-        $this->assertIsObject($resultado);
-        $this->assertEquals('http://www.sat.gob.mx/cfd/4', $resultado->namespaceURI);
-        $this->assertEquals('Comprobante', $resultado->localName);
-        $this->assertEquals('cfdi:Comprobante', $resultado->nodeName);
-        $this->assertEquals('cfdi:Comprobante', $resultado->tagName);
-        $this->assertEquals('cfdi', $resultado->prefix);
-
-
-        errores::$error = false;
-    }
-
-    public function test_attr_ns(): void
-    {
-        errores::$error = false;
-
-        $dom = new dom_xml();
-        //$dom = new liberator($dom);
-
-        $xml = new xml();
-
-        $comprobante = new stdClass();
-        $comprobante->tipo_de_comprobante = 'I';
-        $comprobante->moneda = 'MXN';
-        $comprobante->exportacion = '01';
-        $comprobante->total = 0;
-        $comprobante->sub_total = 0;
-        $comprobante->lugar_expedicion = 44110;
-        $comprobante->fecha = '2021-01-01';
-        $comprobante->folio = '01';
-        $comprobante = $xml->cfdi_comprobante($comprobante);
-        if(errores::$error){
-            $error = (new errores())->error(mensaje: 'Error al generar comprobante', data: $comprobante);
-            print_r($error);
-            exit;
-        }
-
-        $resultado = $dom->attr_ns($xml);
-        $this->assertNotTrue(errores::$error);
-        $this->assertIsObject($resultado);
-        $this->assertEquals('utf-8', $resultado->dom->actualEncoding);
-        $this->assertEquals('utf-8', $resultado->dom->encoding);
-        $this->assertEquals('utf-8', $resultado->dom->xmlEncoding);
-        $this->assertEquals('1.0', $resultado->dom->version);
-        $this->assertEquals('1.0', $resultado->dom->xmlVersion);
-        $this->assertEquals('#document', $resultado->dom->nodeName);
-        $this->assertEquals('9', $resultado->dom->nodeType);
-        $this->assertEquals('cfdi:Comprobante', $resultado->xml->nodeName);
-        $this->assertEquals('cfdi:Comprobante', $resultado->xml->nodeName);
-        $this->assertEquals('http://www.sat.gob.mx/cfd/4', $resultado->xml->namespaceURI);
-        $this->assertEquals('cfdi', $resultado->xml->prefix);
-        $this->assertEquals('Comprobante', $resultado->xml->localName);
-    }
 
     /**
      * @throws DOMException
@@ -143,12 +64,8 @@ class dom_xmlTest extends test {
         $resultado = $dom->comprobante_pago($comprobante, $xml);
 
         $this->assertNotTrue(errores::$error);
-        $this->assertIsObject($resultado);
-        $this->assertEquals('cfdi:Comprobante', $resultado->tagName);
-        $this->assertEquals('cfdi:Comprobante', $resultado->nodeName);
-        $this->assertEquals('http://www.sat.gob.mx/cfd/4', $resultado->namespaceURI);
-        $this->assertEquals('cfdi', $resultado->prefix);
-        $this->assertEquals('Comprobante', $resultado->localName);
+        $this->assertIsBool($resultado);
+
         errores::$error = false;
 
     }

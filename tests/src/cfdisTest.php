@@ -96,13 +96,14 @@ class cfdisTest extends test {
         $resultado = $cfdis->complemento_pago(comprobante: $comprobante,emisor:  $emisor, pagos: $pagos, receptor: $receptor);
 
 
+
         $this->assertNotTrue(errores::$error);
         $this->assertIsString($resultado);
-        $this->assertStringContainsStringIgnoringCase('<cfdi:Comprobante xmlns:cfdi="http://www.sat.gob.mx/cfd/4"',$resultado);
-        $this->assertStringContainsStringIgnoringCase('"http://www.sat.gob.mx/cfd/4" xm',$resultado);
+        $this->assertStringContainsStringIgnoringCase('<cfdi:Comprobante xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"',$resultado);
+        $this->assertStringContainsStringIgnoringCase('xmlns:cfdi="http://www.sat.gob.mx/cfd/4" xsi:schemaLocation',$resultado);
         $this->assertStringContainsStringIgnoringCase('mlns:xsi="http://www.w3.org/2001/XMLSchema-instance"',$resultado);
         $this->assertStringContainsStringIgnoringCase(' xmlns:pago20="http://www.sat.gob.mx/Pagos20"',$resultado);
-        $this->assertStringContainsStringIgnoringCase('xsi:schemaLocation="http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd "',$resultado);
+        $this->assertStringContainsStringIgnoringCase('xsi:schemaLocation="http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd http://www.sat.gob.mx/Pagos20',$resultado);
         $this->assertStringContainsStringIgnoringCase(' Moneda="XXX" Total="0" Exportacion="01" TipoDeComprobante="P" SubTotal="0"',$resultado);
         $this->assertStringContainsStringIgnoringCase('="0" LugarExpedicion="29960"',$resultado);
         $this->assertStringContainsStringIgnoringCase('sor Rfc="IIA040805DZ4" Nombre="INDISTRIA ILUMINADORA DE ALMACENES" RegimenFiscal="626"/><',$resultado);

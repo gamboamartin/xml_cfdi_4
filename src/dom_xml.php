@@ -41,47 +41,9 @@ class dom_xml{
         return $data_nodo;
     }
 
-    /**
-     * Asigna los atributos xsi para complemento de pago
-     * @version 0.2.0
-     * @param xml $xml Objeto de ejecucion de xml
-     * @return DOMNode|array
-     */
-    private function asigna_cfdi_comprobante_pago(xml $xml): DOMNode|array
-    {
 
-        if(!isset($xml->xml)){
-            return $this->error->error(mensaje: 'Error no esta inicializado el xml', data: $this);
-        }
 
-        $xml->xml->setAttributeNS($xml->cfdi->comprobante->namespace->w3, 'xmlns:pago20',
-            $xml->cfdi->comprobante->xmlns_pago20);
-        $xml->cfdi->comprobante->xsi_schemaLocation.=" ".$xml->cfdi->comprobante->xmlns_pago20;
-        $xml->cfdi->comprobante->xsi_schemaLocation.=" http://www.sat.gob.mx/sitio_internet/cfd/Pagos/Pagos20.xsd";
 
-        return $xml->xml;
-    }
-
-    /**
-     * Se asignan atributos en comprobante para location base
-     * @param xml $xml Obj de cfdi en ejecucion
-     * @return xml|array
-     * @version 0.3.0
-     */
-    PUBLIC function attr_ns(xml $xml): xml|array
-    {
-        if(!isset($xml->xml)){
-            return $this->error->error(mensaje: 'Error no esta inicializado el xml', data: $this);
-        }
-
-        $xml->xml->setAttributeNS($xml->cfdi->comprobante->namespace->w3, 'xmlns:xsi',
-            $xml->cfdi->comprobante->xmlns_xsi);
-
-        $xml->xml->setAttributeNS($xml->cfdi->comprobante->xmlns_xsi, 'xsi:schemaLocation',
-            $xml->cfdi->comprobante->xsi_schemaLocation);
-
-        return $xml;
-    }
 
     private function attrs_concepto(stdClass $concepto, DOMElement $nodo_concepto): DOMElement|array
     {
@@ -242,7 +204,8 @@ class dom_xml{
             return $this->error->error(mensaje: 'Error al inicializar cfdi comprobante', data: $nodo);
         }
 
-        $comprobante_base = $this->comprobante_base(nodo:$nodo, xml: $xml);
+        $comprobante_base = $this->comprobante_base(nodo:$nodo,
+            tipo_de_comprobante: $comprobante->tipo_de_comprobante, xml: $xml);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al inicializar cfdi comprobante', data: $comprobante_base);
         }
@@ -250,14 +213,27 @@ class dom_xml{
         return $comprobante_base;
     }
 
-    private function comprobante_base(DOMElement $nodo, xml $xml): array|stdClass
+    private function comprobante_base(DOMElement $nodo, string $tipo_de_comprobante, xml $xml): array|stdClass
     {
 
 
-        $attr_ns = $this->attr_ns(xml:$xml);
-        if(errores::$error){
-            return $this->error->error(mensaje: 'Error al inicializar dom attr', data: $attr_ns);
+        $nodo->setAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
+
+        if(!isset($xml->xml)){
+            return $this->error->error(mensaje: 'Error no esta inicializado el xml', data: $this);
         }
+
+        if($tipo_de_comprobante === 'P') {
+            $nodo->setAttribute('xmlns:pago20', 'http://www.sat.gob.mx/Pagos20');
+            $nodo->setAttribute('xmlns:cfdi', 'http://www.sat.gob.mx/cfd/4');
+            $nodo->setAttribute('xsi:schemaLocation', 'http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd http://www.sat.gob.mx/Pagos20 http://www.sat.gob.mx/sitio_internet/cfd/Pagos/Pagos20.xsd');
+        }
+        if($tipo_de_comprobante === 'I') {
+            $nodo->setAttribute('xmlns:cfdi', 'http://www.sat.gob.mx/cfd/4');
+            $nodo->setAttribute('xsi:schemaLocation', 'http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd');
+        }
+
+
 
         $data_nodo = $this->init_dom_cfdi_comprobante(nodo: $nodo,xml:  $xml);
         if(errores::$error){
@@ -272,9 +248,9 @@ class dom_xml{
      * @version 0.3.0
      * @param stdClass $comprobante
      * @param xml $xml
-     * @return DOMNode|array
+     * @return bool|array
      */
-    public function comprobante_pago(stdClass $comprobante, xml $xml): DOMNode|array
+    public function comprobante_pago(stdClass $comprobante, xml $xml): bool|array
     {
         if(!isset($xml->xml)){
             return $this->error->error(mensaje: 'Error no esta inicializado el xml', data: $this);
@@ -284,11 +260,8 @@ class dom_xml{
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al validar complemento pago dom pago', data: $valida);
         }
-        $cfdi_comprobante_pago = $this->asigna_cfdi_comprobante_pago(xml: $xml);
-        if(errores::$error){
-            return $this->error->error(mensaje: 'Error al inicializar dom pago', data: $cfdi_comprobante_pago);
-        }
-        return $cfdi_comprobante_pago;
+
+        return $valida;
     }
 
 
@@ -429,8 +402,10 @@ class dom_xml{
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al inicializar comprobante', data: $data_comprobante);
         }
-        $nodo = $xml->dom->createElementNS($xml->cfdi->comprobante->xmlns_cfdi, 'cfdi:Comprobante');
+
+        $nodo = $xml->dom->createElement('cfdi:Comprobante');
         $xml->xml = $xml->dom->appendChild($nodo);
+
 
         return $nodo;
     }

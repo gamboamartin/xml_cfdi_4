@@ -76,8 +76,12 @@ class indexTest extends test {
         curl_close($curl);
         $data = json_decode($data,true);
 
-        $this->assertStringContainsStringIgnoringCase('<cfdi:Comprobante xmlns:cfdi="http://www.sat.gob.mx/cfd/4" ',$data['xml']);
-        $this->assertStringContainsStringIgnoringCase('DomicilioFiscalReceptor="26015" RegimenFiscalReceptor="603" UsoCfdi="CP01"',$data['xml']);
+        $this->assertStringContainsStringIgnoringCase('<cfdi:Comprobante xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"',$data['xml']);
+        $this->assertStringContainsStringIgnoringCase('xmlns:pago20="http://www.sat.gob.mx/Pagos20" xmlns:cfdi="http://www.sat.gob.mx/cfd/4"',$data['xml']);
+        $this->assertStringContainsStringIgnoringCase('Moneda="XXX" Total="0" Exportacion="01" TipoDeComprobante="P" SubTotal="0"',$data['xml']);
+        $this->assertStringContainsStringIgnoringCase('http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd http://www.sat.gob.mx/Pagos20 http://www.sat.gob.mx/sitio_inte',$data['xml']);
+        $this->assertStringContainsStringIgnoringCase('Moneda="XXX" Total="0" Exportacion="01" TipoDeComprobante="P" SubTotal="0" LugarExpedicion="29960"',$data['xml']);
+        $this->assertStringContainsStringIgnoringCase('SubTotal="0" LugarExpedicion="29960"',$data['xml']);
 
 
 

@@ -40,10 +40,10 @@ class xmlTest extends test {
         $this->assertNotTrue(errores::$error);
         $this->assertIsString($resultado);
         $this->assertStringContainsStringIgnoringCase('<?xml version="1.0" encoding="utf-8"?>', $resultado);
-        $this->assertStringContainsStringIgnoringCase('<cfdi:Comprobante xmlns:cfdi="http://www.sat.gob.mx/cfd/4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"', $resultado);
+        $this->assertStringContainsStringIgnoringCase('<cfdi:Comprobante xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:pago20="http://www.sat.gob.mx/Pagos20"', $resultado);
         $this->assertStringContainsStringIgnoringCase('xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:pago20', $resultado);
-        $this->assertStringContainsStringIgnoringCase('go20="http://www.sat.gob.mx/Pagos20" xsi:schemaLoc', $resultado);
-        $this->assertStringContainsStringIgnoringCase('on="http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd " Moneda="XXX"', $resultado);
+        $this->assertStringContainsStringIgnoringCase('http://www.sat.gob.mx/sitio_internet/cfd/Pagos/Pagos20.xsd" Moneda="XXX"', $resultado);
+        $this->assertStringContainsStringIgnoringCase('Moneda="XXX" Total="0" Exportacion="01" TipoDeComprobante="P', $resultado);
         $this->assertStringContainsStringIgnoringCase('eda="XXX" Total="0" Exportacion="01" TipoDeComprobante="P" SubTotal="0" ', $resultado);
         $this->assertStringContainsStringIgnoringCase('" Folio="01" Version="4.0"/>', $resultado);
 
@@ -56,12 +56,7 @@ class xmlTest extends test {
 
         $this->assertNotTrue(errores::$error);
         $this->assertIsString($resultado);
-        $this->assertStringContainsStringIgnoringCase('<?xml version="1.0" encoding="utf-8"?>', $resultado);
-        $this->assertStringContainsStringIgnoringCase('<cfdi:Comprobante xmlns:cfdi="http://www.sat.gob.mx/cfd/4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"', $resultado);
-        $this->assertStringContainsStringIgnoringCase('xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:pago20', $resultado);
-        $this->assertStringContainsStringIgnoringCase('go20="http://www.sat.gob.mx/Pagos20" xsi:schemaLoc', $resultado);
-        $this->assertStringContainsStringIgnoringCase('on="http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd " Moneda="XXX"', $resultado);
-        $this->assertStringContainsStringIgnoringCase('eda="XXX" Total="0" Exportacion="01" TipoDeComprobante="P" SubTotal="0" ', $resultado);
+
         $this->assertStringContainsStringIgnoringCase('" Folio="01" Version="4.0" Serie="NCV4.0"/>', $resultado);
 
         errores::$error = false;
@@ -121,7 +116,7 @@ class xmlTest extends test {
         $this->assertNotTrue(errores::$error);
         $this->assertIsString($resultado);
         $this->assertStringContainsStringIgnoringCase('<?xml version="1.0" encoding="utf-8"?>',$resultado);
-        $this->assertStringContainsStringIgnoringCase('<cfdi:Comprobante xmlns:cfdi="http://www.sat.gob.mx/cfd/4"',$resultado);
+        $this->assertStringContainsStringIgnoringCase('<cfdi:Comprobante xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:pago20="http://www.sat.gob.mx/Pagos20"',$resultado);
         $this->assertStringContainsStringIgnoringCase('xsi:schemaLocation="http://www.sat.gob.mx/cfd/4',$resultado);
         $this->assertStringContainsStringIgnoringCase('cfdi:Emisor Rfc="a" Nombre="a" Regim',$resultado);
         $this->assertStringContainsStringIgnoringCase('a" RegimenFiscal="a"/></cfdi:Comprobante>',$resultado);
@@ -179,13 +174,14 @@ class xmlTest extends test {
 
 
         $resultado = $xml->cfdi_conceptos($conceptos);
+
         $this->assertNotTrue(errores::$error);
         $this->assertIsString($resultado);
-        $this->assertStringContainsStringIgnoringCase('<cfdi:Comprobante xmlns:cfdi="http://www.sat.gob.mx/cfd/4"',$resultado);
-        $this->assertStringContainsStringIgnoringCase('"http://www.sat.gob.mx/cfd/4" xmlns:xsi="http://www.w3.',$resultado);
-        $this->assertStringContainsStringIgnoringCase('si="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://ww',$resultado);
-        $this->assertStringContainsStringIgnoringCase('Location="http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd " Mo',$resultado);
-        $this->assertStringContainsStringIgnoringCase('da="XXX" Total="0" Exportacion="01" TipoDeComprobante="I" SubTotal="0"',$resultado);
+        $this->assertStringContainsStringIgnoringCase('<cfdi:Comprobante xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"',$resultado);
+        $this->assertStringContainsStringIgnoringCase('xsi:schemaLocation="http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd" M',$resultado);
+        $this->assertStringContainsStringIgnoringCase('Moneda="XXX" Total="0" Exportacion="01" TipoDeComprobante="I" SubTotal="0"',$resultado);
+        $this->assertStringContainsStringIgnoringCase('<cfdi:Concepto ClaveProdServ="1" NoIdentificacion="f" ',$resultado);
+        $this->assertStringContainsStringIgnoringCase('Folio="01" Version="4.0"><cfdi:Conceptos>',$resultado);
         $this->assertStringContainsStringIgnoringCase('l="0" LugarExpedicion="44110" Fecha="2',$resultado);
         $this->assertStringContainsStringIgnoringCase('" Folio="01" Version="4.0"><cfdi:Co',$resultado);
         $this->assertStringContainsStringIgnoringCase('i:Conceptos><cfdi:Concepto ClaveProdServ="1" NoIdent',$resultado);
@@ -243,7 +239,7 @@ class xmlTest extends test {
         $resultado = $xml->cfdi_conceptos($conceptos);
         $this->assertNotTrue(errores::$error);
         $this->assertIsString($resultado);
-        $this->assertStringContainsStringIgnoringCase('<cfdi:Comprobante xmlns:cfdi="http://www.sat.gob.mx/cfd/4"',$resultado);
+        $this->assertStringContainsStringIgnoringCase('<cfdi:Comprobante xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cfdi="http://www.sat.gob.mx/cfd/4"',$resultado);
         $this->assertStringContainsStringIgnoringCase('Moneda="XXX" Total="0" Exportacion="01" TipoDeComproba',$resultado);
         $this->assertStringContainsStringIgnoringCase('Folio="01" Version="4.0"><cfdi:Conceptos><cfdi:Con',$resultado);
         $this->assertStringContainsStringIgnoringCase('f" Cantidad="0" ClaveUnidad="f" Descripcion="c" ValorUnitar',$resultado);
@@ -327,7 +323,7 @@ class xmlTest extends test {
 
         $this->assertNotTrue(errores::$error);
         $this->assertIsString($resultado);
-        $this->assertStringContainsStringIgnoringCase('xsi:schemaLocation="http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd "',$resultado);
+        $this->assertStringContainsStringIgnoringCase('xsi:schemaLocation="http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd"',$resultado);
         $this->assertStringContainsStringIgnoringCase('Exportacion="01" TipoDeComprobante="I"',$resultado);
         $this->assertStringContainsStringIgnoringCase('<cfdi:Receptor Rfc="a" Nombre="b"',$resultado);
         $this->assertStringContainsStringIgnoringCase('DomicilioFiscalReceptor="c" RegimenFis',$resultado);
