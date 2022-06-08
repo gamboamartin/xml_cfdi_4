@@ -161,7 +161,7 @@ class dom_xmlTest extends test {
         errores::$error = false;
 
         $dom = new dom_xml();
-        //$dom = new liberator($dom);
+        $dom = new liberator($dom);
 
         $xml = new xml();
 
