@@ -32,6 +32,15 @@ class complementos{
         return $xml;
     }
 
+    public function comprobante_a_cuenta_terceros(stdClass $comprobante): stdClass
+    {
+        $comprobante->metodo_pago = 'PUE';
+        $comprobante->tipo_de_comprobante = 'I';
+        $comprobante->exportacion = '01';
+        return $comprobante;
+    }
+
+
     /**
      * Se precarga la info base de un complemento de pago
      * @version 0.9.0

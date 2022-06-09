@@ -14,6 +14,61 @@ class cfdis{
 
     }
 
+    /**
+     * @throws DOMException
+     */
+    public function complemento_a_cuenta_terceros(stdClass|array $comprobante, stdClass|array $conceptos_a,
+                                                  stdClass|array $emisor, stdClass|array $impuestos,
+                                                  stdClass|array $receptor)
+    {
+        if(is_array($comprobante)){
+            $comprobante = (object) $comprobante;
+        }
+        if(is_array($emisor)){
+            $emisor = (object) $emisor;
+        }
+        if(is_array($impuestos)){
+            $impuestos = (object) $impuestos;
+        }
+        if(is_array($receptor)){
+            $receptor = (object) $receptor;
+        }
+
+        $xml = new xml();
+
+        $comprobante_cp = (new complementos())->comprobante_a_cuenta_terceros(comprobante: $comprobante);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al obtener comprobante', data: $comprobante_cp);
+        }
+
+        $dom = $xml->cfdi_comprobante(comprobante: $comprobante_cp);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al generar comprobante', data: $dom);
+        }
+
+        $dom = $xml->cfdi_emisor(emisor:  $emisor);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al generar emisor', data: $dom);
+        }
+
+        $dom = $xml->cfdi_receptor(receptor:  $receptor);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al generar receptor', data: $dom);
+        }
+
+        $dom = $xml->cfdi_conceptos(conceptos: $conceptos_a);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al generar conceptos', data: $dom);
+        }
+
+        $dom = $xml->cfdi_impuestos(impuestos: $impuestos);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al generar impuestos', data: $dom);
+        }
+
+        return $xml->dom->saveXML();
+    }
+
     public function complemento_pago(stdClass|array $comprobante, stdClass|array $emisor, stdClass|array $pagos,
                                      stdClass|array $receptor): bool|array|string
     {
@@ -145,14 +200,17 @@ class cfdis{
         if(is_array($comprobante)){
             $comprobante = (object) $comprobante;
         }
-        if(is_array($relacionados)){
-            $relacionados = (object) $relacionados;
-        }
         if(is_array($emisor)){
             $emisor = (object) $emisor;
         }
+        if(is_array($impuestos)){
+            $impuestos = (object) $impuestos;
+        }
         if(is_array($receptor)){
             $receptor = (object) $receptor;
+        }
+        if(is_array($relacionados)){
+            $relacionados = (object) $relacionados;
         }
 
         $xml = new xml();

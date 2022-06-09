@@ -335,6 +335,14 @@ class dom_xml{
             return $this->error->error(mensaje: 'Error al cargar nodo impuestos', data: $nodo_impuestos);
         }
 
+        if(isset($concepto->a_cuanta_terceros)){
+            $nodo_a_cuenta_terceros = $this->genera_nodo_a_cuenta_terceros(
+                a_cuanta_terceros: $concepto->a_cuanta_terceros, nodo_concepto: $nodo_concepto, xml: $xml);
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error al cargar nodo a cuenta terceros',
+                    data: $nodo_a_cuenta_terceros);
+            }
+        }
 
         return $nodo_conceptos;
     }
@@ -382,8 +390,38 @@ class dom_xml{
         return $setea;
     }
 
+    private function genera_nodo_a_cuenta_terceros(array $a_cuanta_terceros, DOMElement $nodo_concepto, xml $xml): array|DOMElement
+    {
+        if(count($a_cuanta_terceros)>0){
+            try {
+                $nodo_a_cuanta_terceros = $xml->dom->createElement('cfdi:ACuentaTerceros');
+            }
+            catch (Throwable $e){
+                return $this->error->error(mensaje: 'Error al crear el elemento cfdi:ACuentaTerceros', data: $e);
+            }
 
-    private function    genera_nodo_concepto_impuestos(array $impuestos, DOMElement $nodo_concepto, xml $xml): array|DOMElement
+            $nodo_concepto->appendChild($nodo_a_cuanta_terceros);
+
+            foreach ($a_cuanta_terceros as $a_cuanta_tercero){
+                $nodo_a_cuanta_terceros->setAttribute('RfcACuentaTerceros',
+                    $a_cuanta_tercero->rfc_acuenta_terceros);
+
+                $nodo_a_cuanta_terceros->setAttribute('NombreACuentaTerceros',
+                    $a_cuanta_tercero->nombre_a_cuenta_terceros);
+
+                $nodo_a_cuanta_terceros->setAttribute('RegimenFiscalACuentaTerceros',
+                    $a_cuanta_tercero->regimen_fiscal_a_cuenta_terceros);
+
+                $nodo_a_cuanta_terceros->setAttribute('DomicilioFiscalACuentaTerceros',
+                    $a_cuanta_tercero->domicilio_fiscal_a_cuenta_terceros);
+            }
+
+        }
+
+        return $nodo_concepto;
+    }
+
+    private function genera_nodo_concepto_impuestos(array $impuestos, DOMElement $nodo_concepto, xml $xml): array|DOMElement
     {
 
         if(count($impuestos)>0){

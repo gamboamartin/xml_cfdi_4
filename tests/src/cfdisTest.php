@@ -20,6 +20,84 @@ class cfdisTest extends test {
 
     }
 
+    public function test_complemento_a_cuenta_terceros(): void
+    {
+        errores::$error = false;
+
+        $cfdis = new cfdis();
+        //$com = new liberator($com);
+
+        $comprobante = new stdClass();
+        $comprobante->folio  = 922;
+        $comprobante->forma_pago  = '01';
+        $comprobante->sub_total  = 1050.00;
+        $comprobante->moneda  = 'MXN';
+        $comprobante->total  = 1218.00;
+        $comprobante->lugar_expedicion  = 29960;
+
+        $emisor = new stdClass();
+
+        $emisor->rfc = 'IIA040805DZ4';
+        $emisor->nombre = 'INDISTRIA ILUMINADORA DE ALMACENES';
+        $emisor->regimen_fiscal = '626';
+
+        $receptor = new stdClass();
+        $receptor->rfc = 'EKU9003173C9';
+        $receptor->nombre = 'ESCUELA KEMPER URGATE';
+        $receptor->domicilio_fiscal_receptor = '26015';
+        $receptor->regimen_fiscal_receptor = '603';
+        $receptor->uso_cfdi = 'G03';
+
+        $conceptos = array();
+        $conceptos[0] = new stdClass();
+        $conceptos[0]->clave_prod_serv = '84111506';
+        $conceptos[0]->cantidad = '1';
+        $conceptos[0]->clave_unidad = 'ACT';
+        $conceptos[0]->descripcion = 'Pago';
+        $conceptos[0]->valor_unitario = '0';
+        $conceptos[0]->importe = '0';
+        $conceptos[0]->objeto_imp = '01';
+        $conceptos[0]->no_identificacion = '400578';
+        $conceptos[0]->impuestos = array();
+        $conceptos[0]->impuestos[0]= new stdClass();
+        $conceptos[0]->impuestos[0]->traslados = array();
+        $conceptos[0]->impuestos[0]->traslados[0] = new stdClass();
+        $conceptos[0]->impuestos[0]->traslados[0]->base = '1';
+        $conceptos[0]->impuestos[0]->traslados[0]->impuesto = 'a';
+        $conceptos[0]->impuestos[0]->traslados[0]->tipo_factor = 'a';
+        $conceptos[0]->impuestos[0]->traslados[0]->tasa_o_cuota = '1';
+        $conceptos[0]->impuestos[0]->traslados[0]->importe = '1';
+
+        $conceptos[0]->a_cuanta_terceros = array();
+        $conceptos[0]->a_cuanta_terceros[0] = new stdClass();
+        $conceptos[0]->a_cuanta_terceros[0]->rfc_acuenta_terceros = 'JUFA7608212V6';
+        $conceptos[0]->a_cuanta_terceros[0]->nombre_a_cuenta_terceros = 'ADRIANA JUAREZ FERNANDEZ';
+        $conceptos[0]->a_cuanta_terceros[0]->regimen_fiscal_a_cuenta_terceros = '612';
+        $conceptos[0]->a_cuanta_terceros[0]->domicilio_fiscal_a_cuenta_terceros = '29133';
+
+        $impuestos = new stdClass();
+        $impuestos->total_impuestos_trasladados = '240.00';
+
+        $impuestos->traslados = array();
+        $impuestos->traslados[0] = new stdClass();
+        $impuestos->traslados[0]->base = '1500.00';
+        $impuestos->traslados[0]->impuesto = '002';
+        $impuestos->traslados[0]->tipo_factor = 'Tasa';
+        $impuestos->traslados[0]->tasa_o_cuota = '0.160000';
+        $impuestos->traslados[0]->importe = '240.00';
+
+        $resultado = $cfdis->complemento_a_cuenta_terceros(comprobante: $comprobante,conceptos_a: $conceptos,
+            emisor:  $emisor, impuestos: $impuestos, receptor: $receptor);
+        $this->assertNotTrue(errores::$error);
+        $this->assertIsString($resultado);
+        $this->assertStringContainsStringIgnoringCase('<cfdi:Comprobante xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"',$resultado);
+        $this->assertStringContainsStringIgnoringCase('<cfdi:Conceptos><cfdi:Concepto ClaveProdServ="84111506" NoIdentificacion="400578"',$resultado);
+        $this->assertStringContainsStringIgnoringCase('</cfdi:Impuestos><cfdi:ACuentaTerceros RfcACuentaTerceros="JUFA7608212V6"',$resultado);
+        $this->assertStringContainsStringIgnoringCase('RegimenFiscalACuentaTerceros="612" DomicilioFiscalACuentaTerceros="29133"/>',$resultado);
+
+        errores::$error = false;
+    }
+
     public function test_complemento_pago(): void
     {
         errores::$error = false;
