@@ -25,6 +25,7 @@ class xml{
         $this->cfdi->comprobante = new stdClass();
         $this->cfdi->comprobante->xmlns_xsi = "http://www.w3.org/2001/XMLSchema-instance";
         $this->cfdi->comprobante->xmlns_pago20 = "http://www.sat.gob.mx/Pagos20";
+        $this->cfdi->comprobante->xmlns_nomina12 = "http://www.sat.gob.mx/nomina12";
         $this->cfdi->comprobante->xmlns_cfdi = "http://www.sat.gob.mx/cfd/4";
         $this->cfdi->comprobante->moneda = "";
         $this->cfdi->comprobante->total = "0";

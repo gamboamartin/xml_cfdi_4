@@ -180,7 +180,7 @@ class cfdis{
         return $xml->dom->saveXML();
     }
 
-    public function complemento_nomina(stdClass|array $comprobante, stdClass|array $emisor,
+    public function complemento_nomina(stdClass|array $comprobante, stdClass|array $emisor, stdClass|array $nomina,
                                        stdClass|array $receptor): bool|array|string
     {
 
@@ -189,6 +189,10 @@ class cfdis{
             return $this->error->error(mensaje: 'Error al inicializar datos', data: $data);
         }
 
+        $nomina_ = $nomina;
+        if(is_array($nomina_)){
+            $nomina_ = (object)$nomina_;
+        }
 
 
         $keys = array('lugar_expedicion', 'folio');
@@ -245,6 +249,11 @@ class cfdis{
         $nodo_complemento = (new complementos())->nodo_complemento(xml: $xml);
         if (errores::$error) {
             return $this->error->error(mensaje: 'Error al asignar nodo', data: $nodo_complemento);
+        }
+
+        $nodo_nominas = (new nomina())->nodo_nominas(nodo_complemento: $nodo_complemento, nomina: $nomina_, xml: $xml);
+        if (errores::$error) {
+            return $this->error->error(mensaje: 'Error al asignar nodo', data: $nodo_nominas);
         }
 
 

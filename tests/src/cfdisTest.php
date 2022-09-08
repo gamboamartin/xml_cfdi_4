@@ -127,7 +127,18 @@ class cfdisTest extends test {
         $receptor->regimen_fiscal_receptor = '605';
 
 
-        $resultado = $cfdis->complemento_nomina(comprobante: $comprobante,emisor:  $emisor,receptor:  $receptor);
+        $nomina = new stdClass();
+        $nomina->tipo_nomina = 'O';
+        $nomina->fecha_pago = '2021-12-24';
+        $nomina->fecha_inicial_pago = '2021-12-09';
+        $nomina->fecha_final_pago = '2021-12-24';
+        $nomina->num_dias_pagados = '15';
+        $nomina->total_percepciones = '5000';
+        $nomina->total_deducciones = '300';
+
+        $resultado = $cfdis->complemento_nomina(comprobante: $comprobante,emisor:  $emisor, nomina: $nomina,receptor:  $receptor);
+
+
         $this->assertNotTrue(errores::$error);
         $this->assertIsString($resultado);
 
