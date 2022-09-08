@@ -12,6 +12,10 @@ ini_set('memory_limit', '-1');
 ini_set('upload_max_filesize', '2048M');
 ini_set('post_max_size', '2048M');
 include 'vendor/autoload.php';
+
+
+$tipo_de_comprobante = $_GET['tipo_de_comprobante'];
+
 if(!isset($_GET['tipo_de_comprobante'])){
     $fix = 'Debe existir en tu llamada a la aplicacion por GET el tipo de comprobante';
     $fix .= ' Ej https://xml-cfdi-4.ivitec.com.mx/index.php?tipo_de_comprobante=P';
@@ -37,12 +41,21 @@ if(!isset($_POST['comprobante'])){
     echo json_encode($error, JSON_THROW_ON_ERROR);
     exit;
 }
-if(!isset($_POST['pagos'])){
-    $error = (new errores())->error(mensaje:'Error no existe pagos en POST', data: $_POST);
-    ob_clean();
-    header('Content-Type: application/json');
-    echo json_encode($error, JSON_THROW_ON_ERROR);
-    exit;
+
+if($tipo_de_comprobante === 'P') {
+
+    if (!isset($_POST['pagos'])) {
+        $error = (new errores())->error(mensaje: 'Error no existe pagos en POST', data: $_POST);
+        ob_clean();
+        header('Content-Type: application/json');
+        try {
+            echo json_encode($error, JSON_THROW_ON_ERROR);
+        }
+        catch (Throwable $e){
+            echo 'Error';
+        }
+        exit;
+    }
 }
 if(!isset($_POST['emisor'])){
     $error = (new errores())->error(mensaje:'Error no existe emisor en POST', data: $_POST);
@@ -59,9 +72,9 @@ if(!isset($_POST['receptor'])){
     exit;
 }
 
-$tipo_de_comprobante = $_GET['tipo_de_comprobante'];
 
-$tipos_de_comprobante = array('P');
+
+$tipos_de_comprobante = array('P','I');
 if(!in_array($tipo_de_comprobante, $tipos_de_comprobante, true)){
     $error = (new errores())->error(mensaje:'Error tipo_de_comprobante_invalido',
         data: $tipos_de_comprobante);
