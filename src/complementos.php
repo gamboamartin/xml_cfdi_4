@@ -73,6 +73,22 @@ class complementos{
         return $comprobante;
     }
 
+    private function conceptos_complemento_nomina(float $descuento, float $valor_unitario): array
+    {
+        $conceptos = array();
+        $conceptos[0] = new stdClass();
+        $conceptos[0]->clave_prod_serv = '84111505';
+        $conceptos[0]->cantidad = '1';
+        $conceptos[0]->clave_unidad = 'ACT';
+        $conceptos[0]->descripcion = 'Pago de nómina';
+        $conceptos[0]->valor_unitario = $valor_unitario;
+        $conceptos[0]->importe = $valor_unitario;
+        $conceptos[0]->objeto_imp = '01';
+        $conceptos[0]->descuento = $descuento;
+        $conceptos[0]->impuestos = array();
+        return $conceptos;
+    }
+
 
     private function conceptos_complemento_pago(): array
     {
@@ -89,6 +105,20 @@ class complementos{
         return $conceptos;
     }
 
+    public function conceptos_complemento_nomina_dom(
+        float $descuento, xml $xml, float $valor_unitario): bool|array|string
+    {
+        $conceptos = $this->conceptos_complemento_nomina(descuento:  $descuento,valor_unitario: $valor_unitario);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al obtener conceptos', data: $conceptos);
+        }
+
+        $dom = $xml->cfdi_conceptos(conceptos: $conceptos);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al generar receptor', data: $dom);
+        }
+        return $dom;
+    }
 
     public function conceptos_complemento_pago_dom(xml $xml): bool|array|string
     {

@@ -226,13 +226,17 @@ class cfdis{
             return $this->error->error(mensaje: 'Error al generar emisor', data: $dom);
         }
 
-        $receptor->uso_cfdi = 'CP01';
+        $receptor->uso_cfdi = 'CN01';
         $dom = $xml->cfdi_receptor(receptor:  $data->receptor);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al generar receptor', data: $dom);
         }
 
-
+        $dom = (new complementos())->conceptos_complemento_nomina_dom(descuento: $comprobante->descuento, xml: $xml,
+            valor_unitario: $comprobante->sub_total);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al generar receptor', data: $dom);
+        }
 
         /**
          * COMPLEMENTO

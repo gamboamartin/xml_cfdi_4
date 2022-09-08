@@ -60,6 +60,9 @@ class dom_xml{
         if(isset($concepto->unidad) && $concepto->unidad!==''){
             $nodo_concepto->setAttribute('Unidad', $concepto->unidad);
         }
+        if(isset($concepto->descuento) && $concepto->descuento!==''){
+            $nodo_concepto->setAttribute('Descuento', $concepto->descuento);
+        }
 
         $nodo_concepto->setAttribute('Cantidad', $concepto->cantidad);
         $nodo_concepto->setAttribute('ClaveUnidad', $concepto->clave_unidad);

@@ -112,6 +112,7 @@ class cfdisTest extends test {
         $comprobante->serie = 'Serie';
         $comprobante->descuento = '300';
         $comprobante->tipo_cambio = '1';
+        $comprobante->metodo_pago = 'PPD';
 
         $emisor = new stdClass();
 
@@ -127,8 +128,10 @@ class cfdisTest extends test {
 
 
         $resultado = $cfdis->complemento_nomina(comprobante: $comprobante,emisor:  $emisor,receptor:  $receptor);
+        $this->assertNotTrue(errores::$error);
+        $this->assertIsString($resultado);
 
-       // print_r($resultado);exit;
+        //print_r($resultado);exit;
     }
 
     public function test_complemento_pago(): void
