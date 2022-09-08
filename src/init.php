@@ -107,6 +107,12 @@ class init{
         if(isset($comprobante->metodo_pago) && (string)$comprobante->metodo_pago !== ''){
             $xml->cfdi->comprobante->metodo_pago = $comprobante->metodo_pago;
         }
+        if(isset($comprobante->descuento) && (string)$comprobante->descuento !== ''){
+            $xml->cfdi->comprobante->descuento = $comprobante->descuento;
+        }
+        if(isset($comprobante->tipo_cambio) && (string)$comprobante->tipo_cambio !== ''){
+            $xml->cfdi->comprobante->tipo_cambio = $comprobante->tipo_cambio;
+        }
 
         return $xml->cfdi->comprobante;
     }

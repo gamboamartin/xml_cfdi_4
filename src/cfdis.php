@@ -180,6 +180,76 @@ class cfdis{
         return $xml->dom->saveXML();
     }
 
+    public function complemento_nomina(stdClass|array $comprobante, stdClass|array $emisor,
+                                       stdClass|array $receptor): bool|array|string
+    {
+
+        $data = $this->init_base(comprobante: $comprobante,emisor:  $emisor, receptor: $receptor);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al inicializar datos', data: $data);
+        }
+
+
+
+        $keys = array('lugar_expedicion', 'folio');
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $data->comprobante);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar comprobante de pago', data: $valida);
+        }
+
+        $keys = array('rfc','nombre','regimen_fiscal');
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $data->emisor);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar $emisor', data: $valida);
+        }
+
+        $keys = array('rfc','nombre','domicilio_fiscal_receptor','regimen_fiscal_receptor');
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $data->receptor);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar $receptor', data: $valida);
+        }
+
+        $xml = new xml();
+
+        $comprobante_nm = (new complementos())->comprobante_complemento_nomina(comprobante: $data->comprobante);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al obtener comprobante', data: $comprobante_nm);
+        }
+
+        $dom = $xml->cfdi_comprobante(comprobante: $comprobante_nm);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al generar comprobante', data: $dom);
+        }
+
+        $dom = $xml->cfdi_emisor(emisor:  $data->emisor);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al generar emisor', data: $dom);
+        }
+
+        $receptor->uso_cfdi = 'CP01';
+        $dom = $xml->cfdi_receptor(receptor:  $data->receptor);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al generar receptor', data: $dom);
+        }
+
+
+
+        /**
+         * COMPLEMENTO
+         */
+
+        $nodo_complemento = (new complementos())->nodo_complemento(xml: $xml);
+        if (errores::$error) {
+            return $this->error->error(mensaje: 'Error al asignar nodo', data: $nodo_complemento);
+        }
+
+
+
+
+        return $xml->dom->saveXML();
+    }
+
+
     /**
      * @throws DOMException
      */

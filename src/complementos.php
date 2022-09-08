@@ -40,6 +40,14 @@ class complementos{
         return $comprobante;
     }
 
+    public function comprobante_complemento_nomina(stdClass $comprobante): stdClass
+    {
+        $comprobante->tipo_de_comprobante = 'N';
+        $comprobante->moneda = 'MXN';
+        $comprobante->exportacion = '01';
+        return $comprobante;
+    }
+
 
     /**
      * Se precarga la info base de un complemento de pago

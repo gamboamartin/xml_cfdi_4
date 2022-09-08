@@ -245,6 +245,11 @@ class dom_xml{
             $nodo->setAttribute('xmlns:cfdi', 'http://www.sat.gob.mx/cfd/4');
             $nodo->setAttribute('xsi:schemaLocation', 'http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd');
         }
+        if($tipo_de_comprobante === 'N') {
+            $nodo->setAttribute('xmlns:nomina12', 'http://www.sat.gob.mx/nomina12');
+            $nodo->setAttribute('xmlns:cfdi', 'http://www.sat.gob.mx/cfd/4');
+            $nodo->setAttribute('xsi:schemaLocation', 'http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd http://www.sat.gob.mx/nomina12 http://www.sat.gob.mx/sitio_internet/cfd/nomina/nomina12.xsd');
+        }
 
 
 
@@ -480,6 +485,12 @@ class dom_xml{
         }
         if(isset($xml->cfdi->comprobante->metodo_pago) && (string)$xml->cfdi->comprobante->metodo_pago !== ''){
             $nodo->setAttribute('MetodoPago', $xml->cfdi->comprobante->metodo_pago);
+        }
+        if(isset($xml->cfdi->comprobante->descuento) && (string)$xml->cfdi->comprobante->descuento !== ''){
+            $nodo->setAttribute('Descuento', $xml->cfdi->comprobante->descuento);
+        }
+        if(isset($xml->cfdi->comprobante->tipo_cambio) && (string)$xml->cfdi->comprobante->tipo_cambio !== ''){
+            $nodo->setAttribute('TipoCambio', $xml->cfdi->comprobante->tipo_cambio);
         }
 
         return $nodo;

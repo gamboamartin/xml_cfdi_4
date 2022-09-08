@@ -98,6 +98,39 @@ class cfdisTest extends test {
         errores::$error = false;
     }
 
+    public function test_complemento_nomina(): void
+    {
+        errores::$error = false;
+
+        $cfdis = new cfdis();
+        //$com = new liberator($com);
+        $comprobante = new stdClass();
+        $comprobante->lugar_expedicion = 20000;
+        $comprobante->folio = 'Folio';
+        $comprobante->total = '4700';
+        $comprobante->sub_total = '5000';
+        $comprobante->serie = 'Serie';
+        $comprobante->descuento = '300';
+        $comprobante->tipo_cambio = '1';
+
+        $emisor = new stdClass();
+
+        $emisor->rfc = 'EKU9003173C9';
+        $emisor->nombre = 'ESCUELA KEMPER URGATE';
+        $emisor->regimen_fiscal = '601';
+
+        $receptor = new stdClass();
+        $receptor->rfc = 'XOJI740919U48';
+        $receptor->nombre = 'INGRID XODAR JIMENEZ';
+        $receptor->domicilio_fiscal_receptor = '88965';
+        $receptor->regimen_fiscal_receptor = '605';
+
+
+        $resultado = $cfdis->complemento_nomina(comprobante: $comprobante,emisor:  $emisor,receptor:  $receptor);
+
+       // print_r($resultado);exit;
+    }
+
     public function test_complemento_pago(): void
     {
         errores::$error = false;
