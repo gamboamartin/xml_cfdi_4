@@ -295,10 +295,9 @@ class cfdisTest extends test {
         errores::$error = false;
     }
 
-    /**
-     * @throws \DOMException
-     */
-    public function test_completo_nota_credito(){
+
+    public function test_completo_nota_credito(): void
+    {
         errores::$error = false;
 
         $cfdis = new cfdis();
@@ -373,6 +372,43 @@ class cfdisTest extends test {
         $this->assertStringContainsStringIgnoringCase(' Serie="NCV4.0" FormaPago="01" MetodoPago="PUE"><cfdi:CfdiRelacionados',$resultado);
         $this->assertStringContainsStringIgnoringCase('UUID="7945A043-3073-4295-BC0B-C17AFB6697A5"/></cfdi:CfdiRelacion',$resultado);
 
+        errores::$error = false;
+    }
+
+    public function test_init_base(): void
+    {
+        errores::$error = false;
+
+        $cfdis = new cfdis();
+        $cfdis = new liberator($cfdis);
+        $comprobante = new stdClass();
+        $comprobante->serie  = 'NCV4.0';
+        $comprobante->folio  = 922;
+        $comprobante->forma_pago  = '01';
+        $comprobante->sub_total  = 1050.00;
+        $comprobante->moneda  = 'MXN';
+        $comprobante->total  = 1218.00;
+        $comprobante->lugar_expedicion  = 29960;
+
+        $emisor = new stdClass();
+        $emisor->rfc = 'IIA040805DZ4';
+        $emisor->nombre = 'INDISTRIA ILUMINADORA DE ALMACENES';
+        $emisor->regimen_fiscal = '626';
+
+        $receptor = new stdClass();
+        $receptor->rfc = 'EKU9003173C9';
+        $receptor->nombre = 'ESCUELA KEMPER URGATE';
+        $receptor->domicilio_fiscal_receptor = '26015';
+        $receptor->regimen_fiscal_receptor = '603';
+        $receptor->uso_cfdi = 'G01';
+
+
+        $resultado = $cfdis->init_base($comprobante, $emisor, $receptor);
+        $this->assertNotTrue(errores::$error);
+        $this->assertIsObject($resultado);
+        $this->assertEquals('IIA040805DZ4',$resultado->emisor->rfc);
+        $this->assertEquals('NCV4.0',$resultado->comprobante->serie);
+        $this->assertEquals('603',$resultado->receptor->regimen_fiscal_receptor);
         errores::$error = false;
     }
 

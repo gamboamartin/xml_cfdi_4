@@ -14,9 +14,6 @@ class cfdis{
 
     }
 
-    /**
-     * @throws DOMException
-     */
     public function complemento_a_cuenta_terceros(stdClass|array $comprobante, stdClass|array $conceptos_a,
                                                   stdClass|array $emisor, stdClass|array $impuestos,
                                                   stdClass|array $receptor): bool|array|string
@@ -300,6 +297,7 @@ class cfdis{
      * @param stdClass|array $emisor Datos del emisor del cfdi razon social rfc etc
      * @param stdClass|array $receptor Datos del receptor de cfdi rfc razon social etc
      * @return stdClass
+     * @version 1.4.0
      */
     private function init_base(stdClass|array $comprobante, stdClass|array $emisor, stdClass|array $receptor): stdClass
     {
