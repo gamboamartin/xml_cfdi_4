@@ -1,5 +1,6 @@
 <?php
 
+/*
 use gamboamartin\errores\errores;
 use gamboamartin\xml_cfdi_4\cfdis;
 
@@ -123,4 +124,4 @@ if($tipo_de_comprobante === 'P'){
 
 }
 
-
+*/
