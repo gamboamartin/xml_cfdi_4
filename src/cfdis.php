@@ -19,31 +19,24 @@ class cfdis{
      */
     public function complemento_a_cuenta_terceros(stdClass|array $comprobante, stdClass|array $conceptos_a,
                                                   stdClass|array $emisor, stdClass|array $impuestos,
-                                                  stdClass|array $receptor)
+                                                  stdClass|array $receptor): bool|array|string
     {
 
-        $comprobante_ = $comprobante;
-        $emisor_ = $emisor;
-        $receptor_ = $receptor;
+        $data = $this->init_base(comprobante: $comprobante,emisor:  $emisor, receptor: $receptor);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al inicializar datos', data: $data);
+        }
 
         $impuestos_ = $impuestos;
 
-        if(is_array($comprobante_)){
-            $comprobante_ = (object) $comprobante_;
-        }
-        if(is_array($emisor_)){
-            $emisor_ = (object) $emisor_;
-        }
-        if(is_array($receptor_)){
-            $receptor_ = (object) $receptor_;
-        }
+
         if(is_array($impuestos_)){
             $impuestos_ = (object) $impuestos_;
         }
 
         $xml = new xml();
 
-        $comprobante_cp = (new complementos())->comprobante_a_cuenta_terceros(comprobante: $comprobante_);
+        $comprobante_cp = (new complementos())->comprobante_a_cuenta_terceros(comprobante: $data->comprobante);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al obtener comprobante', data: $comprobante_cp);
         }
@@ -53,12 +46,12 @@ class cfdis{
             return $this->error->error(mensaje: 'Error al generar comprobante', data: $dom);
         }
 
-        $dom = $xml->cfdi_emisor(emisor:  $emisor_);
+        $dom = $xml->cfdi_emisor(emisor:  $data->emisor);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al generar emisor', data: $dom);
         }
 
-        $dom = $xml->cfdi_receptor(receptor:  $receptor_);
+        $dom = $xml->cfdi_receptor(receptor:  $data->receptor);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al generar receptor', data: $dom);
         }
@@ -80,20 +73,13 @@ class cfdis{
                                      stdClass|array $receptor): bool|array|string
     {
 
-        $comprobante_ = $comprobante;
-        $emisor_ = $emisor;
-        $receptor_ = $receptor;
+        $data = $this->init_base(comprobante: $comprobante,emisor:  $emisor, receptor: $receptor);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al inicializar datos', data: $data);
+        }
+
         $pagos_ = $pagos;
 
-        if(is_array($comprobante_)){
-            $comprobante_ = (object) $comprobante_;
-        }
-        if(is_array($emisor_)){
-            $emisor_ = (object) $emisor_;
-        }
-        if(is_array($receptor_)){
-            $receptor_ = (object) $receptor_;
-        }
 
         if(is_array($pagos_)){
             $pagos_ = (object) $pagos_;
@@ -101,26 +87,26 @@ class cfdis{
 
 
         $keys = array('lugar_expedicion', 'folio');
-        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $comprobante_);
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $data->comprobante);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al validar comprobante de pago', data: $valida);
         }
 
         $keys = array('rfc','nombre','regimen_fiscal');
-        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $emisor_);
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $data->emisor);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al validar $emisor', data: $valida);
         }
 
         $keys = array('rfc','nombre','domicilio_fiscal_receptor','regimen_fiscal_receptor');
-        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $receptor_);
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $data->receptor);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al validar $receptor', data: $valida);
         }
 
         $xml = new xml();
 
-        $comprobante_cp = (new complementos())->comprobante_complemento_pago(comprobante: $comprobante_);
+        $comprobante_cp = (new complementos())->comprobante_complemento_pago(comprobante: $data->comprobante);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al obtener comprobante', data: $comprobante_cp);
         }
@@ -130,13 +116,13 @@ class cfdis{
             return $this->error->error(mensaje: 'Error al generar comprobante', data: $dom);
         }
 
-        $dom = $xml->cfdi_emisor(emisor:  $emisor);
+        $dom = $xml->cfdi_emisor(emisor:  $data->emisor);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al generar emisor', data: $dom);
         }
 
         $receptor->uso_cfdi = 'CP01';
-        $dom = $xml->cfdi_receptor(receptor:  $receptor);
+        $dom = $xml->cfdi_receptor(receptor:  $data->receptor);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al generar receptor', data: $dom);
         }
@@ -207,38 +193,29 @@ class cfdis{
                                            stdClass|array $emisor, stdClass|array $impuestos, stdClass|array $receptor,
                                            stdClass|array $relacionados): bool|array|string
     {
-        $comprobante_ = $comprobante;
-        $emisor_ = $emisor;
-        $receptor_ = $receptor;
+
+        $data = $this->init_base(comprobante: $comprobante,emisor:  $emisor, receptor: $receptor);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al inicializar datos', data: $data);
+        }
+
+
         $impuestos_ = $impuestos;
-        
+
         $relacionados_ = $relacionados;
-
-
-        if(is_array($comprobante_)){
-            $comprobante_ = (object) $comprobante_;
-        }
-        if(is_array($emisor_)){
-            $emisor_ = (object) $emisor_;
-        }
-        if(is_array($receptor_)){
-            $receptor_ = (object) $receptor_;
-        }
 
         if(is_array($impuestos_)){
             $impuestos_ = (object) $impuestos_;
         }
-
 
         if(is_array($relacionados_)){
             $relacionados_ = (object) $relacionados_;
         }
 
 
-
         $xml = new xml();
 
-        $comprobante_cp = (new complementos())->comprobante_nota_credito(comprobante: $comprobante_);
+        $comprobante_cp = (new complementos())->comprobante_nota_credito(comprobante: $data->comprobante);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al obtener comprobante', data: $comprobante_cp);
         }
@@ -253,12 +230,12 @@ class cfdis{
             return $this->error->error(mensaje: 'Error al generar relacionados', data: $dom);
         }
 
-        $dom = $xml->cfdi_emisor(emisor:  $emisor_);
+        $dom = $xml->cfdi_emisor(emisor:  $data->emisor);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al generar emisor', data: $dom);
         }
 
-        $dom = $xml->cfdi_receptor(receptor:  $receptor_);
+        $dom = $xml->cfdi_receptor(receptor:  $data->receptor);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al generar receptor', data: $dom);
         }
@@ -277,10 +254,22 @@ class cfdis{
     }
 
     public function ingreso(stdClass|array $comprobante, stdClass|array $emisor, stdClass|array $receptor){
+
+        $data = $this->init_base(comprobante: $comprobante,emisor:  $emisor, receptor: $receptor);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al inicializar datos', data: $data);
+        }
+
+
+
+
+    }
+
+    private function init_base(stdClass|array $comprobante, stdClass|array $emisor, stdClass|array $receptor): stdClass
+    {
         $comprobante_ = $comprobante;
         $emisor_ = $emisor;
         $receptor_ = $receptor;
-
 
         if(is_array($comprobante_)){
             $comprobante_ = (object) $comprobante_;
@@ -292,7 +281,12 @@ class cfdis{
             $receptor_ = (object) $receptor_;
         }
 
+        $data = new stdClass();
+        $data->emisor = $emisor_;
+        $data->comprobante = $comprobante_;
+        $data->receptor = $receptor_;
 
+        return $data;
 
     }
 }
