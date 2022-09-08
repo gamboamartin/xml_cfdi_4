@@ -28,20 +28,18 @@ class cfdis{
         }
 
         $impuestos_ = $impuestos;
-
-
         if(is_array($impuestos_)){
             $impuestos_ = (object) $impuestos_;
         }
 
         $xml = new xml();
 
-        $comprobante_cp = (new complementos())->comprobante_a_cuenta_terceros(comprobante: $data->comprobante);
+        $comprobante_ct = (new complementos())->comprobante_a_cuenta_terceros(comprobante: $data->comprobante);
         if(errores::$error){
-            return $this->error->error(mensaje: 'Error al obtener comprobante', data: $comprobante_cp);
+            return $this->error->error(mensaje: 'Error al obtener comprobante', data: $comprobante_ct);
         }
 
-        $dom = $xml->cfdi_comprobante(comprobante: $comprobante_cp);
+        $dom = $xml->cfdi_comprobante(comprobante: $comprobante_ct);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al generar comprobante', data: $dom);
         }
@@ -79,7 +77,6 @@ class cfdis{
         }
 
         $pagos_ = $pagos;
-
 
         if(is_array($pagos_)){
             $pagos_ = (object) $pagos_;
@@ -198,16 +195,12 @@ class cfdis{
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al inicializar datos', data: $data);
         }
-
-
         $impuestos_ = $impuestos;
 
         $relacionados_ = $relacionados;
-
         if(is_array($impuestos_)){
             $impuestos_ = (object) $impuestos_;
         }
-
         if(is_array($relacionados_)){
             $relacionados_ = (object) $relacionados_;
         }
@@ -215,12 +208,12 @@ class cfdis{
 
         $xml = new xml();
 
-        $comprobante_cp = (new complementos())->comprobante_nota_credito(comprobante: $data->comprobante);
+        $comprobante_nc = (new complementos())->comprobante_nota_credito(comprobante: $data->comprobante);
         if(errores::$error){
-            return $this->error->error(mensaje: 'Error al obtener comprobante', data: $comprobante_cp);
+            return $this->error->error(mensaje: 'Error al obtener comprobante', data: $comprobante_nc);
         }
 
-        $dom = $xml->cfdi_comprobante(comprobante: $comprobante_cp);
+        $dom = $xml->cfdi_comprobante(comprobante: $comprobante_nc);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al generar comprobante', data: $dom);
         }
@@ -253,18 +246,61 @@ class cfdis{
         return $xml->dom->saveXML();
     }
 
-    public function ingreso(stdClass|array $comprobante, stdClass|array $emisor, stdClass|array $receptor){
+    public function ingreso(stdClass|array $comprobante, array $conceptos, stdClass|array $emisor,
+                            array|stdClass $impuestos, stdClass|array $receptor): bool|array|string
+    {
 
         $data = $this->init_base(comprobante: $comprobante,emisor:  $emisor, receptor: $receptor);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al inicializar datos', data: $data);
         }
 
+        $impuestos_ = $impuestos;
+
+        if(is_array($impuestos_)){
+            $impuestos_ = (object) $impuestos_;
+        }
 
 
+        $keys = array('tipo_de_comprobante','moneda','total', 'exportacion','sub_total','lugar_expedicion',
+            'folio');
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $comprobante);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar comprobante', data: $valida);
+        }
+
+        $xml = new xml();
+        $dom = $xml->cfdi_comprobante(comprobante: $data->comprobante);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al generar comprobante', data: $dom);
+        }
+
+        $dom = $xml->cfdi_receptor(receptor:  $data->receptor);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al generar receptor', data: $dom);
+        }
+
+        $dom = $xml->cfdi_conceptos(conceptos: $conceptos);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al generar conceptos', data: $dom);
+        }
+
+        $dom = $xml->cfdi_impuestos(impuestos: $impuestos_);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al generar impuestos', data: $dom);
+        }
+
+        return $xml->dom->saveXML();
 
     }
 
+    /**
+     * Inicializa los elementos basicos de un xml
+     * @param stdClass|array $comprobante Datos del comprobante version fecha etc
+     * @param stdClass|array $emisor Datos del emisor del cfdi razon social rfc etc
+     * @param stdClass|array $receptor Datos del receptor de cfdi rfc razon social etc
+     * @return stdClass
+     */
     private function init_base(stdClass|array $comprobante, stdClass|array $emisor, stdClass|array $receptor): stdClass
     {
         $comprobante_ = $comprobante;

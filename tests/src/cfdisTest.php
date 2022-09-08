@@ -376,5 +376,78 @@ class cfdisTest extends test {
         errores::$error = false;
     }
 
+    public function test_ingreso(){
+        errores::$error = false;
+
+        $cfdis = new cfdis();
+        //$com = new liberator($com);
+        $comprobante = new stdClass();
+        $comprobante->serie  = 'NCV4.0';
+        $comprobante->folio  = 922;
+        $comprobante->forma_pago  = '01';
+        $comprobante->sub_total  = 1050.00;
+        $comprobante->moneda  = 'MXN';
+        $comprobante->total  = 1218.00;
+        $comprobante->lugar_expedicion  = 29960;
+        $comprobante->tipo_de_comprobante  = 'I';
+        $comprobante->exportacion  = '01';
+
+        $emisor = new stdClass();
+        $emisor->rfc = 'IIA040805DZ4';
+        $emisor->nombre = 'INDISTRIA ILUMINADORA DE ALMACENES';
+        $emisor->regimen_fiscal = '626';
+
+        $receptor = new stdClass();
+        $receptor->rfc = 'EKU9003173C9';
+        $receptor->nombre = 'ESCUELA KEMPER URGATE';
+        $receptor->domicilio_fiscal_receptor = '26015';
+        $receptor->regimen_fiscal_receptor = '603';
+        $receptor->uso_cfdi = 'G01';
+
+        $conceptos = array();
+        $conceptos[0] = new stdClass();
+        $conceptos[0]->clave_prod_serv = '84111506';
+        $conceptos[0]->cantidad = '1';
+        $conceptos[0]->clave_unidad = 'ACT';
+        $conceptos[0]->descripcion = 'Pago';
+        $conceptos[0]->valor_unitario = '0';
+        $conceptos[0]->importe = '0';
+        $conceptos[0]->objeto_imp = '01';
+        $conceptos[0]->no_identificacion = '400578';
+        $conceptos[0]->unidad = 'Caja';
+        $conceptos[0]->impuestos = array();
+        $conceptos[0]->impuestos[0]= new stdClass();
+        $conceptos[0]->impuestos[0]->traslados = array();
+        $conceptos[0]->impuestos[0]->traslados[0] = new stdClass();
+        $conceptos[0]->impuestos[0]->traslados[0]->base = '1';
+        $conceptos[0]->impuestos[0]->traslados[0]->impuesto = 'a';
+        $conceptos[0]->impuestos[0]->traslados[0]->tipo_factor = 'a';
+        $conceptos[0]->impuestos[0]->traslados[0]->tasa_o_cuota = '1';
+        $conceptos[0]->impuestos[0]->traslados[0]->importe = '1';
+
+        $impuestos = new stdClass();
+        $impuestos->total_impuestos_trasladados = '168.00';
+
+        $impuestos->traslados = array();
+        $impuestos->traslados[0] = new stdClass();
+        $impuestos->traslados[0]->base = '1';
+        $impuestos->traslados[0]->impuesto = 'a';
+        $impuestos->traslados[0]->tipo_factor = 'a';
+        $impuestos->traslados[0]->tasa_o_cuota = '1';
+        $impuestos->traslados[0]->importe = '1';
+
+        $resultado = $cfdis->ingreso(comprobante: $comprobante, conceptos: $conceptos,
+            emisor:  $emisor, impuestos: $impuestos,receptor: $receptor);
+
+        $this->assertNotTrue(errores::$error);
+        $this->assertIsString($resultado);
+        $this->assertStringContainsStringIgnoringCase('<cfdi:Comprobante xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"',$resultado);
+        $this->assertStringContainsStringIgnoringCase('Moneda="MXN" Total="1218" Exportacion="01" TipoDeComprobante="I"',$resultado);
+
+
+
+        errores::$error = false;
+    }
+
 }
 

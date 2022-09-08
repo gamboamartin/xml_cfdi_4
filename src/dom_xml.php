@@ -96,7 +96,12 @@ class dom_xml{
     public function carga_conceptos(array $conceptos, DOMElement $nodo_conceptos, xml $xml): xml|array
     {
         foreach ($conceptos as $concepto){
-
+            if(is_array($concepto)){
+                $concepto = (object)$concepto;
+            }
+            if(!is_object($concepto)){
+                return $this->error->error(mensaje: 'Error el concepto debe ser un objeto', data: $concepto);
+            }
             $elementos_concepto = (new dom_xml())->elementos_concepto(concepto: $concepto,
                 nodo_conceptos: $nodo_conceptos,xml:  $xml);
             if(errores::$error){
