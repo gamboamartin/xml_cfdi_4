@@ -35,6 +35,10 @@ class fechas{
         return $fecha_cfdi;
     }
 
+    /**
+     * @param stdClass $comprobante
+     * @return array|string
+     */
     public function fecha_cfdi(stdClass $comprobante): array|string
     {
         $hora  = date('H:i:s');
@@ -53,6 +57,11 @@ class fechas{
         return $fecha_cfdi;
     }
 
+    /**
+     * @param string $fecha
+     * @param string $hora
+     * @return array|string
+     */
     private function fecha_cfdi_con_datos(string $fecha, string $hora): array|string
     {
         $fecha_cfdi = $this->fecha_base(fecha: $fecha, hora: $hora);
@@ -86,6 +95,10 @@ class fechas{
 
     }
 
+    /**
+     * @param string $fecha
+     * @return array|string
+     */
     private function fecha_hora_min_sec_esp(string $fecha): array|string
     {
         $fecha_cfdi = $fecha;
@@ -99,6 +112,11 @@ class fechas{
         }
         return $fecha_cfdi;
     }
+
+    /**
+     * @param string $fecha
+     * @return array|string
+     */
     private function fecha_hora_min_sec_t(string $fecha): array|string
     {
         $fecha_cfdi = $fecha;

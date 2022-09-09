@@ -261,6 +261,11 @@ class cfdis{
             return $this->error->error(mensaje: 'Error al asignar nodo', data: $nodo_nominas_emisor);
         }
 
+        $nodo_nominas_receptor = (new nomina())->nodo_nominas_receptor(nodo_nominas: $nodo_nominas, nomina: $nomina_, xml: $xml);
+        if (errores::$error) {
+            return $this->error->error(mensaje: 'Error al asignar nodo', data: $nodo_nominas_receptor);
+        }
+
 
 
 

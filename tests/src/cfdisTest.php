@@ -139,6 +139,25 @@ class cfdisTest extends test {
         $nomina->emisor->registro_patronal = 'B5510768108';
         $nomina->emisor->rfc_patron_origen = 'URE180429TM6';
 
+        $nomina->receptor = new stdClass();
+        $nomina->receptor->curp = 'XEXX010101HNEXXXA4';
+        $nomina->receptor->num_seguridad_social = '000000';
+        $nomina->receptor->fecha_inicio_rel_laboral = '2015-01-01';
+        $nomina->receptor->antiguedad = '2015-01-01';
+        $nomina->receptor->tipo_contrato = '01';
+        $nomina->receptor->tipo_jornada = '01';
+        $nomina->receptor->tipo_regimen = '03';
+        $nomina->receptor->num_empleado = '120';
+        $nomina->receptor->departamento = 'Desarrollo';
+        $nomina->receptor->puesto = 'Ingeniero de Software';
+        $nomina->receptor->riesgo_puesto = '1';
+        $nomina->receptor->periodicidad_pago = '04';
+        $nomina->receptor->cuenta_bancaria = '1111111111';
+        $nomina->receptor->banco = '002';
+        $nomina->receptor->salario_base_cot_apor = '490.22';
+        $nomina->receptor->salario_diario_integrado = '146.47';
+        $nomina->receptor->clave_ent_fed = 'JAL';
+
         $resultado = $cfdis->complemento_nomina(comprobante: $comprobante,emisor:  $emisor, nomina: $nomina,receptor:  $receptor);
        // print_r($resultado);exit;
 

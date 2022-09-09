@@ -84,5 +84,57 @@ class nomina{
         return $nodo_nomina_emisor;
     }
 
+    public function nodo_nominas_receptor(DOMElement $nodo_nominas, stdClass $nomina, xml $xml): bool|DOMElement|array
+    {
+
+        try {
+            $nodo_nomina_receptor = $xml->dom->createElement('nomina12:Receptor');
+        }
+        catch (Throwable $e){
+            return $this->error->error(mensaje: 'Error al crear el elemento nomina12:Emisor', data: $e);
+        }
+
+        $keys = array('receptor');
+
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $nomina);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar nomina', data: $valida);
+        }
+
+        $keys = array('curp','num_seguridad_social','fecha_inicio_rel_laboral','antiguedad','tipo_contrato',
+            'tipo_jornada','tipo_regimen','num_empleado','departamento','puesto','riesgo_puesto','periodicidad_pago',
+            'cuenta_bancaria','banco','salario_base_cot_apor','salario_diario_integrado','clave_ent_fed');
+
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $nomina->receptor);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar nomina', data: $valida);
+        }
+
+        $nodo_nominas->appendChild($nodo_nomina_receptor);
+
+        $nodo_nomina_receptor->setAttribute('Curp', $nomina->receptor->curp);
+        $nodo_nomina_receptor->setAttribute('NumSeguridadSocial', $nomina->receptor->num_seguridad_social);
+        $nodo_nomina_receptor->setAttribute('FechaInicioRelLaboral', $nomina->receptor->fecha_inicio_rel_laboral);
+        $nodo_nomina_receptor->setAttribute('Antigüedad', $nomina->receptor->antiguedad);
+        $nodo_nomina_receptor->setAttribute('TipoContrato', $nomina->receptor->tipo_contrato);
+        $nodo_nomina_receptor->setAttribute('TipoJornada', $nomina->receptor->tipo_jornada);
+        $nodo_nomina_receptor->setAttribute('TipoRegimen', $nomina->receptor->tipo_regimen);
+        $nodo_nomina_receptor->setAttribute('NumEmpleado', $nomina->receptor->num_empleado);
+        $nodo_nomina_receptor->setAttribute('Departamento', $nomina->receptor->departamento);
+        $nodo_nomina_receptor->setAttribute('Puesto', $nomina->receptor->puesto);
+        $nodo_nomina_receptor->setAttribute('RiesgoPuesto', $nomina->receptor->riesgo_puesto);
+        $nodo_nomina_receptor->setAttribute('PeriodicidadPago', $nomina->receptor->periodicidad_pago);
+        $nodo_nomina_receptor->setAttribute('CuentaBancaria', $nomina->receptor->cuenta_bancaria);
+        $nodo_nomina_receptor->setAttribute('Banco', $nomina->receptor->banco);
+        $nodo_nomina_receptor->setAttribute('SalarioBaseCotApor', $nomina->receptor->salario_base_cot_apor);
+        $nodo_nomina_receptor->setAttribute('SalarioDiarioIntegrado', $nomina->receptor->salario_diario_integrado);
+        $nodo_nomina_receptor->setAttribute('ClaveEntFed', $nomina->receptor->clave_ent_fed);
+
+
+
+
+        return $nodo_nomina_receptor;
+    }
+
 
 }
