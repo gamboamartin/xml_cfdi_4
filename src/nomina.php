@@ -50,5 +50,39 @@ class nomina{
         return $nodo_nominas;
     }
 
+    public function nodo_nominas_emisor(DOMElement $nodo_nominas, stdClass $nomina, xml $xml): bool|DOMElement|array
+    {
+
+        try {
+            $nodo_nomina_emisor = $xml->dom->createElement('nomina12:Emisor');
+        }
+        catch (Throwable $e){
+            return $this->error->error(mensaje: 'Error al crear el elemento nomina12:Emisor', data: $e);
+        }
+
+        $keys = array('emisor');
+
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $nomina);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar nomina', data: $valida);
+        }
+
+        $keys = array('registro_patronal','rfc_patron_origen');
+
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $nomina->emisor);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar nomina', data: $valida);
+        }
+
+        $nodo_nominas->appendChild($nodo_nomina_emisor);
+
+        $nodo_nomina_emisor->setAttribute('RegistroPatronal', $nomina->emisor->registro_patronal);
+        $nodo_nomina_emisor->setAttribute('RfcPatronOrigen', $nomina->emisor->rfc_patron_origen);
+
+
+
+        return $nodo_nomina_emisor;
+    }
+
 
 }

@@ -135,9 +135,12 @@ class cfdisTest extends test {
         $nomina->num_dias_pagados = '15';
         $nomina->total_percepciones = '5000';
         $nomina->total_deducciones = '300';
+        $nomina->emisor = new stdClass();
+        $nomina->emisor->registro_patronal = 'B5510768108';
+        $nomina->emisor->rfc_patron_origen = 'URE180429TM6';
 
         $resultado = $cfdis->complemento_nomina(comprobante: $comprobante,emisor:  $emisor, nomina: $nomina,receptor:  $receptor);
-
+       // print_r($resultado);exit;
 
         $this->assertNotTrue(errores::$error);
         $this->assertIsString($resultado);
