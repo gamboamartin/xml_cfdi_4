@@ -80,6 +80,25 @@ class complementosTest extends test {
         errores::$error = false;
     }
 
+    public function test_comprobante_complemento_nomina(): void
+    {
+        errores::$error = false;
+
+        $com = new complementos();
+        //$com = new liberator($com);
+
+
+        $comprobante = new stdClass();
+
+        $resultado = $com->comprobante_complemento_nomina($comprobante);
+        $this->assertNotTrue(errores::$error);
+        $this->assertIsObject($resultado);
+        $this->assertEquals('N',$resultado->tipo_de_comprobante);
+        $this->assertEquals('MXN',$resultado->moneda);
+        $this->assertEquals('01',$resultado->exportacion);
+        errores::$error = false;
+    }
+
     public function test_comprobante_complemento_pago(): void
     {
         errores::$error = false;

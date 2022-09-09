@@ -40,6 +40,13 @@ class complementos{
         return $comprobante;
     }
 
+    /**
+     * Genera la base del complemento del nodo comprobante de nomina
+     * @param stdClass $comprobante Comprobante base nomina
+     * @return stdClass
+     * @version 1.8.0
+     *
+     */
     public function comprobante_complemento_nomina(stdClass $comprobante): stdClass
     {
         $comprobante->tipo_de_comprobante = 'N';
