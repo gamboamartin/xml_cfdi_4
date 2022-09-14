@@ -26,6 +26,12 @@ class deduccion{
 
         $nodo_nominas_deducciones->appendChild($nodo_deduccion);
 
+        $keys = array('tipo_deduccion','clave','concepto','importe');
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $deduccion);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar nomina', data: $valida);
+        }
+
         $nodo_deduccion->setAttribute('TipoDeduccion', $deduccion->tipo_deduccion);
         $nodo_deduccion->setAttribute('Clave', $deduccion->clave);
         $nodo_deduccion->setAttribute('Concepto', $deduccion->concepto);

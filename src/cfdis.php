@@ -269,6 +269,12 @@ class cfdis{
             return $this->error->error(mensaje: 'Error al asignar nodo', data: $nodo_nominas_percepciones);
         }
 
+        $keys = array('percepcion');
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $nomina->percepciones);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar nomina', data: $valida);
+        }
+
         foreach ($nomina_->percepciones->percepcion as $percep){
             if(is_array($percep)){
                 $percep = (object)$percep;
@@ -286,7 +292,13 @@ class cfdis{
         if (errores::$error) {
             return $this->error->error(mensaje: 'Error al asignar nodo', data: $nodo_nominas_deducciones);
         }
-        
+
+        $keys = array('deduccion');
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $nomina->deducciones);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar nomina', data: $valida);
+        }
+
         foreach ($nomina_->deducciones->deduccion as $deduc){
             if(is_array($deduc)){
                 $deduc = (object)$deduc;

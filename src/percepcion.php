@@ -26,6 +26,12 @@ class percepcion{
 
         $nodo_nominas_percepciones->appendChild($nodo_percepcion);
 
+        $keys = array('tipo_percepcion','clave','concepto','importe_gravado','importe_exento');
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $percepcion);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar nomina', data: $valida);
+        }
+
         $nodo_percepcion->setAttribute('TipoPercepcion', $percepcion->tipo_percepcion);
         $nodo_percepcion->setAttribute('Clave', $percepcion->clave);
         $nodo_percepcion->setAttribute('Concepto', $percepcion->concepto);
