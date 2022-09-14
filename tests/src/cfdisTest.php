@@ -175,18 +175,18 @@ class cfdisTest extends test {
         $nomina->deducciones->total_otras_deducciones = '200';
         $nomina->deducciones->total_impuestos_retenidos = '100';
 
-        /*$nomina->deducciones->deduccion = array();
+        $nomina->deducciones->deduccion = array();
         $nomina->deducciones->deduccion[0] = new stdClass();
-        $nomina->deducciones->deduccion[0]->tipo_deduccion = '';
-        $nomina->deducciones->deduccion[0]->clave = '';
-        $nomina->deducciones->deduccion[0]->concepto = '';
-        $nomina->deducciones->deduccion[0]->importe = '';
+        $nomina->deducciones->deduccion[0]->tipo_deduccion = '001';
+        $nomina->deducciones->deduccion[0]->clave = '00301';
+        $nomina->deducciones->deduccion[0]->concepto = 'Seguridad Social';
+        $nomina->deducciones->deduccion[0]->importe = '200';
 
         $nomina->deducciones->deduccion[1] = new stdClass();
-        $nomina->deducciones->deduccion[1]->tipo_deduccion = '';
-        $nomina->deducciones->deduccion[1]->clave = '';
-        $nomina->deducciones->deduccion[1]->concepto = '';
-        $nomina->deducciones->deduccion[1]->importe = '';*/
+        $nomina->deducciones->deduccion[1]->tipo_deduccion = '002';
+        $nomina->deducciones->deduccion[1]->clave = '00302';
+        $nomina->deducciones->deduccion[1]->concepto = 'ISR';
+        $nomina->deducciones->deduccion[1]->importe = '100';
         
 
         $resultado = $cfdis->complemento_nomina(comprobante: $comprobante,emisor:  $emisor, nomina: $nomina,receptor:  $receptor);

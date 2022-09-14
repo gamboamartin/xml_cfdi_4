@@ -286,6 +286,18 @@ class cfdis{
         if (errores::$error) {
             return $this->error->error(mensaje: 'Error al asignar nodo', data: $nodo_nominas_deducciones);
         }
+        
+        foreach ($nomina_->deducciones->deduccion as $deduc){
+            if(is_array($deduc)){
+                $deduc = (object)$deduc;
+            }
+
+            $nodo_deduccion = (new deduccion())->nodo_deduccion(
+                nodo_nominas_deducciones: $nodo_nominas_deducciones, deduccion: $deduc, xml:  $xml);
+            if (errores::$error) {
+                return $this->error->error(mensaje: 'Error al asignar deduccion', data: $nodo_deduccion);
+            }
+        }
 
         return $xml->dom->saveXML();
     }
