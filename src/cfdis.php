@@ -183,7 +183,6 @@ class cfdis{
     public function complemento_nomina(stdClass|array $comprobante, stdClass|array $emisor, stdClass|array $nomina,
                                        stdClass|array $receptor): bool|array|string
     {
-
         $data = $this->init_base(comprobante: $comprobante,emisor:  $emisor, receptor: $receptor);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al inicializar datos', data: $data);
@@ -193,7 +192,6 @@ class cfdis{
         if(is_array($nomina_)){
             $nomina_ = (object)$nomina_;
         }
-
 
         $keys = array('lugar_expedicion', 'folio');
         $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $data->comprobante);
@@ -214,7 +212,6 @@ class cfdis{
         }
 
         $xml = new xml();
-
         $comprobante_nm = (new complementos())->comprobante_complemento_nomina(comprobante: $data->comprobante);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al obtener comprobante', data: $comprobante_nm);
@@ -272,6 +269,16 @@ class cfdis{
             return $this->error->error(mensaje: 'Error al asignar nodo', data: $nodo_nominas_percepciones);
         }
 
+        foreach ($nomina_->percepciones->percepcion as $percep){
+            if(is_array($percep)){
+                $percep = (object)$percep;
+            }
+
+            $nodo_percepcion = (new percepcion())->nodo_percepcion(nodo_nominas_percepciones: $nodo_nominas_percepciones, percepcion: $percep, xml:  $xml);
+            if (errores::$error) {
+                return $this->error->error(mensaje: 'Error al asignar percepcion', data: $nodo_percepcion);
+            }
+        }
 
         return $xml->dom->saveXML();
     }

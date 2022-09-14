@@ -162,14 +162,15 @@ class cfdisTest extends test {
         $nomina->percepciones->total_sueldos = '02';
         $nomina->percepciones->total_gravado = '02';
         $nomina->percepciones->total_exento = '02';
-        /*$nomina->percepciones->percepcion = array();
+
+        $nomina->percepciones->percepcion = array();
         $nomina->percepciones->percepcion[0] = new stdClass();
         $nomina->percepciones->percepcion[0]->tipo_percepcion = '';
         $nomina->percepciones->percepcion[0]->clave = '';
         $nomina->percepciones->percepcion[0]->concepto = '';
         $nomina->percepciones->percepcion[0]->importe_gravado = '';
         $nomina->percepciones->percepcion[0]->importe_exento = '';
-        
+        /*
         $nomina->deducciones = new stdClass();
         $nomina->deducciones->totalo_otras_deducciones = '02';
         $nomina->deducciones->total_impuestos_retenidos = '02';
