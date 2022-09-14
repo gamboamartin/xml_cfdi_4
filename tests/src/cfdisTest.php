@@ -157,9 +157,39 @@ class cfdisTest extends test {
         $nomina->receptor->salario_base_cot_apor = '490.22';
         $nomina->receptor->salario_diario_integrado = '146.47';
         $nomina->receptor->clave_ent_fed = 'JAL';
+        
+        $nomina->percepciones = new stdClass();
+        $nomina->percepciones->total_sueldos = '02';
+        $nomina->percepciones->total_gravado = '02';
+        $nomina->percepciones->total_exento = '02';
+        /*$nomina->percepciones->percepcion = array();
+        $nomina->percepciones->percepcion[0] = new stdClass();
+        $nomina->percepciones->percepcion[0]->tipo_percepcion = '';
+        $nomina->percepciones->percepcion[0]->clave = '';
+        $nomina->percepciones->percepcion[0]->concepto = '';
+        $nomina->percepciones->percepcion[0]->importe_gravado = '';
+        $nomina->percepciones->percepcion[0]->importe_exento = '';
+        
+        $nomina->deducciones = new stdClass();
+        $nomina->deducciones->totalo_otras_deducciones = '02';
+        $nomina->deducciones->total_impuestos_retenidos = '02';
+
+        $nomina->deducciones->deduccion = array();
+        $nomina->deducciones->deduccion[0] = new stdClass();
+        $nomina->deducciones->deduccion[0]->tipo_deduccion = '';
+        $nomina->deducciones->deduccion[0]->clave = '';
+        $nomina->deducciones->deduccion[0]->concepto = '';
+        $nomina->deducciones->deduccion[0]->importe = '';
+
+        $nomina->deducciones->deduccion[1] = new stdClass();
+        $nomina->deducciones->deduccion[1]->tipo_deduccion = '';
+        $nomina->deducciones->deduccion[1]->clave = '';
+        $nomina->deducciones->deduccion[1]->concepto = '';
+        $nomina->deducciones->deduccion[1]->importe = '';*/
+        
 
         $resultado = $cfdis->complemento_nomina(comprobante: $comprobante,emisor:  $emisor, nomina: $nomina,receptor:  $receptor);
-       // print_r($resultado);exit;
+       print_r($resultado);exit;
 
         $this->assertNotTrue(errores::$error);
         $this->assertIsString($resultado);
