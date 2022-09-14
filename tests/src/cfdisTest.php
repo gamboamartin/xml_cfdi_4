@@ -143,7 +143,7 @@ class cfdisTest extends test {
         $nomina->receptor->curp = 'XEXX010101HNEXXXA4';
         $nomina->receptor->num_seguridad_social = '000000';
         $nomina->receptor->fecha_inicio_rel_laboral = '2015-01-01';
-        $nomina->receptor->antiguedad = '2015-01-01';
+        $nomina->receptor->antiguedad = 'P364W';
         $nomina->receptor->tipo_contrato = '01';
         $nomina->receptor->tipo_jornada = '01';
         $nomina->receptor->tipo_regimen = '03';
@@ -190,7 +190,6 @@ class cfdisTest extends test {
         
 
         $resultado = $cfdis->complemento_nomina(comprobante: $comprobante,emisor:  $emisor, nomina: $nomina,receptor:  $receptor);
-       print_r($resultado);exit;
 
         $this->assertNotTrue(errores::$error);
         $this->assertIsString($resultado);
