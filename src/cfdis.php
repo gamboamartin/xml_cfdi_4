@@ -274,10 +274,17 @@ class cfdis{
                 $percep = (object)$percep;
             }
 
-            $nodo_percepcion = (new percepcion())->nodo_percepcion(nodo_nominas_percepciones: $nodo_nominas_percepciones, percepcion: $percep, xml:  $xml);
+            $nodo_percepcion = (new percepcion())->nodo_percepcion(
+                nodo_nominas_percepciones: $nodo_nominas_percepciones, percepcion: $percep, xml:  $xml);
             if (errores::$error) {
                 return $this->error->error(mensaje: 'Error al asignar percepcion', data: $nodo_percepcion);
             }
+        }
+
+        $nodo_nominas_deducciones = (new nomina())->nodo_nominas_deducciones(nodo_nominas: $nodo_nominas,
+            nomina: $nomina_, xml: $xml);
+        if (errores::$error) {
+            return $this->error->error(mensaje: 'Error al asignar nodo', data: $nodo_nominas_deducciones);
         }
 
         return $xml->dom->saveXML();

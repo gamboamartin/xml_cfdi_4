@@ -165,5 +165,36 @@ class nomina{
         return $nodo_nomina_percepciones;
     }
 
+    public function nodo_nominas_deducciones(DOMElement $nodo_nominas, stdClass $nomina, xml $xml): bool|DOMElement|array
+    {
+        try {
+            $nodo_nomina_deducciones = $xml->dom->createElement('nomina12:Deducciones');
+        }
+        catch (Throwable $e){
+            return $this->error->error(mensaje: 'Error al crear el elemento nomina12:Emisor', data: $e);
+        }
+
+        $keys = array('deducciones');
+
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $nomina);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar nomina', data: $valida);
+        }
+
+        $keys = array('total_otras_deducciones','total_impuestos_retenidos');
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $nomina->deducciones);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar nomina', data: $valida);
+        }
+
+        $nodo_nominas->appendChild($nodo_nomina_deducciones);
+
+        $nodo_nomina_deducciones->setAttribute('TotalOtrasDeducciones',
+            $nomina->deducciones->total_otras_deducciones);
+        $nodo_nomina_deducciones->setAttribute('TotalImpuestosRetenidos',
+            $nomina->deducciones->total_impuestos_retenidos);
+
+        return $nodo_nomina_deducciones;
+    }
 
 }
