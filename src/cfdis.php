@@ -193,7 +193,7 @@ class cfdis{
             $nomina_ = (object)$nomina_;
         }
 
-        $keys = array('lugar_expedicion', 'folio');
+        $keys = array('lugar_expedicion', 'folio','descuento');
         $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $data->comprobante);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al validar comprobante de pago', data: $valida);
