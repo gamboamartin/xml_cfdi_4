@@ -12,13 +12,24 @@ class fechas{
     }
 
     /**
-     * CON FIX Funcion que ajusta la fecha de un cfdi a formato T
+     * Funcion que ajusta la fecha de un cfdi a formato T
      * @param string $fecha Fecha en formato YYYY-mm-dd
      * @param string $hora Hora de emision del cfdi
      * @return array|string
+     * @version 1.17.0
      */
     private function fecha_base(string $fecha, string $hora): array|string
     {
+        $fecha = trim($fecha);
+        if($fecha === ''){
+            $fix = 'Es necesario enviar la fecha con el siguiente formato YYYY-mm-dd donde YYYY Es un año valido ';
+            $fix .= 'a 4 digitos ej 2020 mm corresponde al mes a dos digitos 01 = enero 11 = noviembre';
+            $fix .= ' dd corresponde al dia a 2 digitos ejemplo 01 igual al primero 0 dia 12 o 31';
+            $fix .= ' entonces fecha puede ser 2020-01-01 donde se representa primero de enero del año 2020';
+            $fix .= ' o 2022-06-08 donde se representa el 8 de junio de 2022';
+            return $this->error->error(mensaje: 'Error fecha esta vacia', data: $fecha, fix: $fix);
+        }
+
         $fecha_cfdi = $fecha;
         $es_fecha_base = $this->valida->valida_pattern(key:'fecha', txt: $fecha);
         if(errores::$error){
@@ -32,11 +43,15 @@ class fechas{
         if($es_fecha_base) {
             $fecha_cfdi = $fecha . 'T' . $hora;
         }
+
+
+
+
         return $fecha_cfdi;
     }
 
     /**
-     * @param stdClass $comprobante
+     * @param stdClass $comprobante Datos para nodo comprobante
      * @return array|string
      */
     public function fecha_cfdi(stdClass $comprobante): array|string
@@ -58,7 +73,7 @@ class fechas{
     }
 
     /**
-     * @param string $fecha
+     * @param string $fecha Fecha a verificar
      * @param string $hora
      * @return array|string
      */
