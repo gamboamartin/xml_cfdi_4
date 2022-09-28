@@ -276,6 +276,12 @@ class cfdis{
         }
 
         foreach ($nomina_->percepciones->percepcion as $percep){
+
+            if(!is_array($percep) && !is_object($percep)){
+                return $this->error->error(mensaje: 'Error la percepcion debe ser un array o un objeto',
+                    data: $percep);
+            }
+
             if(is_array($percep)){
                 $percep = (object)$percep;
             }
