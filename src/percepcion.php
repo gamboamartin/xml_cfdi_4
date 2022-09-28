@@ -15,6 +15,14 @@ class percepcion{
     }
 
 
+    /**
+     * Genera el nodo percepcion de un xml
+     * @param DOMElement $nodo_nominas_percepciones  Nodo de nomina inicializado
+     * @param stdClass $percepcion Percepcion a integrar
+     * @param xml $xml Xml inicializado
+     * @return array|DOMElement
+     * @version 1.20.0
+     */
     public function nodo_percepcion(DOMElement $nodo_nominas_percepciones, stdClass $percepcion, xml $xml): array|DOMElement
     {
         try {
@@ -30,6 +38,24 @@ class percepcion{
         $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $percepcion);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al validar nomina', data: $valida);
+        }
+
+        $keys = array('tipo_percepcion');
+        $valida = $this->valida->valida_codigos_int_0_3_numbers(keys: $keys,registro: $percepcion);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar percepcion', data: $valida);
+        }
+
+        $keys = array('importe_gravado','importe_exento');
+        $valida = $this->valida->valida_double_mayores_igual_0(keys: $keys,registro: $percepcion);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar percepcion', data: $valida);
+        }
+
+        $total_percepciones = round($percepcion->importe_gravado, 2) +  round($percepcion->importe_exento, 2);
+        $total_percepciones = round($total_percepciones,2);
+        if($total_percepciones<=0.0){
+            return $this->error->error(mensaje: 'Error algun importe debe ser mayor a 0', data: $valida);
         }
 
         $nodo_percepcion->setAttribute('TipoPercepcion', $percepcion->tipo_percepcion);
