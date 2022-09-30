@@ -187,6 +187,15 @@ class cfdisTest extends test {
         $nomina->deducciones->deduccion[1]->clave = '00302';
         $nomina->deducciones->deduccion[1]->concepto = 'ISR';
         $nomina->deducciones->deduccion[1]->importe = '100';
+
+
+        $nomina->otros_pagos = new stdClass();
+        $nomina->otros_pagos->otro_pago = array();
+        $nomina->otros_pagos->otro_pago[0] = new stdClass();
+        $nomina->otros_pagos->otro_pago[0]->tipo_otro_pago = '001';
+        $nomina->otros_pagos->otro_pago[0]->clave = '00301';
+        $nomina->otros_pagos->otro_pago[0]->concepto = 'Seguridad Social';
+        $nomina->otros_pagos->otro_pago[0]->importe = '200';
         
 
         $resultado = $cfdis->complemento_nomina(comprobante: $comprobante,emisor:  $emisor, nomina: $nomina,receptor:  $receptor);

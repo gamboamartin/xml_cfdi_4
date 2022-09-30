@@ -197,4 +197,27 @@ class nomina{
         return $nodo_nomina_deducciones;
     }
 
+    public function nodo_nominas_otros_pagos(DOMElement $nodo_nominas, stdClass $nomina, xml $xml): bool|DOMElement|array
+    {
+        try {
+            $nodo_nomina_otros_pagos = $xml->dom->createElement('nomina12:OtrosPagos');
+        }
+        catch (Throwable $e){
+            return $this->error->error(mensaje: 'Error al crear el elemento nomina12:OtrosPagos', data: $e);
+        }
+
+        $keys = array('otros_pagos');
+
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $nomina);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar nomina', data: $valida);
+        }
+
+
+        $nodo_nominas->appendChild($nodo_nomina_otros_pagos);
+
+
+        return $nodo_nomina_otros_pagos;
+    }
+
 }

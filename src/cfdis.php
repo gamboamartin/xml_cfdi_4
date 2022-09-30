@@ -317,6 +317,30 @@ class cfdis{
             }
         }
 
+        $keys = array('otro_pago');
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $nomina->otros_pagos);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar nomina', data: $valida);
+        }
+
+        $nodo_nominas_otros_pagos = (new nomina())->nodo_nominas_otros_pagos(nodo_nominas: $nodo_nominas,
+            nomina: $nomina_, xml: $xml);
+        if (errores::$error) {
+            return $this->error->error(mensaje: 'Error al asignar nodo', data: $nodo_nominas_otros_pagos);
+        }
+
+        foreach ($nomina_->otros_pagos->otro_pago as $op){
+            if(is_array($op)){
+                $op = (object)$op;
+            }
+
+            $nodo_otro_pago = (new otro_pago())->nodo_otro_pago(
+                nodo_nominas_otros_pagos: $nodo_nominas_otros_pagos, otro_pago: $op, xml:  $xml);
+            if (errores::$error) {
+                return $this->error->error(mensaje: 'Error al asignar deduccion', data: $nodo_otro_pago);
+            }
+        }
+
         return $xml->dom->saveXML();
     }
 
