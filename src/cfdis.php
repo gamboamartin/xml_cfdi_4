@@ -334,6 +334,12 @@ class cfdis{
                 $op = (object)$op;
             }
 
+            $keys = array('tipo_otro_pago','clave','concepto','importe','es_subsidio');
+            $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $op);
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error al validar otro pago', data: $valida);
+            }
+
             $nodo_otro_pago = (new otro_pago())->nodo_otro_pago(
                 nodo_nominas_otros_pagos: $nodo_nominas_otros_pagos, otro_pago: $op, xml:  $xml);
             if (errores::$error) {

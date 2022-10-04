@@ -21,21 +21,35 @@ class otro_pago{
             $nodo_otro_pago = $xml->dom->createElement('nomina12:OtrosPagos');
         }
         catch (Throwable $e){
-            return $this->error->error(mensaje: 'Error al crear el elemento otro_pago20:otropago', data: $e);
+            return $this->error->error(mensaje: 'Error al crear el elemento nomina12:OtrosPagos', data: $e);
         }
 
         $nodo_nominas_otros_pagos->appendChild($nodo_otro_pago);
 
-        $keys = array('tipo_otro_pago','clave','concepto','importe');
+        $keys = array('subsidio_causado');
         $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $otro_pago);
         if(errores::$error){
-            return $this->error->error(mensaje: 'Error al validar nomina', data: $valida);
+            return $this->error->error(mensaje: 'Error al validar otro pago subsidio', data: $valida);
         }
 
         $nodo_otro_pago->setAttribute('TipoDeduccion', $otro_pago->tipo_otro_pago);
         $nodo_otro_pago->setAttribute('Clave', $otro_pago->clave);
         $nodo_otro_pago->setAttribute('Concepto', $otro_pago->concepto);
         $nodo_otro_pago->setAttribute('Importe', $otro_pago->importe);
+
+        if($otro_pago->es_subsidio){
+
+
+
+            try {
+                $nodo_otro_pago_sub = $xml->dom->createElement('nomina12:SubsidioAlEmpleo');
+            }
+            catch (Throwable $e){
+                return $this->error->error(mensaje: 'Error al crear el elemento nomina12:SubsidioAlEmpleo', data: $e);
+            }
+            $nodo_otro_pago->appendChild($nodo_otro_pago_sub);
+            $nodo_otro_pago_sub->setAttribute('SubsidioCausado',$otro_pago->subsidio_causado );
+        }
 
         return $nodo_nominas_otros_pagos;
     }

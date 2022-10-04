@@ -196,9 +196,13 @@ class cfdisTest extends test {
         $nomina->otros_pagos->otro_pago[0]->clave = '00301';
         $nomina->otros_pagos->otro_pago[0]->concepto = 'Seguridad Social';
         $nomina->otros_pagos->otro_pago[0]->importe = '200';
-        
+        $nomina->otros_pagos->otro_pago[0]->es_subsidio = true;
+        $nomina->otros_pagos->otro_pago[0]->subsidio_causado = 20;
+
 
         $resultado = $cfdis->complemento_nomina(comprobante: $comprobante,emisor:  $emisor, nomina: $nomina,receptor:  $receptor);
+
+
 
         $this->assertNotTrue(errores::$error);
         $this->assertIsString($resultado);
