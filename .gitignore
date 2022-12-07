@@ -58,6 +58,7 @@ unit_test/prueba.zip
 composer.lock
 tests/config.php
 config/database.php
+config/pac.php
 
 
 /vendor/
