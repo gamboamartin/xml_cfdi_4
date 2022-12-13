@@ -143,13 +143,15 @@ class xml{
     {
 
         $aplica_impuestos = false;
-
         $aplica_impuestos_trasladados = false;
+        $keys = array();
         if(isset($impuestos->traslados)){
             if(count($impuestos->traslados ) > 0){
+
                 $aplica_impuestos_trasladados = true;
                 $aplica_impuestos = true;
                 $keys[] = 'total_impuestos_trasladados';
+
             }
         }
         $aplica_impuestos_retenidos = false;

@@ -338,6 +338,7 @@ class xmlTest extends test {
         $impuestos->retenciones[0]->importe = '10';
 
         $resultado = $xml->cfdi_impuestos($impuestos);
+       
         $this->assertNotTrue(errores::$error);
         $this->assertIsString($resultado);
         $this->assertStringContainsStringIgnoringCase('idos="x"><cfdi:Retenciones><cfdi:Retencio',$resultado);
