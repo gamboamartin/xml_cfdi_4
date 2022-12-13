@@ -138,28 +138,62 @@ class xml{
     }
 
     /**
-     * @throws DOMException
      */
     public function cfdi_impuestos(stdClass $impuestos): bool|array|string
     {
-        $keys = array('total_impuestos_trasladados');
-        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $impuestos);
-        if(errores::$error){
-            return $this->error->error(mensaje: 'Error al validar $receptor', data: $valida);
+
+        $aplica_impuestos = false;
+
+        $aplica_impuestos_trasladados = false;
+        if(isset($impuestos->traslados)){
+            if(count($impuestos->traslados ) > 0){
+                $aplica_impuestos_trasladados = true;
+                $aplica_impuestos = true;
+                $keys[] = 'total_impuestos_trasladados';
+            }
         }
-        if(!isset($this->xml)){
-            return $this->error->error(mensaje: 'Error no esta inicializado el xml', data: $this);
+        $aplica_impuestos_retenidos = false;
+        if(isset($impuestos->retenciones)){
+            if(count($impuestos->retenciones ) > 0){
+                $aplica_impuestos_retenidos = true;
+                $aplica_impuestos = true;
+                $keys[] = 'total_impuestos_retenidos';
+            }
+
         }
 
-        $data_nodo = (new dom_xml())->nodo(keys: $keys, keys_especial: array(),
-            local_name: 'cfdi:Impuestos', nodo_key: 'impuestos', object:  $impuestos,xml:  $this);
-        if(errores::$error){
-            return $this->error->error(mensaje: 'Error al setear $emisor', data: $data_nodo);
-        }
+        if($aplica_impuestos) {
 
-        $traslados = (new dom_xml())->anexa_traslados(data_nodo: $data_nodo,impuestos:  $impuestos,xml:  $this);
-        if(errores::$error){
-            return $this->error->error(mensaje: 'Error al generar nodo', data: $traslados);
+            $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $impuestos);
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error al validar $receptor', data: $valida);
+            }
+            if(!isset($this->xml)){
+                return $this->error->error(mensaje: 'Error no esta inicializado el xml', data: $this);
+            }
+
+            $data_nodo = (new dom_xml())->nodo(keys: $keys, keys_especial: array(),
+                local_name: 'cfdi:Impuestos', nodo_key: 'impuestos', object: $impuestos, xml: $this);
+            if (errores::$error) {
+                return $this->error->error(mensaje: 'Error al setear $emisor', data: $data_nodo);
+            }
+
+            if($aplica_impuestos_trasladados){
+                $traslados = (new dom_xml())->anexa_impuestos(data_nodo: $data_nodo,
+                    impuestos: $impuestos, obj_impuestos: 'traslados', tipo_impuesto: 'Traslado', xml: $this);
+                if (errores::$error) {
+                    return $this->error->error(mensaje: 'Error al generar nodo', data: $traslados);
+                }
+            }
+            if($aplica_impuestos_retenidos){
+                $retenciones = (new dom_xml())->anexa_impuestos(data_nodo: $data_nodo,impuestos:  $impuestos,
+                    obj_impuestos: 'retenciones',tipo_impuesto: 'Retencion',xml:  $this);
+                if(errores::$error){
+                    return $this->error->error(mensaje: 'Error al generar nodo', data: $retenciones);
+                }
+            }
+
+
         }
 
         return $this->dom->saveXML();

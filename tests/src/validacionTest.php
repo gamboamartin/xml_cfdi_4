@@ -49,7 +49,7 @@ class validacionTest extends test {
         errores::$error = false;
     }
 
-    public function test_valida_nodo_traslado(){
+    public function test_valida_nodo_impuesto(){
         errores::$error = false;
 
         $val = new validacion();
@@ -57,10 +57,10 @@ class validacionTest extends test {
 
         $traslado = new stdClass();
 
-        $resultado = $val->valida_nodo_traslado($traslado);
+        $resultado = $val->valida_nodo_impuesto($traslado);
         $this->assertTrue(errores::$error);
         $this->assertIsArray($resultado);
-        $this->assertStringContainsStringIgnoringCase('Error al validar traspaso',$resultado['mensaje']);
+        $this->assertStringContainsStringIgnoringCase('Error al validar obj_impuesto',$resultado['mensaje']);
 
         errores::$error = false;
 
@@ -71,7 +71,7 @@ class validacionTest extends test {
         $traslado->tasa_o_cuota = 1;
         $traslado->importe = 1;
 
-        $resultado = $val->valida_nodo_traslado($traslado);
+        $resultado = $val->valida_nodo_impuesto($traslado);
         $this->assertNotTrue(errores::$error);
         $this->assertIsBool($resultado);
         $this->assertTrue($resultado);

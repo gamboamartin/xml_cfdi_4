@@ -5,7 +5,7 @@ use DOMElement;
 use DOMException;
 use DOMNode;
 use gamboamartin\errores\errores;
-use PhpParser\Builder\Function_;
+
 use stdClass;
 use Throwable;
 
@@ -17,31 +17,29 @@ class dom_xml{
         $this->error = new errores();
     }
 
-    /**
-     * @throws DOMException
-     */
-    public function anexa_traslados(DOMElement $data_nodo, stdClass $impuestos, xml $xml): array|DOMElement
+    public function anexa_impuestos(DOMElement $data_nodo, stdClass $impuestos,
+                                    string $obj_impuestos, string $tipo_impuesto, xml $xml): array|DOMElement
     {
-        if(!isset($impuestos->traslados)){
-            return $this->error->error(mensaje: 'Error no existe traslados en impuestos', data: $impuestos);
+        if(!isset($impuestos->$obj_impuestos)){
+            return $this->error->error(mensaje: "Error no existe $obj_impuestos en impuestos", data: $impuestos);
         }
-        if(!is_array($impuestos->traslados)){
-            return $this->error->error(mensaje: 'Error traslados en impuestos debe ser un array', data: $impuestos);
+        if(!is_array($impuestos->$obj_impuestos)){
+            return $this->error->error(mensaje: 'Error obj_impuestos en impuestos debe ser un array', data: $impuestos);
         }
-        if(count($impuestos->traslados)>0){
-            $nodo_traslados = $xml->dom->createElement('cfdi:Traslados');
-            $data_nodo->appendChild($nodo_traslados);
+        if(count($impuestos->$obj_impuestos)>0){
+            $obj_imp_xml = ucwords($obj_impuestos);
+            $nodo_impuestos = $xml->dom->createElement("cfdi:$obj_imp_xml");
+            $data_nodo->appendChild($nodo_impuestos);
 
-            $nodo_traslados = $this->carga_traslados(impuestos: $impuestos,nodo_traslados:  $nodo_traslados, xml: $xml);
+            $nodo_impuestos = $this->carga_impuestos(impuestos: $impuestos,nodo_impuestos:  $nodo_impuestos,
+                tipo_impuesto: $tipo_impuesto,obj_impuestos: $obj_impuestos, xml: $xml);
             if(errores::$error){
-                return $this->error->error(mensaje: 'Error al generar nodo', data: $nodo_traslados);
+                return $this->error->error(mensaje: 'Error al generar nodo', data: $nodo_impuestos);
             }
 
         }
         return $data_nodo;
     }
-
-
 
 
 
@@ -155,22 +153,21 @@ class dom_xml{
         return $nodo_traslado;
     }
 
-    /**
-     * @throws DOMException
-     */
-    private function carga_nodo_traslado_comprobante(DOMElement $nodo_traslados, stdClass $traslado, xml $xml): array|DOMElement
+    private function carga_nodo_impuesto_comprobante(DOMElement $nodo_impuestos, stdClass $obj_impuesto, string $tipo_impuesto, xml $xml): array|DOMElement
     {
-        $nodo_traslado = $this->crea_nodo_traslado(nodo_traslados: $nodo_traslados, xml: $xml);
+        $nodo_impuesto= $this->crea_nodo_impuesto(nodo_impuestos: $nodo_impuestos,tipo_impuesto: $tipo_impuesto, xml: $xml);
         if(errores::$error){
-            return $this->error->error(mensaje: 'Error al generar nodo', data: $nodo_traslado);
+            return $this->error->error(mensaje: 'Error al generar nodo', data: $nodo_impuesto);
         }
 
-        $nodo_traslado = $this->nodo_traslado(nodo_traslado: $nodo_traslado,traslado:  $traslado);
+        $nodo_impuesto = $this->nodo_impuesto(nodo_impuesto: $nodo_impuesto,obj_impuesto:  $obj_impuesto);
         if(errores::$error){
-            return $this->error->error(mensaje: 'Error al generar nodo', data: $nodo_traslado);
+            return $this->error->error(mensaje: 'Error al generar nodo', data: $nodo_impuesto);
         }
-        return $nodo_traslado;
+        return $nodo_impuesto;
     }
+
+
 
 
     private function carga_nodos_traslado(DOMElement $nodo_traslados, array $traslados, XML $xml): array|DOMElement
@@ -187,27 +184,25 @@ class dom_xml{
         return $nodo_traslados;
     }
 
-    /**
-     * @throws DOMException
-     */
-    private function carga_traslados(stdClass $impuestos, DOMElement $nodo_traslados, xml $xml): array|DOMElement
-    {
-        foreach ($impuestos->traslados as $traslado){
+    private function carga_impuestos(stdClass $impuestos,DOMElement $nodo_impuestos, string $tipo_impuesto, string $obj_impuestos, xml $xml):  array|DOMElement{
+        foreach ($impuestos->$obj_impuestos as $obj_impuesto){
 
-            $valida = $this->valida->valida_nodo_traslado(traslado: $traslado);
+            $valida = $this->valida->valida_nodo_impuesto(obj_impuesto: $obj_impuesto);
             if(errores::$error){
-                return $this->error->error(mensaje: 'Error al validar traspaso', data: $valida);
+                return $this->error->error(mensaje: "Error al validar $tipo_impuesto", data: $valida);
             }
 
-            $nodo_traslado = $this->carga_nodo_traslado_comprobante(nodo_traslados: $nodo_traslados,
-                traslado:  $traslado,xml:  $xml);
+            $nodo_impuesto = $this->carga_nodo_impuesto_comprobante(nodo_impuestos: $nodo_impuestos,
+                obj_impuesto:  $obj_impuesto, tipo_impuesto: $tipo_impuesto,xml:  $xml);
             if(errores::$error){
-                return $this->error->error(mensaje: 'Error al generar nodo', data: $nodo_traslado);
+                return $this->error->error(mensaje: 'Error al generar nodo', data: $nodo_impuesto);
             }
 
         }
-        return $nodo_traslados;
+        return $nodo_impuestos;
     }
+
+
 
     public function comprobante(stdClass $comprobante, xml $xml): array|stdClass
     {
@@ -303,15 +298,14 @@ class dom_xml{
         return $nodo_traslados;
     }
 
-    /**
-     * @throws DOMException
-     */
-    private function crea_nodo_traslado(DOMElement $nodo_traslados, xml $xml): bool|DOMElement
+    private function crea_nodo_impuesto(DOMElement $nodo_impuestos, string $tipo_impuesto, xml $xml): bool|DOMElement
     {
-        $nodo_traslado = $xml->dom->createElement('cfdi:Traslado');
-        $nodo_traslados->appendChild($nodo_traslado);
-        return $nodo_traslado;
+        $nodo_impuesto = $xml->dom->createElement("cfdi:$tipo_impuesto");
+        $nodo_impuestos->appendChild($nodo_impuesto);
+        return $nodo_impuesto;
     }
+
+
 
 
     private function elemento_concepto(stdClass $concepto, DOMElement $nodo_conceptos, xml $xml): array|DOMElement
@@ -533,6 +527,7 @@ class dom_xml{
     public function nodo(array $keys, array $keys_especial, string $local_name, string $nodo_key,
                          stdClass $object, xml $xml): array|DOMElement
     {
+
         if(!isset($xml->cfdi->$nodo_key)){
             return $this->error->error(mensaje: 'Error no esta inicializado $xml->cfdi->'.$nodo_key,
                 data: $xml->cfdi);
@@ -553,15 +548,17 @@ class dom_xml{
         return $nodo;
     }
 
-    private function nodo_traslado(DOMElement $nodo_traslado, stdClass $traslado): DOMElement
+    private function nodo_impuesto(DOMElement $nodo_impuesto, stdClass $obj_impuesto): DOMElement
     {
-        $nodo_traslado->setAttribute('Base', $traslado->base);
-        $nodo_traslado->setAttribute('Impuesto', $traslado->impuesto);
-        $nodo_traslado->setAttribute('TipoFactor', $traslado->tipo_factor);
-        $nodo_traslado->setAttribute('TasaOCuota', $traslado->tasa_o_cuota);
-        $nodo_traslado->setAttribute('Importe', $traslado->importe);
-        return $nodo_traslado;
+        $nodo_impuesto->setAttribute('Base', $obj_impuesto->base);
+        $nodo_impuesto->setAttribute('Impuesto', $obj_impuesto->impuesto);
+        $nodo_impuesto->setAttribute('TipoFactor', $obj_impuesto->tipo_factor);
+        $nodo_impuesto->setAttribute('TasaOCuota', $obj_impuesto->tasa_o_cuota);
+        $nodo_impuesto->setAttribute('Importe', $obj_impuesto->importe);
+        return $nodo_impuesto;
     }
+
+
 
     private function setea_attr(array $keys, array $keys_especial, DOMElement $nodo,
                                 string $nodo_key, xml $xml): DOMElement

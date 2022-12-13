@@ -285,6 +285,108 @@ class xmlTest extends test {
         $this->assertIsString($resultado);
         $this->assertStringContainsStringIgnoringCase('<cfdi:Impuestos TotalImpuestosTrasladados="x"',$resultado);
 
+
+        errores::$error = false;
+        $xml = new xml();
+        $comprobante = new stdClass();
+        $comprobante->tipo_de_comprobante = 'I';
+        $comprobante->moneda = 'XXX';
+        $comprobante->exportacion = '01';
+        $comprobante->total = 0;
+        $comprobante->sub_total = 0;
+        $comprobante->lugar_expedicion = 44110;
+        $comprobante->fecha = '2021-01-01';
+        $comprobante->folio = '01';
+        $comprobante = $xml->cfdi_comprobante($comprobante);
+        if(errores::$error){
+            $error = (new errores())->error(mensaje: 'Error al generar comprobante', data: $comprobante);
+            print_r($error);
+            exit;
+        }
+        $impuestos = new stdClass();
+        $resultado = $xml->cfdi_impuestos($impuestos);
+        $this->assertNotTrue(errores::$error);
+        $this->assertIsString($resultado);
+        $this->assertStringContainsStringIgnoringCase('<?xml version="1.0" encoding="utf-8"?>',$resultado);
+
+
+        errores::$error = false;
+        $xml = new xml();
+        $comprobante = new stdClass();
+        $comprobante->tipo_de_comprobante = 'I';
+        $comprobante->moneda = 'XXX';
+        $comprobante->exportacion = '01';
+        $comprobante->total = 0;
+        $comprobante->sub_total = 0;
+        $comprobante->lugar_expedicion = 44110;
+        $comprobante->fecha = '2021-01-01';
+        $comprobante->folio = '01';
+        $comprobante = $xml->cfdi_comprobante($comprobante);
+        if(errores::$error){
+            $error = (new errores())->error(mensaje: 'Error al generar comprobante', data: $comprobante);
+            print_r($error);
+            exit;
+        }
+        $impuestos = new stdClass();
+        $impuestos->total_impuestos_retenidos = 'x';
+        $impuestos->retenciones = array();
+        $impuestos->retenciones[0] = new stdClass();
+        $impuestos->retenciones[0]->base = '10';
+        $impuestos->retenciones[0]->impuesto = '10';
+        $impuestos->retenciones[0]->tipo_factor = '10';
+        $impuestos->retenciones[0]->tasa_o_cuota = '10';
+        $impuestos->retenciones[0]->importe = '10';
+
+        $resultado = $xml->cfdi_impuestos($impuestos);
+        $this->assertNotTrue(errores::$error);
+        $this->assertIsString($resultado);
+        $this->assertStringContainsStringIgnoringCase('idos="x"><cfdi:Retenciones><cfdi:Retencio',$resultado);
+
+        errores::$error = false;
+        $xml = new xml();
+        $comprobante = new stdClass();
+        $comprobante->tipo_de_comprobante = 'I';
+        $comprobante->moneda = 'XXX';
+        $comprobante->exportacion = '01';
+        $comprobante->total = 0;
+        $comprobante->sub_total = 0;
+        $comprobante->lugar_expedicion = 44110;
+        $comprobante->fecha = '2021-01-01';
+        $comprobante->folio = '01';
+        $comprobante = $xml->cfdi_comprobante($comprobante);
+        if(errores::$error){
+            $error = (new errores())->error(mensaje: 'Error al generar comprobante', data: $comprobante);
+            print_r($error);
+            exit;
+        }
+        $impuestos = new stdClass();
+        $impuestos->total_impuestos_retenidos = 'x';
+        $impuestos->retenciones = array();
+        $impuestos->retenciones[0] = new stdClass();
+        $impuestos->retenciones[0]->base = '10';
+        $impuestos->retenciones[0]->impuesto = '10';
+        $impuestos->retenciones[0]->tipo_factor = '10';
+        $impuestos->retenciones[0]->tasa_o_cuota = '10';
+        $impuestos->retenciones[0]->importe = '10';
+
+        $impuestos->total_impuestos_trasladados = 'x';
+        $impuestos->traslados = array();
+        $impuestos->traslados[0] = new stdClass();
+        $impuestos->traslados[0]->base = '10';
+        $impuestos->traslados[0]->impuesto = '10';
+        $impuestos->traslados[0]->tipo_factor = '10';
+        $impuestos->traslados[0]->tasa_o_cuota = '10';
+        $impuestos->traslados[0]->importe = '10';
+
+        $resultado = $xml->cfdi_impuestos($impuestos);
+        $this->assertNotTrue(errores::$error);
+        $this->assertIsString($resultado);
+        $this->assertStringContainsStringIgnoringCase(':Retencion Base="10" Imp',$resultado);
+        $this->assertStringContainsStringIgnoringCase('x"><cfdi:Traslados><cfdi:Traslado Base="10',$resultado);
+
+        errores::$error = false;
+
+
     }
 
     /**

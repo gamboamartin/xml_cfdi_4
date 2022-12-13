@@ -88,6 +88,8 @@ class cfdisTest extends test {
 
         $resultado = $cfdis->complemento_a_cuenta_terceros(comprobante: $comprobante,conceptos_a: $conceptos,
             emisor:  $emisor, impuestos: $impuestos, receptor: $receptor);
+
+
         $this->assertNotTrue(errores::$error);
         $this->assertIsString($resultado);
         $this->assertStringContainsStringIgnoringCase('<cfdi:Comprobante xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"',$resultado);
