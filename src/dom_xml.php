@@ -72,6 +72,27 @@ class dom_xml{
         return $nodo_concepto;
     }
 
+    private function attrs_concepto_retencion(DOMElement $nodo_retencion, stdClass $retencion): DOMElement|array
+    {
+        $keys = array('base','impuesto','tipo_factor','tasa_o_cuota','importe');
+        $valida = $this->valida->valida_existencia_keys(keys: $keys,registro:  $retencion);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar retencion', data: $valida);
+        }
+        $keys = array('base','tasa_o_cuota','importe');
+        $valida = $this->valida->valida_numerics(keys:$keys, row: $retencion);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar traslado', data: $valida);
+        }
+
+        $nodo_retencion->setAttribute('Base', $retencion->base);
+        $nodo_retencion->setAttribute('Impuesto', $retencion->impuesto);
+        $nodo_retencion->setAttribute('TipoFactor', $retencion->tipo_factor);
+        $nodo_retencion->setAttribute('TasaOCuota', $retencion->tasa_o_cuota);
+        $nodo_retencion->setAttribute('Importe', $retencion->importe);
+        return $nodo_retencion;
+    }
+
     private function attrs_concepto_traslado(DOMElement $nodo_traslado, stdClass $traslado): DOMElement|array
     {
         $keys = array('base','impuesto','tipo_factor','tasa_o_cuota','importe');
@@ -122,7 +143,7 @@ class dom_xml{
                 return $this->error->error(mensaje: 'Error al validar $impuesto', data: $valida);
             }
 
-            if(count($impuesto->traslados)>0){
+            if(isset($impuesto->traslados) && count($impuesto->traslados)>0){
 
                 $nodo_traslados = $this->concepto_traslados(nodo_impuestos: $nodo_impuestos,
                     traslados: $impuesto->traslados,xml: $xml);
@@ -130,9 +151,34 @@ class dom_xml{
                     return $this->error->error(mensaje: 'Error al asignar atributos', data: $nodo_traslados);
                 }
             }
+            if(isset($impuesto->retenciones) && count($impuesto->retenciones)>0){
+
+                $nodo_retenciones = $this->concepto_retenciones(nodo_impuestos: $nodo_impuestos,
+                    retenciones: $impuesto->retenciones,xml: $xml);
+                if(errores::$error){
+                    return $this->error->error(mensaje: 'Error al asignar atributos', data: $nodo_retenciones);
+                }
+            }
 
         }
         return $nodo_impuestos;
+    }
+
+    private function carga_nodo_retencion(DOMElement $nodo_retenciones, stdClass $retencion, xml $xml): array|DOMElement
+    {
+        try {
+            $nodo_retencion = $xml->dom->createElement('cfdi:Retencion');
+        }
+        catch (Throwable $e){
+            return $this->error->error(mensaje: 'Error al crear elemento cfdi:Traslado', data: $e);
+        }
+
+        $nodo_retenciones->appendChild($nodo_retencion);
+        $nodo_retencion = $this->attrs_concepto_retencion(nodo_retencion: $nodo_retencion,retencion: $retencion);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al asignar atributos', data: $nodo_retencion);
+        }
+        return $nodo_retencion;
     }
 
 
@@ -167,7 +213,19 @@ class dom_xml{
         return $nodo_impuesto;
     }
 
-
+    private function carga_nodos_retencion(DOMElement $nodo_retenciones, array $retenciones, XML $xml): array|DOMElement
+    {
+        foreach ($retenciones as $retencion){
+            if(!is_object($retencion)){
+                return $this->error->error(mensaje: 'Error retencion debe ser un objeto', data: $retencion);
+            }
+            $nodo_retencion = $this->carga_nodo_retencion(nodo_retenciones: $nodo_retenciones,retencion: $retencion,xml: $xml);
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error al asignar atributos', data: $nodo_retencion);
+            }
+        }
+        return $nodo_retenciones;
+    }
 
 
     private function carga_nodos_traslado(DOMElement $nodo_traslados, array $traslados, XML $xml): array|DOMElement
@@ -278,6 +336,23 @@ class dom_xml{
         }
 
         return $valida;
+    }
+
+    private function concepto_retenciones(DOMElement $nodo_impuestos, array $retenciones, xml $xml): array|DOMElement
+    {
+
+        try {
+            $nodo_retenciones = $xml->dom->createElement('cfdi:Retenciones');
+        }
+        catch (Throwable $e){
+            return $this->error->error(mensaje: 'Error al crear el elemento cfdi:Retenciones', data: $e);
+        }
+        $nodo_impuestos->appendChild($nodo_retenciones);
+        $nodo_retenciones= $this->carga_nodos_retencion(nodo_retenciones: $nodo_retenciones,retenciones: $retenciones, xml: $xml);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al asignar atributos', data: $nodo_retenciones);
+        }
+        return $nodo_retenciones;
     }
 
 
