@@ -443,6 +443,11 @@ class cfdis{
             return $this->error->error(mensaje: 'Error al generar comprobante', data: $dom);
         }
 
+        $dom = $xml->cfdi_emisor(emisor:  $data->emisor);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al generar emisor', data: $dom);
+        }
+
         $dom = $xml->cfdi_receptor(receptor:  $data->receptor);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al generar receptor', data: $dom);
