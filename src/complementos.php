@@ -88,10 +88,10 @@ class complementos{
         $conceptos[0]->cantidad = '1';
         $conceptos[0]->clave_unidad = 'ACT';
         $conceptos[0]->descripcion = 'Pago de nómina';
-        $conceptos[0]->valor_unitario = $valor_unitario;
-        $conceptos[0]->importe = $valor_unitario;
+        $conceptos[0]->valor_unitario = number_format((float)$valor_unitario, 2, '.', '');
+        $conceptos[0]->importe = number_format((float)$valor_unitario, 2, '.', '');
         $conceptos[0]->objeto_imp = '01';
-        $conceptos[0]->descuento = $descuento;
+        $conceptos[0]->descuento = number_format((float)$descuento, 2, '.', '');;
         $conceptos[0]->impuestos = array();
         return $conceptos;
     }
