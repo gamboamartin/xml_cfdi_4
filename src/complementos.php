@@ -93,6 +93,7 @@ class complementos{
         $conceptos[0]->objeto_imp = '01';
         $conceptos[0]->descuento = number_format((float)$descuento, 2, '.', '');;
         $conceptos[0]->impuestos = array();
+        
         return $conceptos;
     }
 
