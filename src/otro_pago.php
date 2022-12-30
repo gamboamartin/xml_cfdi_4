@@ -18,7 +18,7 @@ class otro_pago{
     public function nodo_otro_pago(DOMElement $nodo_nominas_otros_pagos, stdClass $otro_pago, xml $xml): array|DOMElement
     {
         try {
-            $nodo_otro_pago = $xml->dom->createElement('nomina12:OtrosPagos');
+            $nodo_otro_pago = $xml->dom->createElement('nomina12:OtroPago');
         }
         catch (Throwable $e){
             return $this->error->error(mensaje: 'Error al crear el elemento nomina12:OtrosPagos', data: $e);
