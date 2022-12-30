@@ -32,7 +32,7 @@ class otro_pago{
             return $this->error->error(mensaje: 'Error al validar otro pago subsidio', data: $valida);
         }
 
-        $nodo_otro_pago->setAttribute('TipoDeduccion', $otro_pago->tipo_otro_pago);
+        $nodo_otro_pago->setAttribute('TipoOtroPago', $otro_pago->tipo_otro_pago);
         $nodo_otro_pago->setAttribute('Clave', $otro_pago->clave);
         $nodo_otro_pago->setAttribute('Concepto', $otro_pago->concepto);
         $nodo_otro_pago->setAttribute('Importe', $otro_pago->importe);
