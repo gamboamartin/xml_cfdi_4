@@ -44,6 +44,7 @@ class nomina{
         $nodo_nominas->setAttribute('NumDiasPagados',$nomina->num_dias_pagados);
         $nodo_nominas->setAttribute('TotalPercepciones',$nomina->total_percepciones);
         $nodo_nominas->setAttribute('TotalDeducciones',$nomina->total_deducciones);
+        $nodo_nominas->setAttribute('TotalOtrosPagos',$nomina->total_otros_pagos);
 
 
 
