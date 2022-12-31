@@ -126,7 +126,9 @@ class nomina{
         $nodo_nomina_receptor->setAttribute('RiesgoPuesto', $nomina->receptor->riesgo_puesto);
         $nodo_nomina_receptor->setAttribute('PeriodicidadPago', $nomina->receptor->periodicidad_pago);
         $nodo_nomina_receptor->setAttribute('CuentaBancaria', $nomina->receptor->cuenta_bancaria);
-        $nodo_nomina_receptor->setAttribute('Banco', $nomina->receptor->banco);
+        if(!isset($nomina->receptor->cuenta_bancaria)){
+            $nodo_nomina_receptor->setAttribute('Banco', $nomina->receptor->banco);
+        }
         $nodo_nomina_receptor->setAttribute('SalarioBaseCotApor', $nomina->receptor->salario_base_cot_apor);
         $nodo_nomina_receptor->setAttribute('SalarioDiarioIntegrado', $nomina->receptor->salario_diario_integrado);
         $nodo_nomina_receptor->setAttribute('ClaveEntFed', $nomina->receptor->clave_ent_fed);
