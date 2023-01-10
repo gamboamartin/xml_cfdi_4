@@ -434,6 +434,54 @@ class dom_xml{
      */
     private function elementos_concepto(stdClass $concepto, DOMElement $nodo_conceptos, xml $xml): xml|array
     {
+
+        /**
+         * REFCATORIZAR
+         */
+        if(isset($concepto->valor_unitario)){
+            $valor_unitario = trim($concepto->valor_unitario);
+            $valor_unitario = str_replace('$', '', $valor_unitario);
+            $valor_unitario = str_replace(',', '', $valor_unitario);
+            $concepto->valor_unitario = $valor_unitario;
+        }
+        if(isset($concepto->importe)){
+            $importe = trim($concepto->importe);
+            $importe = str_replace('$', '', $importe);
+            $importe = str_replace(',', '', $importe);
+            $concepto->importe = $importe;
+        }
+
+        if(isset($concepto->impuestos)){
+            foreach ($concepto->impuestos as $impuesto){
+                if(isset($impuesto->traslados)){
+                    foreach ($impuesto->traslados as $indice=>$traslado){
+                        if(isset($traslado->base)){
+                            $base = trim($traslado->base);
+                            $base = str_replace('$', '', $base);
+                            $base = str_replace(',', '', $base);
+                            $traslado->base = $base;
+                            $impuesto->traslados[$indice] = $traslado;
+
+                        }
+                    }
+                }
+
+                if(isset($impuesto->retenciones)){
+                    foreach ($impuesto->retenciones as $indice=>$retencion){
+                        if(isset($retencion->base)){
+                            $base = trim($retencion->base);
+                            $base = str_replace('$', '', $base);
+                            $base = str_replace(',', '', $base);
+                            $retencion->base = $base;
+                            $impuesto->retenciones[$indice] = $retencion;
+
+                        }
+                    }
+                }
+
+            }
+        }
+
         $xml->cfdi->conceptos[] = new stdClass();
         $valida = $this->valida->valida_concepto(concepto: $concepto);
         if(errores::$error){
