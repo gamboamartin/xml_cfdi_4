@@ -554,7 +554,26 @@ class dom_xml{
     private function genera_nodo_concepto_impuestos(array $impuestos, DOMElement $nodo_concepto, xml $xml): array|DOMElement
     {
 
+        /**
+         * REFACTORIZAR
+         */
+        $aplica_nodo_impuestos = false;
         if(count($impuestos)>0){
+            foreach ($impuestos as $impuesto){
+                foreach ($impuesto as $tipo_imp){
+                    if(count($tipo_imp)>0){
+                        $aplica_nodo_impuestos = true;
+                        break;
+                    }
+                }
+                if($aplica_nodo_impuestos){
+                    break;
+                }
+
+            }
+        }
+
+        if($aplica_nodo_impuestos){
             try {
                 $nodo_impuestos = $xml->dom->createElement('cfdi:Impuestos');
             }
