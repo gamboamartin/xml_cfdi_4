@@ -112,11 +112,16 @@ class fechas{
 
     /**
      * Integra una fecha con espacios con formato T
-     * @param string $fecha Fecah en ejecucion
+     * @param string $fecha Fecha en ejecucion
      * @return array|string
+     * @version 1.47.0
      */
     private function fecha_hora_min_sec_esp(string $fecha): array|string
     {
+        $fecha = trim($fecha);
+        if($fecha === ''){
+            return $this->error->error(mensaje: 'Error fecha vacia', data: $fecha);
+        }
         $fecha_cfdi = $fecha;
         $es_fecha_hora_min_sec_esp = $this->valida->valida_pattern(key:'fecha_hora_min_sec_esp', txt: $fecha);
         if(errores::$error){
