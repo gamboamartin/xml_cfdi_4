@@ -703,6 +703,11 @@ class dom_xml{
         return $nodo_impuesto;
     }
 
+    /**
+     * Limpia un monto
+     * @param string|int|float $monto monto a limpiar
+     * @return array|string
+     */
     private function limpia_monto(string|int|float $monto): array|string
     {
         $monto = trim($monto);
