@@ -32,6 +32,11 @@ class complementos{
         return $xml;
     }
 
+    /**
+     * Integra los elementos base de a cuenta a terceros
+     * @param stdClass $comprobante datos del cfdi
+     * @return stdClass
+     */
     public function comprobante_a_cuenta_terceros(stdClass $comprobante): stdClass
     {
         $comprobante->metodo_pago = 'PUE';
