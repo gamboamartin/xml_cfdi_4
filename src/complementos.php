@@ -36,6 +36,7 @@ class complementos{
      * Integra los elementos base de a cuenta a terceros
      * @param stdClass $comprobante datos del cfdi
      * @return stdClass
+     * @version 1.38.0
      */
     public function comprobante_a_cuenta_terceros(stdClass $comprobante): stdClass
     {

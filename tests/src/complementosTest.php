@@ -80,6 +80,25 @@ class complementosTest extends test {
         errores::$error = false;
     }
 
+    public function test_comprobante_a_cuenta_terceros(): void
+    {
+        errores::$error = false;
+
+        $com = new complementos();
+        //$com = new liberator($com);
+
+
+        $comprobante = new stdClass();
+
+        $resultado = $com->comprobante_a_cuenta_terceros($comprobante);
+        $this->assertNotTrue(errores::$error);
+        $this->assertIsObject($resultado);
+        $this->assertEquals('PUE',$resultado->metodo_pago);
+        $this->assertEquals('I',$resultado->tipo_de_comprobante);
+        $this->assertEquals('01',$resultado->exportacion);
+        errores::$error = false;
+    }
+
     public function test_comprobante_complemento_nomina(): void
     {
         errores::$error = false;
