@@ -90,11 +90,24 @@ class init{
     }
 
     public function inicializa_valores_comprobante(stdClass $comprobante, xml $xml){
+
+        $total = $this->limpia_double(monto: $comprobante->total);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al limpiar monto', data: $total);
+        }
+
+        $sub_total = $this->limpia_double(monto: $comprobante->sub_total);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al limpiar monto', data: $sub_total);
+        }
+
+        $xml->cfdi->comprobante->total = $total;
+        $xml->cfdi->comprobante->sub_total = $sub_total;
+
         $xml->cfdi->comprobante->tipo_de_comprobante = $comprobante->tipo_de_comprobante;
         $xml->cfdi->comprobante->moneda = $comprobante->moneda;
-        $xml->cfdi->comprobante->total = $comprobante->total;
         $xml->cfdi->comprobante->exportacion = $comprobante->exportacion;
-        $xml->cfdi->comprobante->sub_total = $comprobante->sub_total;
+
         $xml->cfdi->comprobante->lugar_expedicion = $comprobante->lugar_expedicion;
         $xml->cfdi->comprobante->fecha = $comprobante->fecha;
         $xml->cfdi->comprobante->folio = $comprobante->folio;
@@ -108,13 +121,28 @@ class init{
             $xml->cfdi->comprobante->metodo_pago = $comprobante->metodo_pago;
         }
         if(isset($comprobante->descuento) && (string)$comprobante->descuento !== ''){
-            $xml->cfdi->comprobante->descuento = $comprobante->descuento;
+
+            $descuento = $this->limpia_double(monto: $comprobante->descuento);
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error al limpiar monto', data: $descuento);
+            }
+
+            $xml->cfdi->comprobante->descuento = $descuento;
         }
         if(isset($comprobante->tipo_cambio) && (string)$comprobante->tipo_cambio !== ''){
             $xml->cfdi->comprobante->tipo_cambio = $comprobante->tipo_cambio;
         }
 
         return $xml->cfdi->comprobante;
+    }
+
+    private function limpia_double(int|float|string $monto): float
+    {
+        $monto = trim($monto);
+        $monto = str_replace(' ','',$monto);
+        $monto = str_replace(',','',$monto);
+        $monto = str_replace('$','',$monto);
+        return (float)$monto;
     }
 
     private function monto_dos_decimals(float|int $value): string
