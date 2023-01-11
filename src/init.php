@@ -136,13 +136,12 @@ class init{
         return $xml->cfdi->comprobante;
     }
 
-    private function limpia_double(int|float|string $monto): float
+    private function limpia_double(int|float|string $monto): string
     {
         $monto = trim($monto);
         $monto = str_replace(' ','',$monto);
         $monto = str_replace(',','',$monto);
-        $monto = str_replace('$','',$monto);
-        return (float)$monto;
+        return str_replace('$','',$monto);
     }
 
     private function monto_dos_decimals(float|int $value): string
