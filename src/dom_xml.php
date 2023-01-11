@@ -438,44 +438,47 @@ class dom_xml{
         /**
          * REFCATORIZAR
          */
-        if(isset($concepto->valor_unitario)){
-            $valor_unitario = trim($concepto->valor_unitario);
-            $valor_unitario = str_replace('$', '', $valor_unitario);
-            $valor_unitario = str_replace(',', '', $valor_unitario);
-            $concepto->valor_unitario = $valor_unitario;
-        }
-        if(isset($concepto->importe)){
-            $importe = trim($concepto->importe);
-            $importe = str_replace('$', '', $importe);
-            $importe = str_replace(',', '', $importe);
-            $concepto->importe = $importe;
+
+
+        $attrs = array('valor_unitario','importe');
+        foreach ($attrs as $attr){
+            $concepto = $this->limpia_monto_attr(key: $attr, obj: $concepto);
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error al limpiar objeto', data: $concepto);
+            }
         }
 
         if(isset($concepto->impuestos)){
             foreach ($concepto->impuestos as $impuesto){
                 if(isset($impuesto->traslados)){
                     foreach ($impuesto->traslados as $indice=>$traslado){
-                        if(isset($traslado->base)){
-                            $base = trim($traslado->base);
-                            $base = str_replace('$', '', $base);
-                            $base = str_replace(',', '', $base);
-                            $traslado->base = $base;
-                            $impuesto->traslados[$indice] = $traslado;
 
+                        $attrs = array('base','importe');
+                        foreach ($attrs as $attr){
+                            $traslado = $this->limpia_attr_existente(key: $attr,obj:  $traslado);
+                            if(errores::$error){
+                                return $this->error->error(mensaje: 'Error al limpiar objeto', data: $traslado);
+                            }
                         }
+
+                        $impuesto->traslados[$indice] = $traslado;
+
                     }
                 }
 
                 if(isset($impuesto->retenciones)){
                     foreach ($impuesto->retenciones as $indice=>$retencion){
-                        if(isset($retencion->base)){
-                            $base = trim($retencion->base);
-                            $base = str_replace('$', '', $base);
-                            $base = str_replace(',', '', $base);
-                            $retencion->base = $base;
-                            $impuesto->retenciones[$indice] = $retencion;
 
+                        $attrs = array('base','importe');
+                        foreach ($attrs as $attr){
+                            $retencion = $this->limpia_attr_existente(key: $attr,obj:  $retencion);
+                            if(errores::$error){
+                                return $this->error->error(mensaje: 'Error al limpiar objeto', data: $traslado);
+                            }
                         }
+
+                        $impuesto->retenciones[$indice] = $retencion;
+
                     }
                 }
 
@@ -698,6 +701,33 @@ class dom_xml{
         $nodo_impuesto->setAttribute('TasaOCuota', $obj_impuesto->tasa_o_cuota);
         $nodo_impuesto->setAttribute('Importe', $obj_impuesto->importe);
         return $nodo_impuesto;
+    }
+
+    private function limpia_monto(string|int|float $monto): array|string
+    {
+        $monto = trim($monto);
+        $monto = str_replace('$', '', $monto);
+        return str_replace(',', '', $monto);
+    }
+
+    private function limpia_monto_attr(string $key, stdClass $obj){
+        $monto = $this->limpia_monto(monto: $obj->$key);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al limpiar monto', data: $monto);
+        }
+        $obj->$key = $monto;
+        return $obj;
+    }
+
+    private function limpia_attr_existente(string $key, stdClass $obj){
+        if(isset($obj->$key)){
+
+            $obj = $this->limpia_monto_attr(key: $key, obj: $obj);
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error al limpiar objeto', data: $obj);
+            }
+        }
+        return $obj;
     }
 
 
