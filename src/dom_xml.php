@@ -473,7 +473,7 @@ class dom_xml{
                         foreach ($attrs as $attr){
                             $retencion = $this->limpia_attr_existente(key: $attr,obj:  $retencion);
                             if(errores::$error){
-                                return $this->error->error(mensaje: 'Error al limpiar objeto', data: $traslado);
+                                return $this->error->error(mensaje: 'Error al limpiar objeto', data: $retencion);
                             }
                         }
 
@@ -695,6 +695,7 @@ class dom_xml{
 
     private function nodo_impuesto(DOMElement $nodo_impuesto, stdClass $obj_impuesto): DOMElement
     {
+
         $nodo_impuesto->setAttribute('Base', $obj_impuesto->base);
         $nodo_impuesto->setAttribute('Impuesto', $obj_impuesto->impuesto);
         $nodo_impuesto->setAttribute('TipoFactor', $obj_impuesto->tipo_factor);
@@ -708,7 +709,7 @@ class dom_xml{
      * @param string|int|float $monto monto a limpiar
      * @return array|string
      */
-    private function limpia_monto(string|int|float $monto): array|string 
+    private function limpia_monto(string|int|float $monto): array|string
     {
         $monto = trim($monto);
         $monto = str_replace('$', '', $monto);

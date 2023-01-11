@@ -458,6 +458,24 @@ class cfdis{
             return $this->error->error(mensaje: 'Error al generar conceptos', data: $dom);
         }
 
+        if(isset($impuestos_->total_impuestos_trasladados)){
+            $total_impuestos_trasladados = trim($impuestos_->total_impuestos_trasladados);
+            $total_impuestos_trasladados = str_replace(' ', '', $total_impuestos_trasladados);
+            $total_impuestos_trasladados = str_replace('$', '', $total_impuestos_trasladados);
+            $total_impuestos_trasladados = str_replace(',', '', $total_impuestos_trasladados);
+
+            $impuestos_->total_impuestos_trasladados = $total_impuestos_trasladados;
+        }
+
+        if(isset($impuestos_->total_impuestos_retenidos)){
+            $total_impuestos_retenidos = trim($impuestos_->total_impuestos_retenidos);
+            $total_impuestos_retenidos = str_replace(' ', '', $total_impuestos_retenidos);
+            $total_impuestos_retenidos = str_replace('$', '', $total_impuestos_retenidos);
+            $total_impuestos_retenidos = str_replace(',', '', $total_impuestos_retenidos);
+
+            $impuestos_->total_impuestos_retenidos = $total_impuestos_retenidos;
+        }
+
         $dom = $xml->cfdi_impuestos(impuestos: $impuestos_);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al generar impuestos', data: $dom);
