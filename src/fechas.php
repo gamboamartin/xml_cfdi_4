@@ -111,7 +111,8 @@ class fechas{
     }
 
     /**
-     * @param string $fecha
+     * Integra una fecha con espacios con formato T
+     * @param string $fecha Fecah en ejecucion
      * @return array|string
      */
     private function fecha_hora_min_sec_esp(string $fecha): array|string
