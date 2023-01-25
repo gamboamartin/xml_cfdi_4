@@ -38,7 +38,7 @@ class complementos{
      * @return stdClass
      * @version 1.38.0
      */
-    public function comprobante_a_cuenta_terceros(stdClass $comprobante): stdClass
+    final public function comprobante_a_cuenta_terceros(stdClass $comprobante): stdClass
     {
         $comprobante->metodo_pago = 'PUE';
         $comprobante->tipo_de_comprobante = 'I';
