@@ -51,9 +51,11 @@ class timbraTest extends test {
   </cfdi:Impuestos>
 
 </cfdi:Comprobante>';
+
         $id_comprobante = '';
 
-        $resultado = $timbra->timbra($contenido_xml, $id_comprobante);
+        $resultado = $timbra->timbra($contenido_xml, $id_comprobante, 'profact');
+
         $this->assertNotTrue(errores::$error);
         $this->assertIsObject($resultado);
         $this->assertNotEmpty($resultado->uuid);

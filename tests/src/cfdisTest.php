@@ -594,9 +594,17 @@ class cfdisTest extends test {
         $this->assertStringContainsStringIgnoringCase('<cfdi:Comprobante xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"',$resultado);
         $this->assertStringContainsStringIgnoringCase('Moneda="MXN" Total="1218" Exportacion="01" TipoDeComprobante="I"',$resultado);
 
-
-
         errores::$error = false;
+
+
+        $resultado = $cfdis->ingreso(comprobante: $comprobante, conceptos: $conceptos,
+            emisor:  $emisor, impuestos: $impuestos,receptor: $receptor, tipo: 'json');
+
+
+        //print_r($resultado);exit;
+
+
+
     }
 
 }

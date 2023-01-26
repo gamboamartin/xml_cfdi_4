@@ -415,7 +415,7 @@ class cfdis{
     }
 
     public function ingreso(stdClass|array $comprobante, array $conceptos, stdClass|array $emisor,
-                            array|stdClass $impuestos, stdClass|array $receptor): bool|array|string
+                            array|stdClass $impuestos, stdClass|array $receptor, string $tipo = 'xml'): bool|array|string
     {
 
         $data = $this->init_base(comprobante: $comprobante,emisor:  $emisor, receptor: $receptor);
@@ -437,25 +437,42 @@ class cfdis{
             return $this->error->error(mensaje: 'Error al validar comprobante', data: $valida);
         }
 
-        $xml = new xml();
-        $dom = $xml->cfdi_comprobante(comprobante: $data->comprobante);
-        if(errores::$error){
-            return $this->error->error(mensaje: 'Error al generar comprobante', data: $dom);
+        if($tipo === 'xml') {
+
+            $xml = new xml();
+            $dom = $xml->cfdi_comprobante(comprobante: $data->comprobante);
+            if (errores::$error) {
+                return $this->error->error(mensaje: 'Error al generar comprobante', data: $dom);
+            }
+
+            $dom = $xml->cfdi_emisor(emisor: $data->emisor);
+            if (errores::$error) {
+                return $this->error->error(mensaje: 'Error al generar emisor', data: $dom);
+            }
+
+            $dom = $xml->cfdi_receptor(receptor: $data->receptor);
+            if (errores::$error) {
+                return $this->error->error(mensaje: 'Error al generar receptor', data: $dom);
+            }
+
+            $dom = $xml->cfdi_conceptos(conceptos: $conceptos);
+            if (errores::$error) {
+                return $this->error->error(mensaje: 'Error al generar conceptos', data: $dom);
+            }
         }
 
-        $dom = $xml->cfdi_emisor(emisor:  $data->emisor);
-        if(errores::$error){
-            return $this->error->error(mensaje: 'Error al generar emisor', data: $dom);
-        }
+        if($tipo === 'json'){
+            $keys_data = $this->keys_data_comprobante();
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error al obtener keys data',data:  $keys_data);
+            }
+            $output = array();
+            $output['Comprobante'] = array();
+            foreach ($data->comprobante as $attr=>$value){
+                $output['Comprobante'][$keys_data[$attr]] = $value;
+            }
 
-        $dom = $xml->cfdi_receptor(receptor:  $data->receptor);
-        if(errores::$error){
-            return $this->error->error(mensaje: 'Error al generar receptor', data: $dom);
-        }
-
-        $dom = $xml->cfdi_conceptos(conceptos: $conceptos);
-        if(errores::$error){
-            return $this->error->error(mensaje: 'Error al generar conceptos', data: $dom);
+            //$output['Comprobante']
         }
 
         if(isset($impuestos_->total_impuestos_trasladados)){
@@ -476,12 +493,18 @@ class cfdis{
             $impuestos_->total_impuestos_retenidos = $total_impuestos_retenidos;
         }
 
-        $dom = $xml->cfdi_impuestos(impuestos: $impuestos_);
-        if(errores::$error){
-            return $this->error->error(mensaje: 'Error al generar impuestos', data: $dom);
+        if($tipo === 'xml') {
+            $dom = $xml->cfdi_impuestos(impuestos: $impuestos_);
+            if (errores::$error) {
+                return $this->error->error(mensaje: 'Error al generar impuestos', data: $dom);
+            }
+            $output =  $xml->dom->saveXML();
+        }
+        if($tipo === 'json'){
+            $output = json_encode($output);
         }
 
-        return $xml->dom->saveXML();
+        return $output;
 
     }
 
@@ -516,5 +539,23 @@ class cfdis{
 
         return $data;
 
+    }
+
+    private function keys_data_comprobante(): array
+    {
+        $keys_data['serie'] = 'Serie';
+        $keys_data['folio'] = 'Folio';
+        $keys_data['forma_pago'] = 'FormaPago';
+        $keys_data['sub_total'] = 'SubTotal';
+        $keys_data['moneda'] = 'Moneda';
+        $keys_data['total'] = 'Total';
+        $keys_data['lugar_expedicion'] = 'LugarExpedicion';
+        $keys_data['tipo_de_comprobante'] = 'TipoDeComprobante';
+        $keys_data['exportacion'] = 'Exportacion';
+        $keys_data['fecha'] = 'Fecha';
+        $keys_data['descuento'] = 'Descuento';
+        $keys_data['no_certificado'] = 'NoCertificado';
+        $keys_data['metodo_pago'] = 'MetodoPago';
+        return $keys_data;
     }
 }

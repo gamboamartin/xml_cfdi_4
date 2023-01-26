@@ -17,7 +17,7 @@ class timbra{
 
     }
 
-    public function timbra(string $contenido_xml, string $id_comprobante = ''): array|stdClass
+    public function timbra(string $contenido_xml, string $id_comprobante = '', string $pac_prov=''): array|stdClass
     {
 
         $contenido_xml = trim($contenido_xml);
@@ -37,23 +37,48 @@ class timbra{
         }
 
 
+
         $ws= $pac->ruta_pac;
         $usuario_int = $pac->usuario_integrador;
+        $timbra_rs = $pac->timbra_rs;
+        $aplica_params = true;
+
+        if($pac_prov!==''){
+            $ws= $pac->pac->$pac_prov->ruta;
+            $usuario_int = $pac->pac->$pac_prov->pass;
+            $timbra_rs = $pac->pac->$pac_prov->timbra_rs;
+            $aplica_params = $pac->pac->$pac_prov->aplica_params;
+        }
+
+
         $base64Comprobante = base64_encode($contenido_xml);
 
         $params = array();
+
         $params['usuarioIntegrador'] = $usuario_int;
         $params['xmlComprobanteBase64'] = $base64Comprobante;
         $params['idComprobante'] = $id_comprobante;
 
         try {
-            $client = new SoapClient($ws,$params);
+            if($aplica_params) {
+                $client = new SoapClient($ws, $params);
+            }
+            else{
+                $client = new SoapClient($ws);
+            }
         }
         catch (Throwable $e){
             return $this->error->error('Error al timbrar',array($e,htmlentities($contenido_xml)));
         }
 
-        $response = $client->__soapCall('TimbraCFDI', array('parameters' => $params));
+        if($aplica_params){
+            $response = $client->__soapCall($timbra_rs, array('parameters' => $params));
+        }
+        else{
+            $response = $client->timbrarTFD($usuario_int, $contenido_xml);
+        }
+
+
         $result = $response->TimbraCFDIResult->anyType;
         $tipo_resultado = $result[0];
         $cod_mensaje = $result[1];
