@@ -601,7 +601,7 @@ class cfdisTest extends test {
             emisor:  $emisor, impuestos: $impuestos,receptor: $receptor, tipo: 'json');
 
 
-       // print_r($resultado);exit;
+        //print_r($resultado);exit;
 
 
 

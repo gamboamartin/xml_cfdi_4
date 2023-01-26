@@ -14,6 +14,21 @@ class cfdis{
 
     }
 
+    private function add_concepto(stdClass $concepto, array $output){
+        $output['Comprobante']['Conceptos']= array();
+        $concepto_json = array();
+        foreach ($concepto as $attr=>$value) {
+
+            $concepto_json = $this->concepto_para_json(attr: $attr,concepto_json:  $concepto_json, value: $value);
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error al integrar concepto_json',data:  $concepto_json);
+            }
+
+        }
+        $output['Comprobante']['Conceptos'][] = $concepto_json;
+        return $output;
+    }
+
     public function complemento_a_cuenta_terceros(stdClass|array $comprobante, stdClass|array $conceptos_a,
                                                   stdClass|array $emisor, stdClass|array $impuestos,
                                                   stdClass|array $receptor): bool|array|string
@@ -414,6 +429,118 @@ class cfdis{
         return $xml->dom->saveXML();
     }
 
+    private function concepto_para_json(string $attr, array $concepto_json, string|array $value): array
+    {
+        $keys_data_concepto = $this->keys_data_concepto();
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al obtener keys_data_concepto',data:  $keys_data_concepto);
+        }
+
+        if(!is_array($value)) {
+            $key_output = $this->key_output(atributo: $attr, keys_data: $keys_data_concepto);
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error al obtener key_output',data:  $key_output);
+            }
+            $concepto_json[$key_output] = $value;
+        }
+        if(is_array($value)){
+            $concepto_json = $this->data_impuesto_concepto(attr: $attr,concepto_json:  $concepto_json,impuestos:  $value);
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error al integrar impuesto concepto_json',data:  $concepto_json);
+            }
+        }
+        return $concepto_json;
+    }
+
+    private function data_impuesto_concepto(string $attr, array $concepto_json, array $impuestos){
+
+        if($attr === 'impuestos') {
+            foreach ($impuestos as $impuesto) {
+                $concepto_json = $this->impuestos_concepto(attr: $attr, concepto_json: $concepto_json, impuesto: $impuesto);
+                if (errores::$error) {
+                    return $this->error->error(mensaje: 'Error al integrar impuesto concepto_json', data: $concepto_json);
+                }
+            }
+        }
+        return $concepto_json;
+    }
+
+    private function genera_impuestos(string $attr, array $concepto_json, array $imps, string $tipo_impuestos){
+        foreach ($imps as $imp){
+            $concepto_json = $this->integra_impuesto(attr:$attr, concepto_json: $concepto_json, imp: $imp,tipo_impuestos:  $tipo_impuestos);
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error al integrar impuesto key_output',data:  $concepto_json);
+            }
+        }
+        return $concepto_json;
+    }
+
+    private function imp_json(string $attr_imp, array $imp_json, string $value_imp){
+        $keys_data_impuesto = $this->keys_data_impuesto();
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al obtener keys_data_impuesto',data:  $keys_data_impuesto);
+        }
+
+        $key_output = $this->key_output(atributo: $attr_imp, keys_data: $keys_data_impuesto);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al obtener key_output',data:  $key_output);
+        }
+        $imp_json[$key_output] = $value_imp;
+        return $imp_json;
+    }
+
+    private function imps_json(stdClass $imp){
+        $imp_json = array();
+        foreach ($imp as $attr_imp=>$value_imp){
+            $imp_json = $this->imp_json(attr_imp: $attr_imp,imp_json:  $imp_json,value_imp:  $value_imp);
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error al asignar value',data:  $imp_json);
+            }
+        }
+        return $imp_json;
+    }
+
+    private function impuesto_concepto(string $attr, array $concepto_json, stdClass $impuesto, string $tipo_impuestos){
+        $attr_imp = trim($tipo_impuestos);
+        $attr_imp = strtolower($attr_imp);
+        if(isset($impuesto->$attr_imp)){
+            $concepto_json = $this->impuestos_json(attr: $attr,concepto_json:  $concepto_json,impuesto:  $impuesto, tipo_impuestos: $attr_imp);
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error al integrar impuesto concepto_json',data:  $concepto_json);
+            }
+        }
+        return $concepto_json;
+    }
+
+    private function impuestos_concepto(string $attr, array $concepto_json, stdClass $impuesto){
+        $tipos_impuestos[] = 'traslados';
+        $tipos_impuestos[] = 'retenciones';
+        foreach ($tipos_impuestos as $tipo_impuesto) {
+            $concepto_json = $this->impuesto_concepto(attr: $attr, concepto_json: $concepto_json, impuesto: $impuesto, tipo_impuestos: $tipo_impuesto);
+            if (errores::$error) {
+                return $this->error->error(mensaje: 'Error al integrar impuesto concepto_json', data: $concepto_json);
+            }
+        }
+        return $concepto_json;
+    }
+
+    private function impuestos_json(string $attr, array $concepto_json, stdClass $impuesto, string $tipo_impuestos){
+        $attr_imp = trim($tipo_impuestos);
+        $attr_imp = strtolower($attr_imp);
+
+        $values_attr = trim($tipo_impuestos);
+        $values_attr = ucwords($values_attr);
+
+        $imps = $impuesto->$attr_imp;
+        $tipo_impuestos = $values_attr;
+
+        $concepto_json = $this->genera_impuestos(attr: $attr,concepto_json:  $concepto_json,imps:  $imps,tipo_impuestos:  $tipo_impuestos);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al integrar impuesto key_output',data:  $concepto_json);
+        }
+        return $concepto_json;
+    }
+
     public function ingreso(stdClass|array $comprobante, array $conceptos, stdClass|array $emisor,
                             array|stdClass $impuestos, stdClass|array $receptor, string $tipo = 'xml'): bool|array|string
     {
@@ -474,76 +601,44 @@ class cfdis{
             if(errores::$error){
                 return $this->error->error(mensaje: 'Error al obtener keys data',data:  $keys_data_receptor);
             }
-            $keys_data_concepto = $this->keys_data_concepto();
-            if(errores::$error){
-                return $this->error->error(mensaje: 'Error al obtener keys data',data:  $keys_data_concepto);
-            }
-            $keys_data_impuesto = $this->keys_data_impuesto();
-            if(errores::$error){
-                return $this->error->error(mensaje: 'Error al obtener keys data',data:  $keys_data_concepto);
-            }
+
+
 
             $output = array();
             $output['Comprobante'] = array();
             foreach ($data->comprobante as $attr=>$value){
-                $output['Comprobante'][$keys_data_comprobante[$attr]] = $value;
+                $key_output = $this->key_output(atributo: $attr, keys_data: $keys_data_comprobante);
+                if(errores::$error){
+                    return $this->error->error(mensaje: 'Error al obtener key_output',data:  $key_output);
+                }
+                $output['Comprobante'][$key_output] = $value;
             }
 
             foreach ($emisor as $attr=>$value){
-                $output['Comprobante']['Emisor'][$keys_data_emisor[$attr]] = $value;
+                $key_output = $this->key_output(atributo: $attr, keys_data: $keys_data_emisor);
+                if(errores::$error){
+                    return $this->error->error(mensaje: 'Error al obtener key_output',data:  $key_output);
+                }
+                $output['Comprobante']['Emisor'][$key_output] = $value;
             }
-
 
 
             foreach ($receptor as $attr=>$value){
-                $output['Comprobante']['Receptor'][$keys_data_receptor[$attr]] = $value;
+
+                $key_output = $this->key_output(atributo: $attr, keys_data: $keys_data_receptor);
+                if(errores::$error){
+                    return $this->error->error(mensaje: 'Error al obtener key_output',data:  $key_output);
+                }
+
+                $output['Comprobante']['Receptor'][$key_output] = $value;
             }
 
 
-
             foreach ($conceptos as $concepto){
-                $output['Comprobante']['Conceptos']= array();
-                $concepto_json = array();
-                foreach ($concepto as $attr=>$value) {
-                    if(!is_array($value)) {
-                        $concepto_json[$keys_data_concepto[$attr]] = $value;
-                    }
-                    if(is_array($value)){
-                        if($attr === 'impuestos'){
-                            $impuestos = $value;
-                            foreach ($impuestos as $impuesto){
-                                if(isset($impuesto->traslados)){
-                                    $traslados = $impuesto->traslados;
-                                    foreach ($traslados as $traslado){
-                                        $traslado_json = array();
-                                        foreach ($traslado as $attr_traslado=>$value_traslado){
-                                            $traslado_json[$keys_data_impuesto[$attr_traslado]] = $value_traslado;
-                                        }
-                                        $concepto_json[$keys_data_concepto[$attr]]['Traslados'][] = $traslado_json;
-
-                                    }
-
-                                }
-                                if(isset($impuesto->retenciones)){
-                                    $retenciones = $impuesto->retenciones;
-                                    foreach ($retenciones as $retencion){
-                                        $retencion_json = array();
-                                        foreach ($retencion as $attr_retencion=>$value_retencion){
-                                            $retencion_json[$keys_data_impuesto[$attr_retencion]] = $value_retencion;
-                                        }
-                                        $concepto_json[$keys_data_concepto[$attr]]['Retenciones'][] = $retencion_json;
-
-                                    }
-                                }
-
-                            }
-
-                        }
-
-                    }
-
+                $output = $this->add_concepto(concepto: $concepto,output:  $output);
+                if(errores::$error){
+                    return $this->error->error(mensaje: 'Error al integrar concepto_json',data:  $output);
                 }
-                $output['Comprobante']['Conceptos'][] = $concepto_json;
             }
 
 
@@ -588,13 +683,13 @@ class cfdis{
                 }
                 if($attr_impuesto === 'traslados'){
                     $output['Comprobante']['Impuestos']['Traslados'] = array();
-                    $traslados = $value_impuesto;
-                    foreach ($traslados as $traslado){
-                        $traslado_json = array();
-                        foreach ($traslado as $attr_traslado=>$value_traslado){
-                            $traslado_json[$keys_data_impuesto[$attr_traslado]] = $value_traslado;
+                    $imps = $value_impuesto;
+                    foreach ($imps as $imp){
+                        $imp_json = $this->imps_json(imp: $imp);
+                        if(errores::$error){
+                            return $this->error->error(mensaje: 'Error al asignar value',data:  $imp_json);
                         }
-                        $output['Comprobante']['Impuestos']['Traslados'][] = $traslado_json;
+                        $output['Comprobante']['Impuestos']['Traslados'][] = $imp_json;
 
                     }
                 }
@@ -604,13 +699,13 @@ class cfdis{
                 }
                 if($attr_impuesto === 'retenciones'){
                     $output['Comprobante']['Impuestos']['Retenciones'] = array();
-                    $retenciones = $value_impuesto;
-                    foreach ($retenciones as $retencion){
-                        $retencion_json = array();
-                        foreach ($retencion as $attr_retencion=>$value_retencion){
-                            $retencion_json[$keys_data_impuesto[$attr_retencion]] = $value_retencion;
+                    $imps = $value_impuesto;
+                    foreach ($imps as $imp){
+                        $imp_json = $this->imps_json(imp: $imp);
+                        if(errores::$error){
+                            return $this->error->error(mensaje: 'Error al asignar value',data:  $imp_json);
                         }
-                        $output['Comprobante']['Impuestos']['Retenciones'][] = $retencion_json;
+                        $output['Comprobante']['Impuestos']['Retenciones'][] = $imp_json;
 
                     }
                 }
@@ -658,6 +753,31 @@ class cfdis{
         return $data;
 
     }
+
+    private function integra_impuesto(string $attr, array $concepto_json, stdClass $imp, string $tipo_impuestos){
+        $keys_data_concepto = $this->keys_data_concepto();
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al obtener keys_data_concepto',data:  $keys_data_concepto);
+        }
+
+        $imp_json = $this->imps_json(imp: $imp);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al asignar value',data:  $imp_json);
+        }
+
+        $key_output = $this->key_output(atributo: $attr, keys_data: $keys_data_concepto);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al obtener key_output',data:  $key_output);
+        }
+
+        $concepto_json[$key_output][$tipo_impuestos][] = $imp_json;
+        return $concepto_json;
+    }
+
+    private function key_output(string $atributo, array $keys_data){
+        return $keys_data[$atributo];
+    }
+
 
     private function keys_data_comprobante(): array
     {

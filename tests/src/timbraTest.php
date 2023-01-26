@@ -52,9 +52,73 @@ class timbraTest extends test {
 
 </cfdi:Comprobante>';
 
+        /*$contenido_xml = '{
+  "Comprobante": {
+    "Serie": "A",
+    "Folio": "1",
+    "Fecha": "2023-01-26T11:11:11",
+    "FormaPago": "01",
+    "NoCertificado": "30001000000300023708",
+    "CondicionesDePago": "NA",
+    "SubTotal": "1.00",
+    "Moneda": "MXN",
+    "TipoCambio": "1",
+    "Total": "1.16",
+    "TipoDeComprobante": "I",
+    "MetodoPago": "PUE",
+    "LugarExpedicion": "45079",
+    "Emisor": {
+      "Rfc": "AAA010101AAA",
+      "Nombre": "Soluciones Fiscales Facturalo S DE RL DE CV",
+      "RegimenFiscal": "601"
+    },
+    "Receptor": {
+      "Rfc": "XAXX010101000",
+      "Nombre": "PUBLICO EN GENERAL",
+      "UsoCFDI": "G01"
+    },
+    "Conceptos": [
+      {
+        "ClaveProdServ": "01010101",
+        "NoIdentificacion": "00001",
+        "Cantidad": "1",
+        "ClaveUnidad": "F52",
+        "Unidad": "TONELADA",
+        "Descripcion": "ACERO",
+        "ValorUnitario": "1.00",
+        "Importe": "1.00",
+        "Impuestos":
+        {
+          "Traslados": [
+            {
+              "Base": "1.00",
+              "Impuesto": "002",
+              "TipoFactor": "Tasa",
+              "TasaOCuota": "0.160000",
+              "Importe": "0.16"
+            }
+          ]
+        }
+      }
+    ],
+    "Impuestos": {
+      "TotalImpuestosTrasladados": "0.16",
+      "Traslados": [
+        {
+          "Impuesto": "002",
+          "TipoFactor": "Tasa",
+          "TasaOCuota": "0.160000",
+          "Importe": "0.16"
+        }
+      ]
+    }
+  }
+}';*/
+
         $id_comprobante = '';
 
         $resultado = $timbra->timbra($contenido_xml, $id_comprobante, 'profact');
+       // print_r($resultado);exit;
 
         $this->assertNotTrue(errores::$error);
         $this->assertIsObject($resultado);

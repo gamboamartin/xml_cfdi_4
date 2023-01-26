@@ -42,16 +42,19 @@ class timbra{
         $usuario_int = $pac->usuario_integrador;
         $timbra_rs = $pac->timbra_rs;
         $aplica_params = true;
+        $tipo_entrada = 'xml';
 
         if($pac_prov!==''){
             $ws= $pac->pac->$pac_prov->ruta;
             $usuario_int = $pac->pac->$pac_prov->pass;
             $timbra_rs = $pac->pac->$pac_prov->timbra_rs;
             $aplica_params = $pac->pac->$pac_prov->aplica_params;
+            $tipo_entrada = $pac->pac->$pac_prov->tipo_entrada;
         }
 
 
         $base64Comprobante = base64_encode($contenido_xml);
+
 
         $params = array();
 
@@ -75,8 +78,13 @@ class timbra{
             $response = $client->__soapCall($timbra_rs, array('parameters' => $params));
         }
         else{
-            $response = $client->timbrarTFD($usuario_int, $contenido_xml);
+
+            $keyPEM = file_get_contents('/var/www/html/xml_cfdi_4/CSD01_AAA010101AAA_key.pem');
+            $cerPEM = file_get_contents('/var/www/html/xml_cfdi_4/CSD01_AAA010101AAA_cer.pem');
+            $response = $client->timbrarJSON($usuario_int, $base64Comprobante, $keyPEM, $cerPEM);
         }
+
+        //print_r($response);exit;
 
 
         $result = $response->TimbraCFDIResult->anyType;
