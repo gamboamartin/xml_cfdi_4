@@ -462,15 +462,91 @@ class cfdis{
         }
 
         if($tipo === 'json'){
-            $keys_data = $this->keys_data_comprobante();
+            $keys_data_comprobante = $this->keys_data_comprobante();
             if(errores::$error){
-                return $this->error->error(mensaje: 'Error al obtener keys data',data:  $keys_data);
+                return $this->error->error(mensaje: 'Error al obtener keys data',data:  $keys_data_comprobante);
             }
+            $keys_data_emisor = $this->keys_data_emisor();
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error al obtener keys data',data:  $keys_data_emisor);
+            }
+            $keys_data_receptor = $this->keys_data_receptor();
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error al obtener keys data',data:  $keys_data_receptor);
+            }
+            $keys_data_concepto = $this->keys_data_concepto();
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error al obtener keys data',data:  $keys_data_concepto);
+            }
+            $keys_data_impuesto = $this->keys_data_impuesto();
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error al obtener keys data',data:  $keys_data_concepto);
+            }
+
             $output = array();
             $output['Comprobante'] = array();
             foreach ($data->comprobante as $attr=>$value){
-                $output['Comprobante'][$keys_data[$attr]] = $value;
+                $output['Comprobante'][$keys_data_comprobante[$attr]] = $value;
             }
+
+            foreach ($emisor as $attr=>$value){
+                $output['Comprobante']['Emisor'][$keys_data_emisor[$attr]] = $value;
+            }
+
+
+
+            foreach ($receptor as $attr=>$value){
+                $output['Comprobante']['Receptor'][$keys_data_receptor[$attr]] = $value;
+            }
+
+
+
+            foreach ($conceptos as $concepto){
+                $output['Comprobante']['Conceptos']= array();
+                $concepto_json = array();
+                foreach ($concepto as $attr=>$value) {
+                    if(!is_array($value)) {
+                        $concepto_json[$keys_data_concepto[$attr]] = $value;
+                    }
+                    if(is_array($value)){
+                        if($attr === 'impuestos'){
+                            $impuestos = $value;
+                            foreach ($impuestos as $impuesto){
+                                if(isset($impuesto->traslados)){
+                                    $traslados = $impuesto->traslados;
+                                    foreach ($traslados as $traslado){
+                                        $traslado_json = array();
+                                        foreach ($traslado as $attr_traslado=>$value_traslado){
+                                            $traslado_json[$keys_data_impuesto[$attr_traslado]] = $value_traslado;
+                                        }
+                                        $concepto_json[$keys_data_concepto[$attr]]['Traslados'][] = $traslado_json;
+
+                                    }
+
+                                }
+                                if(isset($impuesto->retenciones)){
+                                    $retenciones = $impuesto->retenciones;
+                                    foreach ($retenciones as $retencion){
+                                        $retencion_json = array();
+                                        foreach ($retencion as $attr_retencion=>$value_retencion){
+                                            $retencion_json[$keys_data_impuesto[$attr_retencion]] = $value_retencion;
+                                        }
+                                        $concepto_json[$keys_data_concepto[$attr]]['Retenciones'][] = $retencion_json;
+
+                                    }
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+                $output['Comprobante']['Conceptos'][] = $concepto_json;
+            }
+
+
 
             //$output['Comprobante']
         }
@@ -500,7 +576,49 @@ class cfdis{
             }
             $output =  $xml->dom->saveXML();
         }
-        if($tipo === 'json'){
+
+        if($tipo === 'json') {
+            foreach ($impuestos_ as $attr_impuesto=>$value_impuesto){
+                $keys_data_impuesto = $this->keys_data_impuesto();
+                if(errores::$error){
+                    return $this->error->error(mensaje: 'Error al obtener keys data',data:  $keys_data_impuesto);
+                }
+                if($attr_impuesto === 'total_impuestos_trasladados'){
+                    $output['Comprobante']['Impuestos']['TotalImpuestosTrasladados'] = $value_impuesto;
+                }
+                if($attr_impuesto === 'traslados'){
+                    $output['Comprobante']['Impuestos']['Traslados'] = array();
+                    $traslados = $value_impuesto;
+                    foreach ($traslados as $traslado){
+                        $traslado_json = array();
+                        foreach ($traslado as $attr_traslado=>$value_traslado){
+                            $traslado_json[$keys_data_impuesto[$attr_traslado]] = $value_traslado;
+                        }
+                        $output['Comprobante']['Impuestos']['Traslados'][] = $traslado_json;
+
+                    }
+                }
+
+                if($attr_impuesto === 'total_impuestos_retenidos'){
+                    $output['Comprobante']['Impuestos']['TotalImpuestosRetenidos'] = $value_impuesto;
+                }
+                if($attr_impuesto === 'retenciones'){
+                    $output['Comprobante']['Impuestos']['Retenciones'] = array();
+                    $retenciones = $value_impuesto;
+                    foreach ($retenciones as $retencion){
+                        $retencion_json = array();
+                        foreach ($retencion as $attr_retencion=>$value_retencion){
+                            $retencion_json[$keys_data_impuesto[$attr_retencion]] = $value_retencion;
+                        }
+                        $output['Comprobante']['Impuestos']['Retenciones'][] = $retencion_json;
+
+                    }
+                }
+
+
+
+            }
+            //print_r($impuestos_);exit;
             $output = json_encode($output);
         }
 
@@ -556,6 +674,55 @@ class cfdis{
         $keys_data['descuento'] = 'Descuento';
         $keys_data['no_certificado'] = 'NoCertificado';
         $keys_data['metodo_pago'] = 'MetodoPago';
+        return $keys_data;
+    }
+
+    private function keys_data_concepto(): array
+    {
+        $keys_data['clave_prod_serv'] = 'ClaveProdServ';
+        $keys_data['cantidad'] = 'Cantidad';
+        $keys_data['clave_unidad'] = 'Cantidad';
+        $keys_data['descripcion'] = 'Descripcion';
+        $keys_data['valor_unitario'] = 'ValorUnitario';
+        $keys_data['importe'] = 'Importe';
+        $keys_data['objeto_imp'] = 'ObjetoImp';
+        $keys_data['no_identificacion'] = 'NoIdentificacion';
+        $keys_data['unidad'] = 'Unidad';
+        $keys_data['impuestos'] = 'Impuestos';
+
+
+
+        return $keys_data;
+    }
+
+    private function keys_data_emisor(): array
+    {
+        $keys_data['rfc'] = 'Rfc';
+        $keys_data['nombre'] = 'Nombre';
+        $keys_data['regimen_fiscal'] = 'FormaPago';
+        $keys_data['sub_total'] = 'RegimenFiscal';
+        return $keys_data;
+    }
+
+    private function keys_data_impuesto(): array
+    {
+        $keys_data['base'] = 'Base';
+        $keys_data['impuesto'] = 'Impuesto';
+        $keys_data['tipo_factor'] = 'TipoFactor';
+        $keys_data['tasa_o_cuota'] = 'TasaOCuota';
+        $keys_data['importe'] = 'Importe';
+        $keys_data['descuento'] = 'Descuento';
+
+        return $keys_data;
+    }
+    private function keys_data_receptor(): array
+    {
+        $keys_data['rfc'] = 'Rfc';
+        $keys_data['nombre'] = 'Nombre';
+        $keys_data['uso_cfdi'] = 'UsoCFDI';
+        $keys_data['domicilio_fiscal_receptor'] = 'DomicilioFiscalReceptor';
+        $keys_data['regimen_fiscal_receptor'] = 'RegimenFiscalReceptor';
+
         return $keys_data;
     }
 }
