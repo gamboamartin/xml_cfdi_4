@@ -206,7 +206,8 @@ class dom_xml{
             return $this->error->error(mensaje: 'Error al generar nodo', data: $nodo_impuesto);
         }
 
-        $nodo_impuesto = $this->nodo_impuesto(nodo_impuesto: $nodo_impuesto,obj_impuesto:  $obj_impuesto);
+        $nodo_impuesto = $this->nodo_impuesto(
+            nodo_impuesto: $nodo_impuesto,obj_impuesto:  $obj_impuesto, tipo_impuesto: $tipo_impuesto);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al generar nodo', data: $nodo_impuesto);
         }
@@ -693,13 +694,21 @@ class dom_xml{
         return $nodo;
     }
 
-    private function nodo_impuesto(DOMElement $nodo_impuesto, stdClass $obj_impuesto): DOMElement
+    /**
+     * @param DOMElement $nodo_impuesto
+     * @param stdClass $obj_impuesto
+     * @param string $tipo_impuesto
+     * @return DOMElement
+     */
+    private function nodo_impuesto(DOMElement $nodo_impuesto, stdClass $obj_impuesto,string  $tipo_impuesto = 'Traslado'): DOMElement
     {
 
         $nodo_impuesto->setAttribute('Base', $obj_impuesto->base);
-        $nodo_impuesto->setAttribute('Impuesto', $obj_impuesto->impuesto);
-        $nodo_impuesto->setAttribute('TipoFactor', $obj_impuesto->tipo_factor);
-        $nodo_impuesto->setAttribute('TasaOCuota', $obj_impuesto->tasa_o_cuota);
+        if($tipo_impuesto === 'Traslado') {
+            $nodo_impuesto->setAttribute('Impuesto', $obj_impuesto->impuesto);
+            $nodo_impuesto->setAttribute('TipoFactor', $obj_impuesto->tipo_factor);
+            $nodo_impuesto->setAttribute('TasaOCuota', $obj_impuesto->tasa_o_cuota);
+        }
         $nodo_impuesto->setAttribute('Importe', $obj_impuesto->importe);
         return $nodo_impuesto;
     }
