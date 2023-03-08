@@ -702,10 +702,12 @@ class dom_xml{
      */
     private function nodo_impuesto(DOMElement $nodo_impuesto, stdClass $obj_impuesto,string  $tipo_impuesto = 'Traslado'): DOMElement
     {
-
-        $nodo_impuesto->setAttribute('Base', $obj_impuesto->base);
         if($tipo_impuesto === 'Traslado') {
-            $nodo_impuesto->setAttribute('Impuesto', $obj_impuesto->impuesto);
+            $nodo_impuesto->setAttribute('Base', $obj_impuesto->base);
+        }
+        $nodo_impuesto->setAttribute('Impuesto', $obj_impuesto->impuesto);
+
+        if($tipo_impuesto === 'Traslado') {
             $nodo_impuesto->setAttribute('TipoFactor', $obj_impuesto->tipo_factor);
             $nodo_impuesto->setAttribute('TasaOCuota', $obj_impuesto->tasa_o_cuota);
         }

@@ -382,7 +382,7 @@ class xmlTest extends test {
         $resultado = $xml->cfdi_impuestos($impuestos);
         $this->assertNotTrue(errores::$error);
         $this->assertIsString($resultado);
-        $this->assertStringContainsStringIgnoringCase(':Retencion Base="10" Imp',$resultado);
+        $this->assertStringContainsStringIgnoringCase(':Retencion Imp',$resultado);
         $this->assertStringContainsStringIgnoringCase('x"><cfdi:Traslados><cfdi:Traslado Base="10',$resultado);
 
         errores::$error = false;
