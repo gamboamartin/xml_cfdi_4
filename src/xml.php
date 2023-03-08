@@ -179,14 +179,6 @@ class xml{
             if (errores::$error) {
                 return $this->error->error(mensaje: 'Error al setear $emisor', data: $data_nodo);
             }
-
-            if($aplica_impuestos_trasladados){
-                $traslados = (new dom_xml())->anexa_impuestos(data_nodo: $data_nodo,
-                    impuestos: $impuestos, obj_impuestos: 'traslados', tipo_impuesto: 'Traslado', xml: $this);
-                if (errores::$error) {
-                    return $this->error->error(mensaje: 'Error al generar nodo', data: $traslados);
-                }
-            }
             if($aplica_impuestos_retenidos){
                 $retenciones = (new dom_xml())->anexa_impuestos(data_nodo: $data_nodo,impuestos:  $impuestos,
                     obj_impuestos: 'retenciones',tipo_impuesto: 'Retencion',xml:  $this);
@@ -194,7 +186,13 @@ class xml{
                     return $this->error->error(mensaje: 'Error al generar nodo', data: $retenciones);
                 }
             }
-
+            if($aplica_impuestos_trasladados){
+                $traslados = (new dom_xml())->anexa_impuestos(data_nodo: $data_nodo,
+                    impuestos: $impuestos, obj_impuestos: 'traslados', tipo_impuesto: 'Traslado', xml: $this);
+                if (errores::$error) {
+                    return $this->error->error(mensaje: 'Error al generar nodo', data: $traslados);
+                }
+            }
 
         }
 

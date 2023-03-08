@@ -380,10 +380,11 @@ class xmlTest extends test {
         $impuestos->traslados[0]->importe = '10';
 
         $resultado = $xml->cfdi_impuestos($impuestos);
+        //print_r($resultado);exit;
         $this->assertNotTrue(errores::$error);
         $this->assertIsString($resultado);
         $this->assertStringContainsStringIgnoringCase(':Retencion Imp',$resultado);
-        $this->assertStringContainsStringIgnoringCase('x"><cfdi:Traslados><cfdi:Traslado Base="10',$resultado);
+        $this->assertStringContainsStringIgnoringCase('<cfdi:Traslados><cfdi:Traslado Base="10',$resultado);
 
         errores::$error = false;
 
