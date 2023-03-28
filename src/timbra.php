@@ -80,6 +80,10 @@ class timbra{
         $mensaje_error = $result[7];
         $salida = $result[8];
 
+        if((int)$cod_error !==0){
+            return $this->error->error(mensaje: 'Error al timbrar',data: $result);
+        }
+
 
         $data = new stdClass();
         $data->response = $response;
