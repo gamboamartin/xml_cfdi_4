@@ -427,6 +427,17 @@ class dom_xml{
             }
         }
 
+        if(isset($concepto->cuenta_predial)){
+            try {
+                $nodo_cuenta_predial = $xml->dom->createElement('cfdi:CuentaPredial');
+                $nodo_cuenta_predial->setAttribute('Numero', $concepto->cuenta_predial);
+            }
+            catch (Throwable $e){
+                return $this->error->error(mensaje: 'Error al crear el elemento cfdi:CuentaPredial', data: $e);
+            }
+            $nodo_concepto->appendChild($nodo_cuenta_predial);
+        }
+
         return $nodo_conceptos;
     }
 
