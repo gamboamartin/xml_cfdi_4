@@ -5,7 +5,6 @@
     "license": "GPL-3.0-or-later",
     "autoload": {
         "psr-4": {
-            "gamboamartin\\calculo\\": "src/",
             "gamboamartin\\test\\": "tests/",
             "gamboamartin\\xml_cfdi_4\\": "src/",
             "config\\": "config/"
