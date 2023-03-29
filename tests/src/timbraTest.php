@@ -52,68 +52,7 @@ class timbraTest extends test {
 
 </cfdi:Comprobante>';
 
-        /*$contenido_xml = '{
-  "Comprobante": {
-    "Serie": "A",
-    "Folio": "1",
-    "Fecha": "2023-01-26T11:11:11",
-    "FormaPago": "01",
-    "NoCertificado": "30001000000300023708",
-    "CondicionesDePago": "NA",
-    "SubTotal": "1.00",
-    "Moneda": "MXN",
-    "TipoCambio": "1",
-    "Total": "1.16",
-    "TipoDeComprobante": "I",
-    "MetodoPago": "PUE",
-    "LugarExpedicion": "45079",
-    "Emisor": {
-      "Rfc": "AAA010101AAA",
-      "Nombre": "Soluciones Fiscales Facturalo S DE RL DE CV",
-      "RegimenFiscal": "601"
-    },
-    "Receptor": {
-      "Rfc": "XAXX010101000",
-      "Nombre": "PUBLICO EN GENERAL",
-      "UsoCFDI": "G01"
-    },
-    "Conceptos": [
-      {
-        "ClaveProdServ": "01010101",
-        "NoIdentificacion": "00001",
-        "Cantidad": "1",
-        "ClaveUnidad": "F52",
-        "Unidad": "TONELADA",
-        "Descripcion": "ACERO",
-        "ValorUnitario": "1.00",
-        "Importe": "1.00",
-        "Impuestos":
-        {
-          "Traslados": [
-            {
-              "Base": "1.00",
-              "Impuesto": "002",
-              "TipoFactor": "Tasa",
-              "TasaOCuota": "0.160000",
-              "Importe": "0.16"
-            }
-          ]
-        }
-      }
-    ],
-    "Impuestos": {
-      "TotalImpuestosTrasladados": "0.16",
-      "Traslados": [
-        {
-          "Impuesto": "002",
-          "TipoFactor": "Tasa",
-          "TasaOCuota": "0.160000",
-          "Importe": "0.16"
-        }
-      ]
-    }
-  }
-}';*/
+
 
         $id_comprobante = '';
 
@@ -159,6 +98,62 @@ class timbraTest extends test {
 
         $resultado = $timbra->timbra($contenido_xml, $id_comprobante, 'profact');
 
+        $this->assertNotTrue(errores::$error);
+        $this->assertIsObject($resultado);
+        $this->assertNotEmpty($resultado->uuid);
+
+        errores::$error = false;
+
+        $contenido_xml = '{
+    "Comprobante":
+    {
+        "Version": "4.0",
+        "Serie": "LC-P",
+        "Folio": "LC1236",
+        "Fecha": "2023-03-28T10:37:08",
+        "NoCertificado": "30001000000400002434",
+        "SubTotal": "0",
+        "Moneda": "XXX",
+        "Total": "0",
+        "TipoDeComprobante": "T",
+        "Exportacion": "01",
+        "LugarExpedicion": "55000",
+        "Emisor":
+        {
+            "Rfc": "EKU9003173C9",
+            "Nombre": "ESCUELA KEMPER URGATE",
+            "RegimenFiscal": "601"
+        },
+        "Receptor":
+        {
+            "Rfc": "EKU9003173C9",
+            "Nombre": "ESCUELA KEMPER URGATE",
+            "DomicilioFiscalReceptor": "26015",
+            "RegimenFiscalReceptor": "601",
+            "UsoCFDI": "S01"
+        },
+        "Conceptos":
+        [
+            {
+                "ClaveProdServ": "60101704",
+                "NoIdentificacion": "000004",
+                "Cantidad": "1",
+                "ClaveUnidad": "E48",
+                "Unidad": "Paquetes",
+                "Descripcion": "LIBRO(S) TEXTO Y/O MAT. BIBLIOGRAFICO VL",
+                "ValorUnitario": "0",
+                "Importe": "0",
+                "ObjetoImp": "01"
+            }
+        ]
+    }
+}';
+
+        $ruta_key_pem = '/var/www/html/xml_cfdi_4/tests/files/CSD_EKU9003173C9_key.pem';
+        $ruta_cer_pem = '/var/www/html/xml_cfdi_4/tests/files/CSD_EKU9003173C9_cer.pem';
+
+        $resultado = $timbra->timbra(contenido_xml: $contenido_xml, id_comprobante: $id_comprobante,
+            ruta_cer_pem: $ruta_cer_pem, ruta_key_pem: $ruta_key_pem, pac_prov: 'facturalo');
         $this->assertNotTrue(errores::$error);
         $this->assertIsObject($resultado);
         $this->assertNotEmpty($resultado->uuid);

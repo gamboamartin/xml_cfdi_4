@@ -99,7 +99,37 @@ class timbra{
         return $data;
     }
 
-    public function timbra(string $contenido_xml, string $id_comprobante = '', string $pac_prov=''): array|stdClass
+    private function get_data_pem(string $ruta_cer_pem, string $ruta_key_pem){
+        $valida = $this->valida_ruta(file: $ruta_key_pem);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar ruta_key_pem',data:  $valida);
+        }
+        $valida = $this->valida_ruta(file: $ruta_cer_pem);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar ruta_cer_pem',data:  $valida);
+        }
+
+        $pems = $this->pems(ruta_cer_pem: $ruta_cer_pem, ruta_key_pem: $ruta_key_pem);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al integrar pems',data:  $pems);
+        }
+        return $pems;
+    }
+
+    private function pems(string $ruta_cer_pem, string $ruta_key_pem): stdClass
+    {
+        $key_pem = file_get_contents($ruta_key_pem);
+        $cer_pem = file_get_contents($ruta_cer_pem);
+
+        $data = new stdClass();
+        $data->key = $key_pem;
+        $data->cer = $cer_pem;
+        return $data;
+
+    }
+
+    public function timbra(string $contenido_xml, string $id_comprobante = '', string $ruta_cer_pem = '',
+                           string $ruta_key_pem = '', string $pac_prov=''): array|stdClass
     {
 
         $contenido_xml = trim($contenido_xml);
@@ -117,7 +147,6 @@ class timbra{
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al validar pac',data: $valida);
         }
-
 
 
         $ws= $pac->ruta_pac;
@@ -138,14 +167,12 @@ class timbra{
         $base64Comprobante = base64_encode($contenido_xml);
 
 
-        $params = array();
-
-        $params['usuarioIntegrador'] = $usuario_int;
-        $params['xmlComprobanteBase64'] = $base64Comprobante;
-        $params['idComprobante'] = $id_comprobante;
-
         try {
             if($aplica_params) {
+                $params = array();
+                $params['usuarioIntegrador'] = $usuario_int;
+                $params['xmlComprobanteBase64'] = $base64Comprobante;
+                $params['idComprobante'] = $id_comprobante;
                 $client = new SoapClient($ws, $params);
             }
             else{
@@ -158,40 +185,72 @@ class timbra{
 
         if($aplica_params){
             $response = $client->__soapCall($timbra_rs, array('parameters' => $params));
+            $result = $response->TimbraCFDIResult->anyType;
         }
         else{
 
-            $keyPEM = file_get_contents('/var/www/html/xml_cfdi_4/CSD01_AAA010101AAA_key.pem');
-            $cerPEM = file_get_contents('/var/www/html/xml_cfdi_4/CSD01_AAA010101AAA_cer.pem');
-            $response = $client->timbrarJSON($usuario_int, $base64Comprobante, $keyPEM, $cerPEM);
+            $pems = $this->get_data_pem(ruta_cer_pem: $ruta_cer_pem,ruta_key_pem:  $ruta_key_pem);
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error al integrar pems',data:  $pems);
+            }
+
+
+            $response = $client->timbrarJSON3($usuario_int, $base64Comprobante, $pems->key, $pems->cer);
+
+
+            $result = (array)$response;
+
+            $cod_error = 0;
+            if((int)$result['code'] !== 200){
+                $cod_error = $result['code'];
+
+            }
+            if((int)$cod_error === 307){
+                $cod_error = 0;
+
+            }
+
+            if((int)$cod_error === 0){
+                $data_json = json_decode($response->data);
+                $result[0] = 'Exito';
+                $result[1] = 'Exito';
+                $result[2] = 'Exito';
+                $result[6] = $cod_error;
+                $result[7] = '';
+                $result[8] = '';
+                $result[4] = $data_json->CodigoQR;
+                $result[5] = $data_json->CadenaOriginalSAT;
+                $result[3] = $data_json->XML;
+
+            }
+
+
         }
 
-        //print_r($response);exit;
+        $xml_sellado = $result[3];
+
+        $lee_xml = (new xml())->get_datos_xml(xml_data: $xml_sellado);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al obtener datos',data:  $lee_xml);
+        }
 
 
-        $result = $response->TimbraCFDIResult->anyType;
         $tipo_resultado = $result[0];
         $cod_mensaje = $result[1];
         $mensaje = $result[2];
         $cod_error = $result[6];
         $mensaje_error = $result[7];
         $salida = $result[8];
-        $xml_sellado = $result[3];
         $qr_code = $result[4];
         $txt = $result[5];
-        $data_uuid = $result[8];
+
 
         if((int)$cod_error !==0){
             return $this->error->error(mensaje: 'Error al timbrar',data: $result);
         }
 
-        $uuid = '';
-        $data_uuid_json = json_decode($data_uuid);
-        if(isset($data_uuid_json[0]->Key)){
-            if($data_uuid_json[0]->Key === 'UUID'){
-                $uuid = $data_uuid_json[0]->Value;
-            }
-        }
+
+        $uuid = $lee_xml['tfd']['UUID'];
 
         $data = new stdClass();
         $data->response = $response;
@@ -204,14 +263,24 @@ class timbra{
         $data->salida = $salida;
         $data->qr_code = $qr_code;
         $data->txt = $txt;
-        $data->data_uuid = $data_uuid;
         $data->uuid = $uuid;
-        $data->data_uuid_json = $data_uuid_json;
         $data->xml_sellado = $xml_sellado;
 
 
         return $data;
 
 
+    }
+
+    private function valida_ruta(string $file): bool|array
+    {
+        $file = trim($file);
+        if($file === ''){
+            return $this->error->error(mensaje: 'Error file esta vacio',data: $file);
+        }
+        if(!file_exists($file)){
+            return $this->error->error(mensaje: 'Error file no existe',data: $file);
+        }
+        return true;
     }
 }
