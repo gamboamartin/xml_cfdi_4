@@ -201,7 +201,7 @@ class timbra{
             $result = (array)$response;
 
             $cod_error = 0;
-            if((int)$result['code'] !== 200){
+            if((string)$result['code'] !== '200'){
                 $cod_error = $result['code'];
                 $result[0] = 'Error';
                 $result[1] = $result['message'];
@@ -213,12 +213,12 @@ class timbra{
                 $result[8] = $result['message'];
 
             }
-            if((int)$cod_error === 307){
+            if((string)$cod_error === '307'){
                 $cod_error = 0;
 
             }
 
-            if((int)$cod_error === 0){
+            if((string)$cod_error === '0'){
                 $data_json = json_decode($response->data);
 
                 $result[0] = 'Exito';
@@ -248,7 +248,7 @@ class timbra{
         $qr_code = $result[4];
         $txt = $result[5];
 
-        if((int)$cod_error !==0){
+        if((string)$cod_error !=='0'){
             return $this->error->error(mensaje: 'Error al timbrar',data: $result);
         }
 
