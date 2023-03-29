@@ -203,6 +203,14 @@ class timbra{
             $cod_error = 0;
             if((int)$result['code'] !== 200){
                 $cod_error = $result['code'];
+                $result[0] = 'Error';
+                $result[1] = $result['message'];
+                $result[2] = $result['message'];
+                $result[4] = $result['message'];
+                $result[5] = $result['message'];
+                $result[6] = $cod_error;
+                $result[7] = $result['message'];
+                $result[8] = $result['message'];
 
             }
             if((int)$cod_error === 307){
@@ -228,12 +236,7 @@ class timbra{
 
         }
 
-        $xml_sellado = $result[3];
 
-        $lee_xml = (new xml())->get_datos_xml(xml_data: $xml_sellado);
-        if(errores::$error){
-            return $this->error->error(mensaje: 'Error al obtener datos',data:  $lee_xml);
-        }
 
 
         $tipo_resultado = $result[0];
@@ -245,9 +248,15 @@ class timbra{
         $qr_code = $result[4];
         $txt = $result[5];
 
-
         if((int)$cod_error !==0){
             return $this->error->error(mensaje: 'Error al timbrar',data: $result);
+        }
+
+        $xml_sellado = $result[3];
+
+        $lee_xml = (new xml())->get_datos_xml(xml_data: $xml_sellado);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al obtener datos',data:  $lee_xml);
         }
 
 
