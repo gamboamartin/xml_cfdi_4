@@ -212,6 +212,7 @@ class timbra{
 
             if((int)$cod_error === 0){
                 $data_json = json_decode($response->data);
+
                 $result[0] = 'Exito';
                 $result[1] = 'Exito';
                 $result[2] = 'Exito';
