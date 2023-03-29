@@ -62,5 +62,25 @@ class fechasTest extends test {
         errores::$error = false;
 
     }
+    public function test_fecha_hora_min_sec_t(){
+        errores::$error = false;
+
+        $fechas = new fechas();
+        $fechas = new liberator($fechas);
+        $fecha = '2020-01-01 00:00:00';
+        $resultado = $fechas->fecha_hora_min_sec_t($fecha);
+        $this->assertNotTrue(errores::$error);
+        $this->assertIsString($resultado);
+        $this->assertEquals('2020-01-01T00:00:00', $resultado);
+
+        errores::$error = false;
+
+        $fecha = '2020-01-01 ';
+        $resultado = $fechas->fecha_hora_min_sec_t($fecha);
+        $this->assertNotTrue(errores::$error);
+        $this->assertIsString($resultado);
+        errores::$error = false;
+
+    }
 }
 

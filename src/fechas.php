@@ -135,19 +135,43 @@ class fechas{
     }
 
     /**
-     * @param string $fecha
+     * Integra la fecha en formato T
+     * @param string $fecha Fecha a integrar
      * @return array|string
+     * @version 2.11.0
      */
     private function fecha_hora_min_sec_t(string $fecha): array|string
     {
+        $fecha = trim($fecha);
+        if($fecha === ''){
+            return $this->error->error(mensaje: 'Error fecha esta vacia', data: $fecha);
+        }
         $fecha_cfdi = $fecha;
-        $es_fecha_hora_min_sec_t = $this->valida->valida_pattern(key:'fecha_hora_min_sec_t', txt: $fecha);
+        $es_fecha_hora_min_sec_esp = $this->valida->valida_pattern(key:'fecha_hora_min_sec_esp', txt: $fecha);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar fecha', data: $es_fecha_hora_min_sec_esp);
+        }
+        if($es_fecha_hora_min_sec_esp) {
+            $hora_ex = explode(' ', $fecha);
+            $fecha_cfdi = $hora_ex[0] . 'T' . $hora_ex[1];
+        }
+
+        $es_fecha = $this->valida->valida_pattern(key:'fecha', txt: $fecha);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar fecha', data: $es_fecha_hora_min_sec_esp);
+        }
+        if($es_fecha) {
+
+            $fecha_cfdi = $fecha . 'T' . date('H:i:s');
+        }
+
+        $es_fecha_hora_min_sec_t = $this->valida->valida_pattern(key:'fecha_hora_min_sec_t', txt: $fecha_cfdi);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al validar fecha', data: $es_fecha_hora_min_sec_t);
         }
-        if($es_fecha_hora_min_sec_t) {
-            $hora_ex = explode('T', $fecha);
-            $fecha_cfdi = $fecha . 'T' . $hora_ex[1];
+        if(!$es_fecha_hora_min_sec_t){
+            return $this->error->error(mensaje: 'Error al validar fecha no tiene el formato especifico',
+                data: $fecha);
         }
         return $fecha_cfdi;
     }

@@ -88,7 +88,12 @@ class xml{
     }
 
 
-    public function cfdi_conceptos(array $conceptos): bool|string|array
+    /**
+     * Genera los conceptos de un cfdi
+     * @param array $conceptos
+     * @return bool|string|array
+     */
+    final public function cfdi_conceptos(array $conceptos): bool|string|array
     {
         if(!isset($this->xml)){
             return $this->error->error(mensaje: 'Error no esta inicializado el xml', data: $this);

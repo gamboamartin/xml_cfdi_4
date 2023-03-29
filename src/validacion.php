@@ -36,7 +36,12 @@ class validacion extends \gamboamartin\validacion\validacion{
         return true;
     }
 
-    public function valida_data_concepto(mixed $concepto): bool|array
+    /**
+     * Valida que existan los elementos de un concepto
+     * @param mixed $concepto Concepto a validar
+     * @return bool|array
+     */
+    final public function valida_data_concepto(mixed $concepto): bool|array
     {
         $keys = array('clave_prod_serv','cantidad','importe','clave_unidad','descripcion',
             'valor_unitario', 'objeto_imp');

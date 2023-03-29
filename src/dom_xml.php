@@ -42,7 +42,12 @@ class dom_xml{
     }
 
 
-
+    /**
+     * Integra los elementos base de un concepto para xml
+     * @param stdClass $concepto
+     * @param DOMElement $nodo_concepto
+     * @return DOMElement|array
+     */
     private function attrs_concepto(stdClass $concepto, DOMElement $nodo_concepto): DOMElement|array
     {
         $valida = $this->valida->valida_data_concepto(concepto: $concepto);
@@ -115,7 +120,14 @@ class dom_xml{
     }
 
 
-    public function carga_conceptos(array $conceptos, DOMElement $nodo_conceptos, xml $xml): xml|array
+    /**
+     * Integra los conceptos de un cfdi
+     * @param array $conceptos
+     * @param DOMElement $nodo_conceptos
+     * @param xml $xml
+     * @return xml|array
+     */
+    final public function carga_conceptos(array $conceptos, DOMElement $nodo_conceptos, xml $xml): xml|array
     {
         foreach ($conceptos as $concepto){
             if(is_array($concepto)){
@@ -382,8 +394,13 @@ class dom_xml{
     }
 
 
-
-
+    /**
+     * Integra un elemento de tipo concepto
+     * @param stdClass $concepto
+     * @param DOMElement $nodo_conceptos
+     * @param xml $xml
+     * @return array|DOMElement
+     */
     private function elemento_concepto(stdClass $concepto, DOMElement $nodo_conceptos, xml $xml): array|DOMElement
     {
         $valida = $this->valida->valida_data_concepto(concepto: $concepto);
@@ -442,7 +459,11 @@ class dom_xml{
     }
 
     /**
-     *
+     * Genera los elementos de un concepto
+     * @param stdClass $concepto
+     * @param DOMElement $nodo_conceptos
+     * @param xml $xml
+     * @return xml|array
      */
     private function elementos_concepto(stdClass $concepto, DOMElement $nodo_conceptos, xml $xml): xml|array
     {

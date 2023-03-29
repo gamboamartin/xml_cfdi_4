@@ -29,7 +29,16 @@ class cfdis{
         return $output;
     }
 
-    public function complemento_a_cuenta_terceros(stdClass|array $comprobante, stdClass|array $conceptos_a,
+    /**
+     * Genera el complemento de cuenta a terceros
+     * @param stdClass|array $comprobante
+     * @param stdClass|array $conceptos_a
+     * @param stdClass|array $emisor
+     * @param stdClass|array $impuestos
+     * @param stdClass|array $receptor
+     * @return bool|array|string
+     */
+    final public function complemento_a_cuenta_terceros(stdClass|array $comprobante, stdClass|array $conceptos_a,
                                                   stdClass|array $emisor, stdClass|array $impuestos,
                                                   stdClass|array $receptor): bool|array|string
     {
