@@ -116,6 +116,9 @@ class init{
         if(isset($comprobante->serie) && (string)$comprobante->serie !== ''){
             $xml->cfdi->comprobante->serie = $comprobante->serie;
         }
+        if(isset($comprobante->no_certificado) && (string)$comprobante->no_certificado !== ''){
+            $xml->cfdi->comprobante->no_certificado = $comprobante->no_certificado;
+        }
         if(isset($comprobante->forma_pago) && (string)$comprobante->forma_pago !== ''){
             $xml->cfdi->comprobante->forma_pago = $comprobante->forma_pago;
         }

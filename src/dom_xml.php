@@ -1110,6 +1110,7 @@ class dom_xml{
         $nodo->setAttribute('Fecha', $xml->cfdi->comprobante->fecha);
         $nodo->setAttribute('Folio', $xml->cfdi->comprobante->folio);
         $nodo->setAttribute('Version', $xml->cfdi->comprobante->version);
+        //$nodo->setAttribute('NoCertificado', $xml->cfdi->comprobante->no_certificado);
         if(isset($xml->cfdi->comprobante->serie) && (string)$xml->cfdi->comprobante->serie !== ''){
             $nodo->setAttribute('Serie', $xml->cfdi->comprobante->serie);
         }
@@ -1140,6 +1141,7 @@ class dom_xml{
         $json['Comprobante']['Fecha'] = $xml->cfdi->comprobante->fecha;
         $json['Comprobante']['Folio'] = $xml->cfdi->comprobante->folio;
         $json['Comprobante']['Version'] = $xml->cfdi->comprobante->version;
+        $json['Comprobante']['NoCertificado'] = $xml->cfdi->comprobante->no_certificado;
         if(isset($xml->cfdi->comprobante->serie) && (string)$xml->cfdi->comprobante->serie !== ''){
             $json['Comprobante']['Serie'] = $xml->cfdi->comprobante->serie;
         }

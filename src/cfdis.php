@@ -665,7 +665,7 @@ class cfdis{
 
 
         $keys = array('tipo_de_comprobante','moneda','total', 'exportacion','sub_total','lugar_expedicion',
-            'folio');
+            'folio','no_certificado');
         $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $comprobante);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al validar comprobante', data: $valida);

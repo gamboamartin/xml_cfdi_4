@@ -524,6 +524,7 @@ class cfdisTest extends test {
         $comprobante->total  = 1218.00;
         $comprobante->lugar_expedicion  = 29960;
         $comprobante->exportacion  = '02';
+        $comprobante->no_certificado  = '010101';
 
         $emisor = new stdClass();
 
