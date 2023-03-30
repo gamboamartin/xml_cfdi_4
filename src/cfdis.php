@@ -521,6 +521,19 @@ class cfdis{
         return $concepto_json;
     }
 
+    private function impuestos(stdClass $impuestos_){
+        $impuestos_ = $this->impuestos_trasladados(impuestos_: $impuestos_);
+        if (errores::$error) {
+            return $this->error->error(mensaje: 'Error al generar traslados', data: $impuestos_);
+        }
+
+        $impuestos_ = $this->impuestos_retenidos(impuestos_: $impuestos_);
+        if (errores::$error) {
+            return $this->error->error(mensaje: 'Error al generar retenciones', data: $impuestos_);
+        }
+        return $impuestos_;
+    }
+
     private function impuestos_concepto(string $attr, array $concepto_json, stdClass $impuesto){
         $tipos_impuestos[] = 'traslados';
         $tipos_impuestos[] = 'retenciones';
@@ -550,6 +563,26 @@ class cfdis{
         return $concepto_json;
     }
 
+    private function impuestos_retenidos(stdClass $impuestos_){
+        if(isset($impuestos_->total_impuestos_retenidos)){
+            $impuestos_ = $this->reasigna_retenciones(impuestos_: $impuestos_);
+            if (errores::$error) {
+                return $this->error->error(mensaje: 'Error al generar retenciones', data: $impuestos_);
+            }
+        }
+        return $impuestos_;
+    }
+
+    private function impuestos_trasladados(stdClass $impuestos_){
+        if(isset($impuestos_->total_impuestos_trasladados)){
+            $impuestos_ = $this->reasigna_traslados(impuestos_: $impuestos_);
+            if (errores::$error) {
+                return $this->error->error(mensaje: 'Error al generar traslados', data: $impuestos_);
+            }
+        }
+        return $impuestos_;
+    }
+
     public function ingreso(stdClass|array $comprobante, array $conceptos, stdClass|array $emisor,
                             array|stdClass $impuestos, stdClass|array $receptor, string $tipo = 'xml'): bool|array|string
     {
@@ -573,160 +606,104 @@ class cfdis{
             return $this->error->error(mensaje: 'Error al validar comprobante', data: $valida);
         }
 
-        if($tipo === 'xml') {
 
-            $xml = new xml();
-            $dom = $xml->cfdi_comprobante(comprobante: $data->comprobante);
-            if (errores::$error) {
-                return $this->error->error(mensaje: 'Error al generar comprobante', data: $dom);
-            }
 
-            $dom = $xml->cfdi_emisor(emisor: $data->emisor);
-            if (errores::$error) {
-                return $this->error->error(mensaje: 'Error al generar emisor', data: $dom);
-            }
-
-            $dom = $xml->cfdi_receptor(receptor: $data->receptor);
-            if (errores::$error) {
-                return $this->error->error(mensaje: 'Error al generar receptor', data: $dom);
-            }
-
-            $dom = $xml->cfdi_conceptos(conceptos: $conceptos);
-            if (errores::$error) {
-                return $this->error->error(mensaje: 'Error al generar conceptos', data: $dom);
-            }
+        $xml = new xml();
+        $dom = $xml->cfdi_comprobante(comprobante: $data->comprobante);
+        if (errores::$error) {
+            return $this->error->error(mensaje: 'Error al generar comprobante', data: $dom);
         }
 
-        if($tipo === 'json'){
-            $keys_data_comprobante = $this->keys_data_comprobante();
-            if(errores::$error){
-                return $this->error->error(mensaje: 'Error al obtener keys data',data:  $keys_data_comprobante);
-            }
-            $keys_data_emisor = $this->keys_data_emisor();
-            if(errores::$error){
-                return $this->error->error(mensaje: 'Error al obtener keys data',data:  $keys_data_emisor);
-            }
-            $keys_data_receptor = $this->keys_data_receptor();
-            if(errores::$error){
-                return $this->error->error(mensaje: 'Error al obtener keys data',data:  $keys_data_receptor);
-            }
-
-
-
-            $output = array();
-            $output['Comprobante'] = array();
-            foreach ($data->comprobante as $attr=>$value){
-                $key_output = $this->key_output(atributo: $attr, keys_data: $keys_data_comprobante);
-                if(errores::$error){
-                    return $this->error->error(mensaje: 'Error al obtener key_output',data:  $key_output);
-                }
-                $output['Comprobante'][$key_output] = $value;
-            }
-
-            foreach ($emisor as $attr=>$value){
-                $key_output = $this->key_output(atributo: $attr, keys_data: $keys_data_emisor);
-                if(errores::$error){
-                    return $this->error->error(mensaje: 'Error al obtener key_output',data:  $key_output);
-                }
-                $output['Comprobante']['Emisor'][$key_output] = $value;
-            }
-
-
-            foreach ($receptor as $attr=>$value){
-
-                $key_output = $this->key_output(atributo: $attr, keys_data: $keys_data_receptor);
-                if(errores::$error){
-                    return $this->error->error(mensaje: 'Error al obtener key_output',data:  $key_output);
-                }
-
-                $output['Comprobante']['Receptor'][$key_output] = $value;
-            }
-
-
-            foreach ($conceptos as $concepto){
-                $output = $this->add_concepto(concepto: $concepto,output:  $output);
-                if(errores::$error){
-                    return $this->error->error(mensaje: 'Error al integrar concepto_json',data:  $output);
-                }
-            }
-
-
-
-            //$output['Comprobante']
+        $dom = $xml->cfdi_emisor(emisor: $data->emisor);
+        if (errores::$error) {
+            return $this->error->error(mensaje: 'Error al generar emisor', data: $dom);
         }
 
-        if(isset($impuestos_->total_impuestos_trasladados)){
-            $total_impuestos_trasladados = trim($impuestos_->total_impuestos_trasladados);
-            $total_impuestos_trasladados = str_replace(' ', '', $total_impuestos_trasladados);
-            $total_impuestos_trasladados = str_replace('$', '', $total_impuestos_trasladados);
-            $total_impuestos_trasladados = str_replace(',', '', $total_impuestos_trasladados);
-
-            $impuestos_->total_impuestos_trasladados = $total_impuestos_trasladados;
+        $dom = $xml->cfdi_receptor(receptor: $data->receptor);
+        if (errores::$error) {
+            return $this->error->error(mensaje: 'Error al generar receptor', data: $dom);
         }
 
-        if(isset($impuestos_->total_impuestos_retenidos)){
-            $total_impuestos_retenidos = trim($impuestos_->total_impuestos_retenidos);
-            $total_impuestos_retenidos = str_replace(' ', '', $total_impuestos_retenidos);
-            $total_impuestos_retenidos = str_replace('$', '', $total_impuestos_retenidos);
-            $total_impuestos_retenidos = str_replace(',', '', $total_impuestos_retenidos);
-
-            $impuestos_->total_impuestos_retenidos = $total_impuestos_retenidos;
+        $dom = $xml->cfdi_conceptos(conceptos: $conceptos);
+        if (errores::$error) {
+            return $this->error->error(mensaje: 'Error al generar conceptos', data: $dom);
         }
 
-        if($tipo === 'xml') {
-            $dom = $xml->cfdi_impuestos(impuestos: $impuestos_);
-            if (errores::$error) {
-                return $this->error->error(mensaje: 'Error al generar impuestos', data: $dom);
-            }
-            $output =  $xml->dom->saveXML();
+
+        $impuestos_ = $this->impuestos(impuestos_: $impuestos_);
+        if (errores::$error) {
+            return $this->error->error(mensaje: 'Error al generar traslados', data: $impuestos_);
         }
 
-        if($tipo === 'json') {
-            foreach ($impuestos_ as $attr_impuesto=>$value_impuesto){
-                $keys_data_impuesto = $this->keys_data_impuesto();
-                if(errores::$error){
-                    return $this->error->error(mensaje: 'Error al obtener keys data',data:  $keys_data_impuesto);
-                }
-                if($attr_impuesto === 'total_impuestos_trasladados'){
-                    $output['Comprobante']['Impuestos']['TotalImpuestosTrasladados'] = $value_impuesto;
-                }
-                if($attr_impuesto === 'traslados'){
-                    $output['Comprobante']['Impuestos']['Traslados'] = array();
-                    $imps = $value_impuesto;
-                    foreach ($imps as $imp){
-                        $imp_json = $this->imps_json(imp: $imp);
-                        if(errores::$error){
-                            return $this->error->error(mensaje: 'Error al asignar value',data:  $imp_json);
-                        }
-                        $output['Comprobante']['Impuestos']['Traslados'][] = $imp_json;
 
-                    }
-                }
+        $dom = $xml->cfdi_impuestos(impuestos: $impuestos_);
+        if (errores::$error) {
+            return $this->error->error(mensaje: 'Error al generar impuestos', data: $dom);
+        }
+        return $xml->dom->saveXML();
 
-                if($attr_impuesto === 'total_impuestos_retenidos'){
-                    $output['Comprobante']['Impuestos']['TotalImpuestosRetenidos'] = $value_impuesto;
-                }
-                if($attr_impuesto === 'retenciones'){
-                    $output['Comprobante']['Impuestos']['Retenciones'] = array();
-                    $imps = $value_impuesto;
-                    foreach ($imps as $imp){
-                        $imp_json = $this->imps_json(imp: $imp);
-                        if(errores::$error){
-                            return $this->error->error(mensaje: 'Error al asignar value',data:  $imp_json);
-                        }
-                        $output['Comprobante']['Impuestos']['Retenciones'][] = $imp_json;
+    }
 
-                    }
-                }
+    public function ingreso_json(stdClass|array $comprobante, array $conceptos, stdClass|array $emisor,
+                            array|stdClass $impuestos, stdClass|array $receptor): bool|array|string
+    {
 
-
-
-            }
-            //print_r($impuestos_);exit;
-            $output = json_encode($output);
+        $data = $this->init_base(comprobante: $comprobante,emisor:  $emisor, receptor: $receptor);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al inicializar datos', data: $data);
+        }
+        if(!isset($data->comprobante->tipo_de_comprobante)){
+            $data->comprobante->tipo_de_comprobante = 'I';
         }
 
-        return $output;
+
+        $impuestos_ = $impuestos;
+
+        if(is_array($impuestos_)){
+            $impuestos_ = (object) $impuestos_;
+        }
+
+
+        $keys = array('tipo_de_comprobante','moneda','total', 'exportacion','sub_total','lugar_expedicion',
+            'folio');
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $comprobante);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar comprobante', data: $valida);
+        }
+
+
+        $xml = new xml();
+        $json = array();
+        $json = $xml->cfdi_comprobante_json(comprobante: $data->comprobante, json: $json);
+        if (errores::$error) {
+            return $this->error->error(mensaje: 'Error al generar comprobante', data: $json);
+        }
+        $json = $xml->cfdi_emisor_json(emisor: $data->emisor, json: $json);
+        if (errores::$error) {
+            return $this->error->error(mensaje: 'Error al generar emisor', data: $json);
+        }
+
+        $json = $xml->cfdi_receptor_json(json: $json, receptor: $data->receptor);
+        if (errores::$error) {
+            return $this->error->error(mensaje: 'Error al generar receptor', data: $json);
+        }
+
+        $json = $xml->cfdi_conceptos_json(conceptos: $conceptos, json: $json);
+        if (errores::$error) {
+            return $this->error->error(mensaje: 'Error al generar conceptos', data: $json);
+        }
+
+
+        $impuestos_ = $this->impuestos(impuestos_: $impuestos_);
+        if (errores::$error) {
+            return $this->error->error(mensaje: 'Error al generar traslados', data: $impuestos_);
+        }
+
+        $json = $xml->cfdi_impuestos_json(impuestos: $impuestos_, json: $json);
+        if (errores::$error) {
+            return $this->error->error(mensaje: 'Error al generar impuestos', data: $json);
+        }
+        return json_encode($json);
 
     }
 
@@ -853,5 +830,41 @@ class cfdis{
         $keys_data['regimen_fiscal_receptor'] = 'RegimenFiscalReceptor';
 
         return $keys_data;
+    }
+
+    private function reasigna_retenciones(stdClass $impuestos_){
+
+        $total_impuestos_retenidos = $this->total_impuestos_retenidos(impuestos_: $impuestos_);
+        if (errores::$error) {
+            return $this->error->error(mensaje: 'Error al generar retenciones', data: $total_impuestos_retenidos);
+        }
+
+        $impuestos_->total_impuestos_retenidos = $total_impuestos_retenidos;
+        return $impuestos_;
+    }
+
+    private function reasigna_traslados(stdClass $impuestos_){
+        $total_impuestos_trasladados = $this->total_impuestos_trasladados(impuestos_: $impuestos_);
+        if (errores::$error) {
+            return $this->error->error(mensaje: 'Error al generar traslados', data: $total_impuestos_trasladados);
+        }
+        $impuestos_->total_impuestos_trasladados = $total_impuestos_trasladados;
+        return $impuestos_;
+    }
+
+    private function total_impuestos_retenidos(stdClass $impuestos_): array|string
+    {
+        $total_impuestos_retenidos = trim($impuestos_->total_impuestos_retenidos);
+        $total_impuestos_retenidos = str_replace(' ', '', $total_impuestos_retenidos);
+        $total_impuestos_retenidos = str_replace('$', '', $total_impuestos_retenidos);
+        return str_replace(',', '', $total_impuestos_retenidos);
+    }
+
+    private function total_impuestos_trasladados(stdClass $impuestos_): array|string
+    {
+        $total_impuestos_trasladados = trim($impuestos_->total_impuestos_trasladados);
+        $total_impuestos_trasladados = str_replace(' ', '', $total_impuestos_trasladados);
+        $total_impuestos_trasladados = str_replace('$', '', $total_impuestos_trasladados);
+        return str_replace(',', '', $total_impuestos_trasladados);
     }
 }

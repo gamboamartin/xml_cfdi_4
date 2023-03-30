@@ -78,6 +78,8 @@ class init{
         return $xml->cfdi->$nodo_key;
     }
 
+
+
     private function asigna_valor_unitario_concepto(stdClass $concepto): array|stdClass
     {
         $valor_unitario = (new parser())->concepto_valor_unitario(valor_unitario: $concepto->valor_unitario);

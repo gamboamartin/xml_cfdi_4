@@ -466,6 +466,26 @@ class cfdisTest extends test {
         $conceptos[0]->impuestos[0]->traslados[0]->tasa_o_cuota = '1';
         $conceptos[0]->impuestos[0]->traslados[0]->importe = '1';
 
+        $conceptos[1] = new stdClass();
+        $conceptos[1]->clave_prod_serv = '84111506';
+        $conceptos[1]->cantidad = '1';
+        $conceptos[1]->clave_unidad = 'ACT';
+        $conceptos[1]->descripcion = 'Pago';
+        $conceptos[1]->valor_unitario = '0';
+        $conceptos[1]->importe = '0';
+        $conceptos[1]->objeto_imp = '01';
+        $conceptos[1]->no_identificacion = '400578';
+        $conceptos[1]->unidad = 'Caja';
+        $conceptos[1]->impuestos = array();
+        $conceptos[1]->impuestos[0]= new stdClass();
+        $conceptos[1]->impuestos[0]->traslados = array();
+        $conceptos[1]->impuestos[0]->traslados[0] = new stdClass();
+        $conceptos[1]->impuestos[0]->traslados[0]->base = '1';
+        $conceptos[1]->impuestos[0]->traslados[0]->impuesto = 'a';
+        $conceptos[1]->impuestos[0]->traslados[0]->tipo_factor = 'a';
+        $conceptos[1]->impuestos[0]->traslados[0]->tasa_o_cuota = '1';
+        $conceptos[1]->impuestos[0]->traslados[0]->importe = '1';
+
         $impuestos = new stdClass();
         $impuestos->total_impuestos_trasladados = '168.00';
 
@@ -485,6 +505,101 @@ class cfdisTest extends test {
         $this->assertStringContainsStringIgnoringCase('Moneda="MXN" Total="1218" Exportacion="01" TipoDeComprobante="E"',$resultado);
         $this->assertStringContainsStringIgnoringCase(' Serie="NCV4.0" FormaPago="01" MetodoPago="PUE"><cfdi:CfdiRelacionados',$resultado);
         $this->assertStringContainsStringIgnoringCase('UUID="7945A043-3073-4295-BC0B-C17AFB6697A5"/></cfdi:CfdiRelacion',$resultado);
+
+        errores::$error = false;
+    }
+
+    public function test_ingreso_json(): void
+    {
+        errores::$error = false;
+
+        $cfdis = new cfdis();
+        //$com = new liberator($com);
+
+        $comprobante = new stdClass();
+        $comprobante->folio  = 922;
+        $comprobante->forma_pago  = '01';
+        $comprobante->sub_total  = 1050.00;
+        $comprobante->moneda  = 'MXN';
+        $comprobante->total  = 1218.00;
+        $comprobante->lugar_expedicion  = 29960;
+        $comprobante->exportacion  = '02';
+
+        $emisor = new stdClass();
+
+        $emisor->rfc = 'IIA040805DZ4';
+        $emisor->nombre = 'INDISTRIA ILUMINADORA DE ALMACENES';
+        $emisor->regimen_fiscal = '626';
+
+        $receptor = new stdClass();
+        $receptor->rfc = 'EKU9003173C9';
+        $receptor->nombre = 'ESCUELA KEMPER URGATE';
+        $receptor->domicilio_fiscal_receptor = '26015';
+        $receptor->regimen_fiscal_receptor = '603';
+        $receptor->uso_cfdi = 'G03';
+
+        $conceptos = array();
+        $conceptos[0] = new stdClass();
+        $conceptos[0]->clave_prod_serv = '84111506';
+        $conceptos[0]->cantidad = '1';
+        $conceptos[0]->clave_unidad = 'ACT';
+        $conceptos[0]->descripcion = 'Pago';
+        $conceptos[0]->valor_unitario = '0';
+        $conceptos[0]->importe = '0';
+        $conceptos[0]->objeto_imp = '01';
+        $conceptos[0]->no_identificacion = '400578';
+        $conceptos[0]->impuestos = array();
+        $conceptos[0]->impuestos[0]= new stdClass();
+        $conceptos[0]->impuestos[0]->traslados = array();
+        $conceptos[0]->impuestos[0]->traslados[0] = new stdClass();
+        $conceptos[0]->impuestos[0]->traslados[0]->base = '1';
+        $conceptos[0]->impuestos[0]->traslados[0]->impuesto = 'a';
+        $conceptos[0]->impuestos[0]->traslados[0]->tipo_factor = 'a';
+        $conceptos[0]->impuestos[0]->traslados[0]->tasa_o_cuota = '1';
+        $conceptos[0]->impuestos[0]->traslados[0]->importe = '1';
+
+        $conceptos[0]->impuestos[0]->retenciones = array();
+        $conceptos[0]->impuestos[0]->retenciones[0] = new stdClass();
+        $conceptos[0]->impuestos[0]->retenciones[0]->base = '1';
+        $conceptos[0]->impuestos[0]->retenciones[0]->impuesto = 'a';
+        $conceptos[0]->impuestos[0]->retenciones[0]->tipo_factor = 'a';
+        $conceptos[0]->impuestos[0]->retenciones[0]->tasa_o_cuota = '1';
+        $conceptos[0]->impuestos[0]->retenciones[0]->importe = '1';
+
+
+        $impuestos = new stdClass();
+        $impuestos->total_impuestos_trasladados = '240.00';
+        $impuestos->total_impuestos_retenidos = '240.00';
+
+        $impuestos->traslados = array();
+        $impuestos->traslados[0] = new stdClass();
+        $impuestos->traslados[0]->base = '1500.00';
+        $impuestos->traslados[0]->impuesto = '002';
+        $impuestos->traslados[0]->tipo_factor = 'Tasa';
+        $impuestos->traslados[0]->tasa_o_cuota = '0.160000';
+        $impuestos->traslados[0]->importe = '240.00';
+
+        $impuestos->retenciones = array();
+        $impuestos->retenciones[0] = new stdClass();
+        $impuestos->retenciones[0]->base = '1500.00';
+        $impuestos->retenciones[0]->impuesto = '002';
+        $impuestos->retenciones[0]->tipo_factor = 'Tasa';
+        $impuestos->retenciones[0]->tasa_o_cuota = '0.160000';
+        $impuestos->retenciones[0]->importe = '240.00';
+
+        $impuestos->retenciones[1] = new stdClass();
+        $impuestos->retenciones[1]->base = '1500.00';
+        $impuestos->retenciones[1]->impuesto = '002';
+        $impuestos->retenciones[1]->tipo_factor = 'Tasa';
+        $impuestos->retenciones[1]->tasa_o_cuota = '0.160000';
+        $impuestos->retenciones[1]->importe = '240.00';
+
+
+        $resultado = $cfdis->ingreso_json($comprobante, $conceptos, $emisor, $impuestos, $receptor);
+
+        $this->assertNotTrue(errores::$error);
+        $this->assertIsString($resultado);
+        $this->assertStringContainsStringIgnoringCase('Comprobante":{"Moneda":"MXN","Total":"1218","Exportacion":"02","TipoDeComprobante":"I","',$resultado);
 
         errores::$error = false;
     }

@@ -87,6 +87,35 @@ class xml{
         return $this->dom;
     }
 
+    public function cfdi_comprobante_json(stdClass $comprobante, array $json): array
+    {
+
+        $keys = array('tipo_de_comprobante','moneda','total', 'exportacion','sub_total','lugar_expedicion',
+            'folio');
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $comprobante);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar comprobante', data: $valida);
+        }
+
+        $fecha_cfdi = (new fechas())->fecha_cfdi(comprobante: $comprobante);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al calcular fecha', data: $fecha_cfdi);
+        }
+
+        $this->cfdi->comprobante->fecha = $fecha_cfdi;
+        $comprobante->fecha = $fecha_cfdi;
+
+
+        $json = (new dom_xml())->comprobante_json(comprobante: $comprobante, json: $json, xml: $this);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al inicializar cfdi comprobante', data: $json);
+        }
+
+
+
+        return $json;
+    }
+
 
     /**
      * Genera los conceptos de un cfdi
@@ -118,6 +147,22 @@ class xml{
         return $this->dom->saveXML();
     }
 
+    final public function cfdi_conceptos_json(array $conceptos, array $json):array
+    {
+        if(count($conceptos) === 0){
+            return $this->error->error(mensaje: 'Error los conceptos no pueden ir vacios', data: $conceptos);
+        }
+
+        $nodo_conceptos = (new dom_xml())->carga_conceptos_json(conceptos: $conceptos, xml:  $this);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al asignar atributos', data: $json);
+        }
+
+        $json['Comprobante']['Conceptos'] = $nodo_conceptos;
+
+        return $json;
+    }
+
     /**
      */
     public function cfdi_emisor(stdClass $emisor): DOMDocument|array
@@ -140,6 +185,23 @@ class xml{
 
 
         return $this->dom;
+    }
+
+    public function cfdi_emisor_json(stdClass $emisor, array $json): array
+    {
+        $keys = array('rfc','nombre','regimen_fiscal');
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $emisor);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar $emisor', data: $valida);
+        }
+
+        $json = (new dom_xml())->nodo_json(json: $json, keys: $keys, keys_especial: array(), local_name: 'Emisor',
+            nodo_key: 'emisor', object: $emisor, xml: $this);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al setear $emisor', data: $json);
+        }
+
+        return $json;
     }
 
     /**
@@ -204,6 +266,65 @@ class xml{
         return $this->dom->saveXML();
     }
 
+    public function cfdi_impuestos_json(stdClass $impuestos, array $json): array
+    {
+
+        $aplica_impuestos = false;
+        $aplica_impuestos_trasladados = false;
+        $keys = array();
+        if(isset($impuestos->traslados)){
+            if(count($impuestos->traslados ) > 0){
+
+                $aplica_impuestos_trasladados = true;
+                $aplica_impuestos = true;
+                $keys[] = 'total_impuestos_trasladados';
+
+            }
+        }
+        $aplica_impuestos_retenidos = false;
+        if(isset($impuestos->retenciones)){
+            if(count($impuestos->retenciones ) > 0){
+                $aplica_impuestos_retenidos = true;
+                $aplica_impuestos = true;
+                $keys[] = 'total_impuestos_retenidos';
+            }
+
+        }
+
+        if($aplica_impuestos) {
+
+            $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $impuestos);
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error al validar $receptor', data: $valida);
+            }
+
+            $json = (new dom_xml())->nodo_json(json: $json, keys: $keys,
+                keys_especial: array(), local_name: 'Impuestos', nodo_key: 'impuestos', object: $impuestos, xml: $this);
+            if (errores::$error) {
+                return $this->error->error(mensaje: 'Error al setear impuestos', data: $json);
+            }
+            if($aplica_impuestos_retenidos){
+                $retenciones = (new dom_xml())->anexa_impuestos_json(impuestos:  $impuestos,
+                    obj_impuestos: 'retenciones',tipo_impuesto: 'Retencion',xml:  $this);
+                if(errores::$error){
+                    return $this->error->error(mensaje: 'Error al generar nodo', data: $retenciones);
+                }
+                $json['Comprobante']['Impuestos']['Retenciones'] = $retenciones;
+            }
+            if($aplica_impuestos_trasladados){
+                $traslados = (new dom_xml())->anexa_impuestos_json(impuestos: $impuestos, obj_impuestos: 'traslados',
+                    tipo_impuesto: 'Traslado', xml: $this);
+                if (errores::$error) {
+                    return $this->error->error(mensaje: 'Error al generar nodo', data: $traslados);
+                }
+                $json['Comprobante']['Impuestos']['Traslados'] = $traslados;
+            }
+
+        }
+
+        return $json;
+    }
+
     public function cfdi_receptor(stdClass $receptor): bool|string|array
     {
         $keys = array('rfc','nombre','domicilio_fiscal_receptor','regimen_fiscal_receptor','uso_cfdi');
@@ -225,6 +346,26 @@ class xml{
         }
 
         return $this->dom->saveXML();
+    }
+
+    public function cfdi_receptor_json(array $json, stdClass $receptor): array
+    {
+        $keys = array('rfc','nombre','domicilio_fiscal_receptor','regimen_fiscal_receptor','uso_cfdi');
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $receptor);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar $receptor', data: $valida);
+        }
+
+
+        $keys_especial = array('uso_cfdi'=>'UsoCFDI');
+
+        $json = (new dom_xml())->nodo_json(json: $json, keys: $keys, keys_especial: $keys_especial,
+            local_name: 'Receptor', nodo_key: 'receptor', object: $receptor, xml: $this);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al setear $receptor', data: $json);
+        }
+
+        return $json;
     }
 
     /**

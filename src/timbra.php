@@ -185,6 +185,7 @@ class timbra{
 
         if($aplica_params){
             $response = $client->__soapCall($timbra_rs, array('parameters' => $params));
+
             $result = $response->TimbraCFDIResult->anyType;
         }
         else{
