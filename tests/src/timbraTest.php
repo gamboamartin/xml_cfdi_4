@@ -112,7 +112,7 @@ class timbraTest extends test {
         "Version": "4.0",
         "Serie": "LC-P",
         "Folio": "LC1236",
-        "Fecha": "2023-03-28T10:37:08",
+        "Fecha": "2023-04-04T10:37:08",
         "NoCertificado": "30001000000400002434",
         "SubTotal": "0",
         "Moneda": "XXX",
@@ -157,6 +157,8 @@ class timbraTest extends test {
 
         $resultado = $timbra->timbra(contenido_xml: $contenido_xml, id_comprobante: $id_comprobante,
             ruta_cer_pem: $ruta_cer_pem, ruta_key_pem: $ruta_key_pem, pac_prov: 'facturalo');
+
+
         $this->assertNotTrue(errores::$error);
         $this->assertIsObject($resultado);
         $this->assertNotEmpty($resultado->uuid);

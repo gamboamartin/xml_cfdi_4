@@ -368,6 +368,17 @@ class xml{
         return $json;
     }
 
+    final public function cfdi_relacionados_json(array $relacionados, array $json): array
+    {
+
+        $json = (new dom_xml())->relacionados_json(relacionados: $relacionados, json: $json);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al inicializar cfdi comprobante', data: $json);
+        }
+
+        return $json;
+    }
+
     /**
      * @param stdClass $relacionados
      * @return bool|array|string

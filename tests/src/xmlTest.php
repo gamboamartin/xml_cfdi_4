@@ -434,5 +434,29 @@ class xmlTest extends test {
         $this->assertStringContainsStringIgnoringCase('FiscalReceptor="d" UsoCfdi="f"/>',$resultado);
         $this->assertStringContainsString('FiscalReceptor="d" UsoCFDI="f"/>',$resultado);
     }
+
+    public function test_cfdi_relacionados_json(): void
+    {
+        errores::$error = false;
+
+        $xml = new xml();
+        //$modelo = new liberator($modelo);
+
+        $relacionados = array();
+        $json = array();
+
+        $relacionados['01'][] = 'a';
+        $relacionados['02'][] = 'b';
+        $relacionados['03'][] = '1';
+        $relacionados['03'][] = '2';
+
+        $resultado = $xml->cfdi_relacionados_json($relacionados, $json);
+        $this->assertNotTrue(errores::$error);
+        $this->assertIsArray($resultado);
+        $this->assertEquals(1,$resultado['CfdiRelacionados'][2]['cfdiRelacionado'][0]);
+        errores::$error = false;
+    }
+
+
 }
 

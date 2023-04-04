@@ -122,6 +122,31 @@ class dom_xmlTest extends test {
 
     }
 
+    public function test_relacionados_json(): void
+    {
+        errores::$error = false;
+
+        $dom = new dom_xml();
+       // $dom = new liberator($dom);
+
+        //$xml = new xml();
+
+
+        $relacionados['01'][] = 'a';
+        $relacionados['01'][] = 'b';
+
+        $relacionados['02'][] = 'a';
+        $relacionados['02'][] = 'b';
+
+        $json = array();
+
+        $resultado = $dom->relacionados_json($relacionados, $json);
+        $this->assertNotTrue(errores::$error);
+        $this->assertIsArray($resultado);
+        $this->assertEquals('b', $resultado['CfdiRelacionados'][1]['cfdiRelacionado'][1]);
+        errores::$error = false;
+    }
+
 
 }
 

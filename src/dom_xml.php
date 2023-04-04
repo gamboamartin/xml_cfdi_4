@@ -1309,6 +1309,35 @@ class dom_xml{
         return $obj;
     }
 
+    final public function relacionados_json(array $relacionados, array $json): array
+    {
+
+        foreach ($relacionados as $tipo_relacion=>$uuids){
+            if(!is_array($uuids)){
+                return $this->error->error(mensaje: 'Error uuids debe ser un array', data: $uuids);
+            }
+
+            if(count($uuids) === 0){
+                return $this->error->error(mensaje: 'Error uuids esta vacio', data: $uuids);
+            }
+
+            $data_relacion = array();
+            $data_relacion['tipoRelacion'] = $tipo_relacion;
+
+            foreach ($uuids as $uuid){
+
+                $data_relacion['cfdiRelacionado'][] = $uuid;
+            }
+
+
+            $json['CfdiRelacionados'][] = $data_relacion;
+        }
+
+
+
+        return $json;
+    }
+
 
 
     private function setea_attr(array $keys, array $keys_especial, DOMElement $nodo,

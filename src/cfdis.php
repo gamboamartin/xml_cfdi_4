@@ -584,7 +584,8 @@ class cfdis{
     }
 
     public function ingreso(stdClass|array $comprobante, array $conceptos, stdClass|array $emisor,
-                            array|stdClass $impuestos, stdClass|array $receptor, string $tipo = 'xml'): bool|array|string
+                            array|stdClass $impuestos, stdClass|array $receptor, stdClass|array $relacionados = array(),
+                            string $tipo = 'xml'): bool|array|string
     {
 
         $data = $this->init_base(comprobante: $comprobante,emisor:  $emisor, receptor: $receptor);
@@ -645,7 +646,8 @@ class cfdis{
     }
 
     public function ingreso_json(stdClass|array $comprobante, array $conceptos, stdClass|array $emisor,
-                            array|stdClass $impuestos, stdClass|array $receptor): bool|array|string
+                            array|stdClass $impuestos, stdClass|array $receptor,
+                                 stdClass|array $relacionados = array()): bool|array|string
     {
 
         $data = $this->init_base(comprobante: $comprobante,emisor:  $emisor, receptor: $receptor);
@@ -678,6 +680,12 @@ class cfdis{
         if (errores::$error) {
             return $this->error->error(mensaje: 'Error al generar comprobante', data: $json);
         }
+
+        $json = $xml->cfdi_relacionados_json($relacionados, $json);
+        if (errores::$error) {
+            return $this->error->error(mensaje: 'Error al generar relaciones', data: $json);
+        }
+
         $json = $xml->cfdi_emisor_json(emisor: $data->emisor, json: $json);
         if (errores::$error) {
             return $this->error->error(mensaje: 'Error al generar emisor', data: $json);
@@ -712,14 +720,17 @@ class cfdis{
      * @param stdClass|array $comprobante Datos del comprobante version fecha etc
      * @param stdClass|array $emisor Datos del emisor del cfdi razon social rfc etc
      * @param stdClass|array $receptor Datos del receptor de cfdi rfc razon social etc
+     * @param stdClass|array $relacionados
      * @return stdClass
      * @version 1.4.0
      */
-    private function init_base(stdClass|array $comprobante, stdClass|array $emisor, stdClass|array $receptor): stdClass
+    private function init_base(stdClass|array $comprobante, stdClass|array $emisor, stdClass|array $receptor,
+                               stdClass|array $relacionados = array()): stdClass
     {
         $comprobante_ = $comprobante;
         $emisor_ = $emisor;
         $receptor_ = $receptor;
+        $relacionados_ = $relacionados;
 
         if(is_array($comprobante_)){
             $comprobante_ = (object) $comprobante_;
@@ -730,11 +741,15 @@ class cfdis{
         if(is_array($receptor_)){
             $receptor_ = (object) $receptor_;
         }
+        if(is_array($relacionados_)){
+            $relacionados_ = (object) $relacionados_;
+        }
 
         $data = new stdClass();
         $data->emisor = $emisor_;
         $data->comprobante = $comprobante_;
         $data->receptor = $receptor_;
+        $data->relacionados = $relacionados_;
 
         return $data;
 
