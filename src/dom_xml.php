@@ -1322,11 +1322,11 @@ class dom_xml{
             }
 
             $data_relacion = array();
-            $data_relacion['tipoRelacion'] = $tipo_relacion;
+            $data_relacion['TipoRelacion'] = $tipo_relacion;
 
             foreach ($uuids as $uuid){
 
-                $data_relacion['cfdiRelacionado'][] = $uuid;
+                $data_relacion['CfdiRelacionado'][] = $uuid;
             }
 
 

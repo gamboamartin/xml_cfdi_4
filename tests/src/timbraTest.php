@@ -111,7 +111,7 @@ class timbraTest extends test {
     {
         "Version": "4.0",
         "Serie": "LC-P",
-        "Folio": "LC1236",
+        "Folio": "1",
         "Fecha": "2023-04-04T10:37:08",
         "NoCertificado": "30001000000400002434",
         "SubTotal": "0",
@@ -162,6 +162,80 @@ class timbraTest extends test {
         $this->assertNotTrue(errores::$error);
         $this->assertIsObject($resultado);
         $this->assertNotEmpty($resultado->uuid);
+
+
+
+        $contenido_xml = '{
+    "Comprobante":
+    {
+        "Version": "4.0",
+        "Serie": "LC-P",
+        "Folio": "1005",
+        "Fecha": "2023-04-03T10:37:08",
+        "NoCertificado": "30001000000400002434",
+        "SubTotal": "0",
+        "Moneda": "XXX",
+        "Total": "0",
+        "TipoDeComprobante": "T",
+        "Exportacion": "01",
+        "LugarExpedicion": "55000",
+        "CfdiRelacionados":[
+        {
+            "TipoRelacion":"04",
+            "CfdiRelacionado":
+                ["6c76a910-2115-4a2c-bf15-e67c1505dd21","0CE337CF-62BE-4ECC-9EBB-67F7EA1AF6C4"]
+        },
+        {
+            "TipoRelacion":"07",
+            "CfdiRelacionado":
+                ["6c76a910-2115-4a2c-bf15-e67c1505dd21","0CE337CF-62BE-4ECC-9EBB-67F7EA1AF6C4"]
+        }
+        ],
+        "Emisor":
+        {
+            "Rfc": "EKU9003173C9",
+            "Nombre": "ESCUELA KEMPER URGATE",
+            "RegimenFiscal": "601"
+        },
+        "Receptor":
+        {
+            "Rfc": "EKU9003173C9",
+            "Nombre": "ESCUELA KEMPER URGATE",
+            "DomicilioFiscalReceptor": "26015",
+            "RegimenFiscalReceptor": "601",
+            "UsoCFDI": "S01"
+        },
+        "Conceptos":
+        [
+            {
+                "ClaveProdServ": "60101704",
+                "NoIdentificacion": "000004",
+                "Cantidad": "1",
+                "ClaveUnidad": "E48",
+                "Unidad": "Paquetes",
+                "Descripcion": "LIBRO(S) TEXTO Y/O MAT. BIBLIOGRAFICO VL",
+                "ValorUnitario": "0",
+                "Importe": "0",
+                "ObjetoImp": "01"
+            }
+        ]
+    }
+}';
+
+        $ruta_key_pem = '/var/www/html/xml_cfdi_4/tests/files/CSD_EKU9003173C9_key.pem';
+        $ruta_cer_pem = '/var/www/html/xml_cfdi_4/tests/files/CSD_EKU9003173C9_cer.pem';
+        $id_comprobante = '';
+
+        $resultado = $timbra->timbra(contenido_xml: $contenido_xml, id_comprobante: $id_comprobante,
+            ruta_cer_pem: $ruta_cer_pem, ruta_key_pem: $ruta_key_pem, pac_prov: 'facturalo');
+
+
+
+        $this->assertNotTrue(errores::$error);
+        $this->assertIsObject($resultado);
+        $this->assertNotEmpty($resultado->uuid);
+        $this->assertStringContainsStringIgnoringCase('CfdiRelacionados TipoRelacion="04"><cfdi:CfdiRelacionado UUID="6c76',$resultado->xml_sellado);
+
 
         errores::$error = false;
 

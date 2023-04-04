@@ -163,7 +163,6 @@ class timbra{
             $tipo_entrada = $pac->pac->$pac_prov->tipo_entrada;
         }
 
-
         $base64Comprobante = base64_encode($contenido_xml);
 
 
