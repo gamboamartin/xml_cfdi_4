@@ -1330,7 +1330,7 @@ class dom_xml{
             }
 
 
-            $json['CfdiRelacionados'][] = $data_relacion;
+            $json['Comprobante']['CfdiRelacionados'][] = $data_relacion;
         }
 
 

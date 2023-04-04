@@ -146,7 +146,7 @@ class dom_xmlTest extends test {
 
         $this->assertNotTrue(errores::$error);
         $this->assertIsArray($resultado);
-        $this->assertEquals('b', $resultado['CfdiRelacionados'][1]['CfdiRelacionado'][1]);
+        $this->assertEquals('b', $resultado['Comprobante']['CfdiRelacionados'][1]['CfdiRelacionado'][1]);
         errores::$error = false;
     }
 

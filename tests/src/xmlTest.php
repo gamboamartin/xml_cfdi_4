@@ -449,12 +449,12 @@ class xmlTest extends test {
         $relacionados['02'][] = 'b';
         $relacionados['03'][] = '1';
         $relacionados['03'][] = '2';
-        
+
 
         $resultado = $xml->cfdi_relacionados_json($relacionados, $json);
         $this->assertNotTrue(errores::$error);
         $this->assertIsArray($resultado);
-        $this->assertEquals(1,$resultado['CfdiRelacionados'][2]['CfdiRelacionado'][0]);
+        $this->assertEquals(1,$resultado['Comprobante']['CfdiRelacionados'][2]['CfdiRelacionado'][0]);
         errores::$error = false;
     }
 
