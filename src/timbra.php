@@ -17,7 +17,11 @@ class timbra{
 
     }
 
-    final public function cancela(string $motivo_cancelacion, string $rfc_emisor, string $uuid, string $pac_prov='', $uuid_sustitucion = ''){
+    final public function cancela(string $motivo_cancelacion, string $rfc_emisor, string $rfc_receptor, string $uuid,
+                                  string $pass_csd = '', string $ruta_cer = '', string $ruta_key = '',
+                                  string $total = '', $uuid_sustitucion = ''){
+
+
         $pac = new pac();
         $keys = array('ruta_pac','usuario_integrador');
         $valida = $this->valida->valida_existencia_keys(keys: $keys,registro:  $pac);
@@ -33,42 +37,27 @@ class timbra{
 
         $ws= $pac->ruta_pac;
         $usuario_int = $pac->usuario_integrador;
-        $timbra_rs = 'CancelaCFDI40';
-        $aplica_params = true;
-        $tipo_entrada = 'xml';
 
-        if($pac_prov!==''){
-            $ws= $pac->pac->$pac_prov->ruta;
-            $usuario_int = $pac->pac->$pac_prov->pass;
-            $timbra_rs = $pac->pac->$pac_prov->timbra_rs;
-            $aplica_params = $pac->pac->$pac_prov->aplica_params;
-            $tipo_entrada = $pac->pac->$pac_prov->tipo_entrada;
-        }
+
         $params = array();
 
-        $params['usuarioIntegrador'] = $usuario_int;
-        $params['rfcEmisor'] = $rfc_emisor;
-        //$params['rfcReceptor'] = $rfc_receptor;
-        $params['folioUUID'] = strtoupper(trim($uuid));
-        $params['motivoCancelacion'] = $motivo_cancelacion;
-        $params['folioUUIDSustitucion'] = $uuid_sustitucion;
 
         try {
-            if($aplica_params) {
-                $client = new SoapClient($ws, $params);
-            }
-            else{
-                $client = new SoapClient($ws);
-            }
+            $client = new SoapClient($ws);
         }
         catch (Throwable $e){
-            return $this->error->error('Error al timbrar',array($e,$params));
+            return $this->error->error('Error al cancelar',array($e,$params));
         }
 
-        if($aplica_params){
-            $response = $client->__soapCall($timbra_rs, array('parameters' => $params));
 
+        $csd = $this->get_data_csd(ruta_cer: $ruta_cer,ruta_key:  $ruta_key);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al integrar pems',data:  $csd);
         }
+
+        $response = $client->cancelar($usuario_int, $csd->key, $csd->cer, $pass_csd, $uuid, $rfc_emisor, $rfc_receptor, $total);
+
+
 
         $result = $response->CancelaCFDI40Result->anyType;
 
@@ -97,6 +86,35 @@ class timbra{
 
 
         return $data;
+    }
+
+    private function csd(string $ruta_cer, string $ruta_key): stdClass
+    {
+        $key = file_get_contents($ruta_key);
+        $cer = file_get_contents($ruta_cer);
+
+        $data = new stdClass();
+        $data->key = $key;
+        $data->cer = $cer;
+        return $data;
+
+    }
+
+    private function get_data_csd(string $ruta_cer, string $ruta_key){
+        $valida = $this->valida_ruta(file: $ruta_key);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar ruta_key_pem',data:  $valida);
+        }
+        $valida = $this->valida_ruta(file: $ruta_cer);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar ruta_cer_pem',data:  $valida);
+        }
+
+        $csd = $this->csd(ruta_cer: $ruta_cer, ruta_key: $ruta_key);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al integrar pems',data:  $csd);
+        }
+        return $csd;
     }
 
     private function get_data_pem(string $ruta_cer_pem, string $ruta_key_pem){
