@@ -59,24 +59,22 @@ class timbra{
 
 
 
-        $result = $response->CancelaCFDI40Result->anyType;
-
-
-        $tipo_resultado = $result[0];
-        $cod_mensaje = $result[1];
-        $mensaje = $result[2];
-        $cod_error = $result[6];
-        $mensaje_error = $result[7];
-        $salida = $result[8];
+        $tipo_resultado = $response->status;
+        $cod_mensaje = $response->code;
+        $mensaje = $response->message;
+        $cod_error = $response->code;
+        $mensaje_error = $response->message;
+        $salida = $response->data;
 
         if((int)$cod_error !==0){
-            return $this->error->error(mensaje: 'Error al timbrar',data: $result);
+            return $this->error->error(mensaje: 'Error al timbrar',data: $response);
         }
+
 
 
         $data = new stdClass();
         $data->response = $response;
-        $data->result = $result;
+        $data->result = $response;
         $data->tipo_resultado = $tipo_resultado;
         $data->cod_mensaje = $cod_mensaje;
         $data->mensaje = $mensaje;
