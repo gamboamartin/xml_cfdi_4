@@ -55,7 +55,7 @@ class timbra{
             return $this->error->error(mensaje: 'Error al integrar pems',data:  $csd);
         }
 
-        $response = $client->cancelar($usuario_int, $csd->key, $csd->cer, $pass_csd, $uuid, $rfc_emisor, $rfc_receptor, $total);
+        $response = $client->cancelar($usuario_int, $csd->key, $csd->cer, $pass_csd, $uuid, $rfc_emisor, $rfc_receptor, $total, $motivo_cancelacion, $uuid_sustitucion);
 
 
 
@@ -94,8 +94,8 @@ class timbra{
         $cer = file_get_contents($ruta_cer);
 
         $data = new stdClass();
-        $data->key = $key;
-        $data->cer = $cer;
+        $data->key = base64_encode($key);
+        $data->cer = base64_encode($cer);
         return $data;
 
     }

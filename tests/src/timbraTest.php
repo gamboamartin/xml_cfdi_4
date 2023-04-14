@@ -112,7 +112,7 @@ class timbraTest extends test {
         "Version": "4.0",
         "Serie": "LC-P",
         "Folio": "1",
-        "Fecha": "2023-04-04T10:37:08",
+        "Fecha": "2023-04-14T10:37:08",
         "NoCertificado": "30001000000400002434",
         "SubTotal": "0",
         "Moneda": "XXX",
@@ -159,6 +159,7 @@ class timbraTest extends test {
             ruta_cer_pem: $ruta_cer_pem, ruta_key_pem: $ruta_key_pem, pac_prov: 'facturalo');
 
 
+
         $this->assertNotTrue(errores::$error);
         $this->assertIsObject($resultado);
         $this->assertNotEmpty($resultado->uuid);
@@ -171,7 +172,7 @@ class timbraTest extends test {
         "Version": "4.0",
         "Serie": "LC-P",
         "Folio": "1005",
-        "Fecha": "2023-04-03T10:37:08",
+        "Fecha": "2023-04-14T10:37:08",
         "NoCertificado": "30001000000400002434",
         "SubTotal": "0",
         "Moneda": "XXX",
