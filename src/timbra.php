@@ -54,10 +54,17 @@ class timbra{
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al integrar pems',data:  $csd);
         }
+        if($uuid_sustitucion!=='') {
 
-        $response = $client->cancelar($usuario_int, $csd->key, $csd->cer, $pass_csd, $uuid, $rfc_emisor, $rfc_receptor, $total, $motivo_cancelacion, $uuid_sustitucion);
+            $response = $client->cancelar($usuario_int, $csd->key, $csd->cer, $pass_csd, $uuid, $rfc_emisor, $rfc_receptor,
+                $total, $motivo_cancelacion, $uuid_sustitucion);
 
+        }
+        else{
+            $response = $client->cancelar($usuario_int, $csd->key, $csd->cer, $pass_csd, $uuid, $rfc_emisor, $rfc_receptor,
+                $total, $motivo_cancelacion);
 
+        }
 
         $tipo_resultado = $response->status;
         $cod_mensaje = $response->code;
@@ -66,9 +73,11 @@ class timbra{
         $mensaje_error = $response->message;
         $salida = $response->data;
 
-        if((int)$cod_error !==0){
+        if(trim($tipo_resultado) !== 'success'){
             return $this->error->error(mensaje: 'Error al timbrar',data: $response);
         }
+
+        $data_acuse = json_decode($response->data,TRUE);
 
 
 
@@ -81,6 +90,8 @@ class timbra{
         $data->cod_error = $cod_error;
         $data->mensaje_error = $mensaje_error;
         $data->salida = $salida;
+        $data->acuse = $data_acuse['acuse'];
+        $data->uuid  = $data_acuse['uuid'];
 
 
         return $data;
