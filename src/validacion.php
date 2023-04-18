@@ -144,12 +144,30 @@ class validacion extends \gamboamartin\validacion\validacion{
         if(!is_object($obj_impuesto)){
             return $this->error->error(mensaje: 'Error obj_impuesto  debe ser un objeto', data: $obj_impuesto);
         }
-        $keys = array('base','impuesto','tipo_factor','tasa_o_cuota','importe');
+
+        $keys = array('tipo_factor');
         $valida = $this->valida_existencia_keys(keys: $keys,registro:  $obj_impuesto);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al validar obj_impuesto', data: $valida);
         }
-        $keys = array('base','tasa_o_cuota','importe');
+
+
+        $keys = array('base','impuesto','tipo_factor');
+
+        if($obj_impuesto->tipo_factor !== 'Exento'){
+            $keys[] = 'tasa_o_cuota';
+            $keys[] = 'importe';
+        }
+        $valida = $this->valida_existencia_keys(keys: $keys,registro:  $obj_impuesto);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar obj_impuesto', data: $valida);
+        }
+        $keys = array('base');
+
+        if($obj_impuesto->tipo_factor !== 'Exento'){
+            $keys[] = 'tasa_o_cuota';
+            $keys[] = 'importe';
+        }
         $valida = $this->valida_numerics(keys: $keys,row:  $obj_impuesto);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al validar obj_impuesto', data: $valida);

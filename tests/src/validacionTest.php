@@ -58,6 +58,7 @@ class validacionTest extends test {
         $traslado = new stdClass();
 
         $resultado = $val->valida_nodo_impuesto($traslado);
+
         $this->assertTrue(errores::$error);
         $this->assertIsArray($resultado);
         $this->assertStringContainsStringIgnoringCase('Error al validar obj_impuesto',$resultado['mensaje']);
