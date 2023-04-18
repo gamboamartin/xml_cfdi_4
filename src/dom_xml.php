@@ -1303,6 +1303,7 @@ class dom_xml{
         $nodo_impuesto['Impuesto'] = $obj_impuesto->impuesto;
 
         if($tipo_impuesto === 'Traslado') {
+            $nodo_impuesto['TipoFactor'] = $obj_impuesto->tipo_factor;
             if($obj_impuesto->tipo_factor !== 'Exento') {
                 $nodo_impuesto['TasaOCuota'] = $obj_impuesto->tasa_o_cuota;
             }
