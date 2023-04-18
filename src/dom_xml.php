@@ -151,22 +151,39 @@ class dom_xml{
 
     private function attrs_concepto_retencion_json(stdClass $retencion): array
     {
-        $keys = array('base','impuesto','tipo_factor','tasa_o_cuota','importe');
+
+        $keys = array('base','impuesto','tipo_factor');
+        if($retencion->tipo_factor !== 'Exento'){
+            $keys[] = 'importe';
+            $keys[] = 'tasa_o_cuota';
+        }
+
+
         $valida = $this->valida->valida_existencia_keys(keys: $keys,registro:  $retencion);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al validar retencion', data: $valida);
         }
-        $keys = array('base','tasa_o_cuota','importe');
+        $keys = array('base');
+
+        if($retencion->tipo_factor !== 'Exento'){
+            $keys[] = 'importe';
+            $keys[] = 'tasa_o_cuota';
+        }
         $valida = $this->valida->valida_numerics(keys:$keys, row: $retencion);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al validar traslado', data: $valida);
         }
 
-        $nodo_retencion['Base'] = $retencion->base;
+        $nodo_retencion['Base'] =  $retencion->base;
         $nodo_retencion['Impuesto'] = $retencion->impuesto;
-        $nodo_retencion['TipoFactor'] = $retencion->tipo_factor;
-        $nodo_retencion['TasaOCuota'] = $retencion->tasa_o_cuota;
-        $nodo_retencion['Importe'] =  $retencion->importe;
+        $nodo_retencion['TipoFactor'] =  $retencion->tipo_factor;
+
+
+        if($retencion->tipo_factor !== 'Exento'){
+            $nodo_retencion['TasaOCuota'] = $retencion->tasa_o_cuota;
+            $nodo_retencion['Importe'] = $retencion->importe;
+        }
+
         return $nodo_retencion;
     }
 
@@ -193,12 +210,23 @@ class dom_xml{
 
     private function attrs_concepto_traslado_json(stdClass $traslado): array
     {
-        $keys = array('base','impuesto','tipo_factor','tasa_o_cuota','importe');
+        $keys = array('base','impuesto','tipo_factor');
+        if($traslado->tipo_factor !== 'Exento'){
+            $keys[] = 'importe';
+            $keys[] = 'tasa_o_cuota';
+        }
+
         $valida = $this->valida->valida_existencia_keys(keys: $keys,registro:  $traslado);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al validar traslado', data: $valida);
         }
-        $keys = array('base','tasa_o_cuota','importe');
+        $keys = array('base');
+
+        if($traslado->tipo_factor !== 'Exento'){
+            $keys[] = 'importe';
+            $keys[] = 'tasa_o_cuota';
+        }
+
         $valida = $this->valida->valida_numerics(keys:$keys, row: $traslado);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al validar traslado', data: $valida);
@@ -207,8 +235,13 @@ class dom_xml{
         $nodo_traslado['Base'] =  $traslado->base;
         $nodo_traslado['Impuesto'] = $traslado->impuesto;
         $nodo_traslado['TipoFactor'] =  $traslado->tipo_factor;
-        $nodo_traslado['TasaOCuota'] = $traslado->tasa_o_cuota;
-        $nodo_traslado['Importe'] = $traslado->importe;
+
+
+        if($traslado->tipo_factor !== 'Exento'){
+            $nodo_traslado['TasaOCuota'] = $traslado->tasa_o_cuota;
+            $nodo_traslado['Importe'] = $traslado->importe;
+        }
+
         return $nodo_traslado;
     }
 
