@@ -155,7 +155,7 @@ class xml{
 
         $nodo_conceptos = (new dom_xml())->carga_conceptos_json(conceptos: $conceptos, xml:  $this);
         if(errores::$error){
-            return $this->error->error(mensaje: 'Error al asignar atributos', data: $json);
+            return $this->error->error(mensaje: 'Error al asignar atributos', data: $nodo_conceptos);
         }
 
         $json['Comprobante']['Conceptos'] = $nodo_conceptos;

@@ -122,6 +122,26 @@ class dom_xmlTest extends test {
 
     }
 
+    public function test_limpia_monto(): void
+    {
+        errores::$error = false;
+
+        $dom = new dom_xml();
+        $dom = new liberator($dom);
+
+        //$xml = new xml();
+
+
+        $monto = '$1.98,09';
+
+
+        $resultado = $dom->limpia_monto($monto);
+        $this->assertNotTrue(errores::$error);
+        $this->assertIsNumeric($resultado);
+        $this->assertEquals(1.9809, $resultado);
+        errores::$error = false;
+    }
+
     public function test_relacionados_json(): void
     {
         errores::$error = false;

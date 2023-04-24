@@ -1319,15 +1319,30 @@ class dom_xml{
      * Limpia un monto
      * @param string|int|float $monto monto a limpiar
      * @return array|string
+     * @version 2.28.0
      */
     private function limpia_monto(string|int|float $monto): array|string
     {
         $monto = trim($monto);
+        if($monto === ''){
+            return $this->error->error(mensaje: 'Error monto esta vacio', data: $monto);
+        }
         $monto = str_replace('$', '', $monto);
-        return str_replace(',', '', $monto);
+        $monto = str_replace(',', '', $monto);
+        if(!is_numeric($monto)){
+            return $this->error->error(mensaje: 'Error monto invalido', data: $monto);
+        }
+        return $monto;
     }
 
-    private function limpia_monto_attr(string $key, stdClass $obj){
+    /**
+     * Limpia un monto de un objeto
+     * @param string $key
+     * @param stdClass $obj
+     * @return array|stdClass
+     */
+    private function limpia_monto_attr(string $key, stdClass $obj): array|stdClass
+    {
         $monto = $this->limpia_monto(monto: $obj->$key);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al limpiar monto', data: $monto);
