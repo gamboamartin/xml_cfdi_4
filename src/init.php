@@ -68,12 +68,14 @@ class init{
      */
     public function asigna_datos_para_nodo(array $keys, string $nodo_key, stdClass $objetc, xml $xml): array|stdClass
     {
+        $nodo_key = trim($nodo_key);
         foreach ($keys as $key){
+            $key = trim($key);
             if(!isset($xml->cfdi->$nodo_key)){
                 return $this->error->error(mensaje: 'Error no esta inicializado $xml->cfdi->'.$nodo_key,
                     data: $xml->cfdi);
             }
-            $xml->cfdi->$nodo_key->$key = $objetc->$key;
+            $xml->cfdi->$nodo_key->$key = trim($objetc->$key);
         }
         return $xml->cfdi->$nodo_key;
     }
@@ -106,24 +108,24 @@ class init{
         $xml->cfdi->comprobante->total = $total;
         $xml->cfdi->comprobante->sub_total = $sub_total;
 
-        $xml->cfdi->comprobante->tipo_de_comprobante = $comprobante->tipo_de_comprobante;
-        $xml->cfdi->comprobante->moneda = $comprobante->moneda;
-        $xml->cfdi->comprobante->exportacion = $comprobante->exportacion;
+        $xml->cfdi->comprobante->tipo_de_comprobante = trim($comprobante->tipo_de_comprobante);
+        $xml->cfdi->comprobante->moneda = trim($comprobante->moneda);
+        $xml->cfdi->comprobante->exportacion = trim($comprobante->exportacion);
 
-        $xml->cfdi->comprobante->lugar_expedicion = $comprobante->lugar_expedicion;
-        $xml->cfdi->comprobante->fecha = $comprobante->fecha;
-        $xml->cfdi->comprobante->folio = $comprobante->folio;
+        $xml->cfdi->comprobante->lugar_expedicion = trim($comprobante->lugar_expedicion);
+        $xml->cfdi->comprobante->fecha = trim($comprobante->fecha);
+        $xml->cfdi->comprobante->folio = trim($comprobante->folio);
         if(isset($comprobante->serie) && (string)$comprobante->serie !== ''){
-            $xml->cfdi->comprobante->serie = $comprobante->serie;
+            $xml->cfdi->comprobante->serie = trim($comprobante->serie);
         }
         if(isset($comprobante->no_certificado) && (string)$comprobante->no_certificado !== ''){
-            $xml->cfdi->comprobante->no_certificado = $comprobante->no_certificado;
+            $xml->cfdi->comprobante->no_certificado = trim($comprobante->no_certificado);
         }
         if(isset($comprobante->forma_pago) && (string)$comprobante->forma_pago !== ''){
-            $xml->cfdi->comprobante->forma_pago = $comprobante->forma_pago;
+            $xml->cfdi->comprobante->forma_pago = trim($comprobante->forma_pago);
         }
         if(isset($comprobante->metodo_pago) && (string)$comprobante->metodo_pago !== ''){
-            $xml->cfdi->comprobante->metodo_pago = $comprobante->metodo_pago;
+            $xml->cfdi->comprobante->metodo_pago = trim($comprobante->metodo_pago);
         }
         if(isset($comprobante->descuento) && (string)$comprobante->descuento !== ''){
 
@@ -135,7 +137,7 @@ class init{
             $xml->cfdi->comprobante->descuento = $descuento;
         }
         if(isset($comprobante->tipo_cambio) && (string)$comprobante->tipo_cambio !== ''){
-            $xml->cfdi->comprobante->tipo_cambio = $comprobante->tipo_cambio;
+            $xml->cfdi->comprobante->tipo_cambio = trim($comprobante->tipo_cambio);
         }
 
         return $xml->cfdi->comprobante;
@@ -151,6 +153,7 @@ class init{
 
     private function monto_dos_decimals(float|int $value): string
     {
+        $value = trim($value);
         $value = round($value,2);
         return number_format($value,2,'.','');
     }
@@ -189,6 +192,7 @@ class init{
 
     private function monto_entero(float|int $value): string
     {
+        $value = trim($value);
         $value = round($value);
         return number_format($value,0,'','');
     }
@@ -197,6 +201,7 @@ class init{
     {
         foreach ($obj as $attr=>$value){
             if(in_array($attr, $keys, true)) {
+                $value = trim($value);
                 $obj->$attr = $this->monto_entero(value: $value);
                 if (errores::$error) {
                     return $this->error->error(mensaje: 'Error al asignar valor', data: $obj->$attr);

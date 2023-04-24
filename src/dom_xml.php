@@ -984,6 +984,9 @@ class dom_xml{
     private function genera_attrs_json(array $json, array $keys, array $keys_especial, string $local_name,
                                        string $nodo_key, stdClass $object, xml $xml): array
     {
+        $local_name = trim($local_name);
+        $nodo_key = trim($nodo_key);
+
         if(!isset($xml->cfdi->$nodo_key)){
             return $this->error->error(mensaje: 'Error no esta inicializado $xml->cfdi->'.$nodo_key,
                 data: $xml->cfdi);
@@ -1165,51 +1168,54 @@ class dom_xml{
 
     private function init_dom_cfdi_comprobante_json(array $json, xml $xml): array
     {
-        $json['Comprobante']['Moneda'] = $xml->cfdi->comprobante->moneda;
-        $json['Comprobante']['Total'] = $xml->cfdi->comprobante->total;
-        $json['Comprobante']['Exportacion'] = $xml->cfdi->comprobante->exportacion;
-        $json['Comprobante']['TipoDeComprobante'] = $xml->cfdi->comprobante->tipo_de_comprobante;
-        $json['Comprobante']['SubTotal'] = $xml->cfdi->comprobante->sub_total;
-        $json['Comprobante']['LugarExpedicion'] = $xml->cfdi->comprobante->lugar_expedicion;
-        $json['Comprobante']['Fecha'] = $xml->cfdi->comprobante->fecha;
-        $json['Comprobante']['Folio'] = $xml->cfdi->comprobante->folio;
-        $json['Comprobante']['Version'] = $xml->cfdi->comprobante->version;
-        $json['Comprobante']['NoCertificado'] = $xml->cfdi->comprobante->no_certificado;
+        $json['Comprobante']['Moneda'] = trim($xml->cfdi->comprobante->moneda);
+        $json['Comprobante']['Total'] = trim($xml->cfdi->comprobante->total);
+        $json['Comprobante']['Exportacion'] = trim($xml->cfdi->comprobante->exportacion);
+        $json['Comprobante']['TipoDeComprobante'] = trim($xml->cfdi->comprobante->tipo_de_comprobante);
+        $json['Comprobante']['SubTotal'] = trim($xml->cfdi->comprobante->sub_total);
+        $json['Comprobante']['LugarExpedicion'] = trim($xml->cfdi->comprobante->lugar_expedicion);
+        $json['Comprobante']['Fecha'] = trim($xml->cfdi->comprobante->fecha);
+        $json['Comprobante']['Folio'] = trim($xml->cfdi->comprobante->folio);
+        $json['Comprobante']['Version'] = trim($xml->cfdi->comprobante->version);
+        $json['Comprobante']['NoCertificado'] = trim($xml->cfdi->comprobante->no_certificado);
         if(isset($xml->cfdi->comprobante->serie) && (string)$xml->cfdi->comprobante->serie !== ''){
-            $json['Comprobante']['Serie'] = $xml->cfdi->comprobante->serie;
+            $json['Comprobante']['Serie'] = trim($xml->cfdi->comprobante->serie);
         }
         if(isset($xml->cfdi->comprobante->forma_pago) && (string)$xml->cfdi->comprobante->forma_pago !== ''){
-            $json['Comprobante']['FormaPago'] = $xml->cfdi->comprobante->forma_pago;
+            $json['Comprobante']['FormaPago'] = trim($xml->cfdi->comprobante->forma_pago);
         }
         if(isset($xml->cfdi->comprobante->metodo_pago) && (string)$xml->cfdi->comprobante->metodo_pago !== ''){
-            $json['Comprobante']['MetodoPago'] = $xml->cfdi->comprobante->metodo_pago;
+            $json['Comprobante']['MetodoPago'] = trim($xml->cfdi->comprobante->metodo_pago);
         }
         if(isset($xml->cfdi->comprobante->descuento) && (string)$xml->cfdi->comprobante->descuento !== ''){
-            $json['Comprobante']['Descuento'] = $xml->cfdi->comprobante->descuento;
+            $json['Comprobante']['Descuento'] = trim($xml->cfdi->comprobante->descuento);
         }
         if(isset($xml->cfdi->comprobante->tipo_cambio) && (string)$xml->cfdi->comprobante->tipo_cambio !== ''){
-            $json['Comprobante']['TipoCambio'] = $xml->cfdi->comprobante->tipo_cambio;
+            $json['Comprobante']['TipoCambio'] = trim($xml->cfdi->comprobante->tipo_cambio);
         }
 
         return $json;
     }
 
     private function key_especial_attr(string $key, string $key_nodo_xml,  array $keys_especial){
+        $key_nodo_xml = trim($key_nodo_xml);
+        $key = trim($key);
         foreach ($keys_especial as $key_val=>$key_especial){
             if($key_val === $key) {
-                $key_nodo_xml = $key_especial;
+                $key_nodo_xml = trim($key_especial);
                 break;
             }
         }
-        return $key_nodo_xml;
+        return trim($key_nodo_xml);
     }
 
 
     private function key_nodo_base(string $key): array|string
     {
-        $key_nodo_xml = str_replace('_', ' ', $key);
-        $key_nodo_xml = ucwords($key_nodo_xml);
-        return str_replace(' ', '', $key_nodo_xml);
+        $key = trim($key);
+        $key_nodo_xml = trim(str_replace('_', ' ', $key));
+        $key_nodo_xml = trim(ucwords($key_nodo_xml));
+        return trim(str_replace(' ', '', $key_nodo_xml));
     }
 
 
@@ -1256,6 +1262,8 @@ class dom_xml{
     public function nodo_json(array $json, array $keys, array $keys_especial, string $local_name, string $nodo_key,
                          stdClass $object, xml $xml): array
     {
+
+        $nodo_key = trim($nodo_key);
 
         if(!isset($xml->cfdi->$nodo_key)){
             return $this->error->error(mensaje: 'Error no esta inicializado $xml->cfdi->'.$nodo_key,
@@ -1343,6 +1351,7 @@ class dom_xml{
      */
     private function limpia_monto_attr(string $key, stdClass $obj): array|stdClass
     {
+        $key = trim($key);
         $monto = $this->limpia_monto(monto: $obj->$key);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al limpiar monto', data: $monto);
@@ -1375,11 +1384,11 @@ class dom_xml{
             }
 
             $data_relacion = array();
-            $data_relacion['TipoRelacion'] = $tipo_relacion;
+            $data_relacion['TipoRelacion'] = trim($tipo_relacion);
 
             foreach ($uuids as $uuid){
 
-                $data_relacion['CfdiRelacionado'][] = $uuid;
+                $data_relacion['CfdiRelacionado'][] = trim($uuid);
             }
 
 
@@ -1412,14 +1421,17 @@ class dom_xml{
     private function setea_attr_json(array $json, array $keys, array $keys_especial, string $local_name,
                                      string $nodo_key, xml $xml): array
     {
+        $local_name = trim($local_name);
         foreach ($keys as $key){
 
+            $key = trim($key);
             $key_nodo_xml = $this->key_nodo_xml(key: $key,keys_especial: $keys_especial);
             if(errores::$error){
                 return $this->error->error(mensaje: 'Error al setear $key_nodo_xml'.$key, data: $key_nodo_xml);
             }
+            $key_nodo_xml = trim($key_nodo_xml);
 
-            $json['Comprobante'][$local_name][$key_nodo_xml] = $xml->cfdi->$nodo_key->$key;
+            $json['Comprobante'][$local_name][$key_nodo_xml] = trim($xml->cfdi->$nodo_key->$key);
 
         }
 

@@ -35,15 +35,15 @@ class pago{
 
         }
 
-        $nodo_docto_relacionado->setAttribute('IdDocumento', $docto_relacionado_->id_documento);
-        $nodo_docto_relacionado->setAttribute('Folio', $docto_relacionado_->folio);
-        $nodo_docto_relacionado->setAttribute('MonedaDR', $docto_relacionado_->moneda_dr);
-        $nodo_docto_relacionado->setAttribute('EquivalenciaDR', $docto_relacionado_->equivalencia_dr);
-        $nodo_docto_relacionado->setAttribute('NumParcialidad', $docto_relacionado_->num_parcialidad);
-        $nodo_docto_relacionado->setAttribute('ImpSaldoAnt', $docto_relacionado_->imp_saldo_ant);
-        $nodo_docto_relacionado->setAttribute('ImpPagado', $docto_relacionado_->imp_pagado);
-        $nodo_docto_relacionado->setAttribute('ImpSaldoInsoluto', $docto_relacionado_->imp_saldo_insoluto);
-        $nodo_docto_relacionado->setAttribute('ObjetoImpDR', $docto_relacionado_->objeto_imp_dr);
+        $nodo_docto_relacionado->setAttribute('IdDocumento', trim($docto_relacionado_->id_documento));
+        $nodo_docto_relacionado->setAttribute('Folio', trim($docto_relacionado_->folio));
+        $nodo_docto_relacionado->setAttribute('MonedaDR', trim($docto_relacionado_->moneda_dr));
+        $nodo_docto_relacionado->setAttribute('EquivalenciaDR', trim($docto_relacionado_->equivalencia_dr));
+        $nodo_docto_relacionado->setAttribute('NumParcialidad', trim($docto_relacionado_->num_parcialidad));
+        $nodo_docto_relacionado->setAttribute('ImpSaldoAnt', trim($docto_relacionado_->imp_saldo_ant));
+        $nodo_docto_relacionado->setAttribute('ImpPagado', trim($docto_relacionado_->imp_pagado));
+        $nodo_docto_relacionado->setAttribute('ImpSaldoInsoluto', trim($docto_relacionado_->imp_saldo_insoluto));
+        $nodo_docto_relacionado->setAttribute('ObjetoImpDR', trim($docto_relacionado_->objeto_imp_dr));
         return $nodo_docto_relacionado;
     }
 
@@ -87,9 +87,9 @@ class pago{
                 data: $valida, fix: $fix);
         }
 
-        $docto_relacionado_->equivalencia_dr = round($docto_relacionado_->equivalencia_dr);
+        $docto_relacionado_->equivalencia_dr = round(trim($docto_relacionado_->equivalencia_dr));
         $docto_relacionado_->equivalencia_dr = (int)$docto_relacionado_->equivalencia_dr;
-        $docto_relacionado_->equivalencia_dr = number_format($docto_relacionado_->equivalencia_dr);
+        $docto_relacionado_->equivalencia_dr = number_format(trim($docto_relacionado_->equivalencia_dr));
         return $docto_relacionado_;
     }
 
