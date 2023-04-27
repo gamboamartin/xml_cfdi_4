@@ -21,6 +21,22 @@ class timbraTest extends test {
     }
 
 
+    public function test_consulta_estado_sat(): void
+    {
+        errores::$error = false;
+
+        $timbra = new timbra();
+
+        $rfc_emisor = 'EKU9003173C9';
+        $rfc_receptor = 'XAXX010101000';
+        $total = '1.16';
+        $uuid = '4a5dc24d-e0a9-4172-9fdd-38b2dfbd4435';
+        $resultado = $timbra->consulta_estado_sat($rfc_emisor, $rfc_receptor, $total, $uuid);
+        $this->assertNotTrue(errores::$error);
+        $this->assertIsObject($resultado);
+        errores::$error = false;
+        //$this->assertNotEmpty($resultado->uuid);
+    }
 
     public function test_timbra(): void
     {

@@ -21,6 +21,22 @@ class timbra{
                                   string $pass_csd = '', string $ruta_cer = '', string $ruta_key = '',
                                   string $total = '', $uuid_sustitucion = ''){
 
+        $rfc_emisor = trim($rfc_emisor);
+        if($rfc_emisor === ''){
+            return $this->error->error(mensaje: 'Error rfc_emisor esta vacio',data: $rfc_emisor);
+        }
+        $rfc_receptor = trim($rfc_receptor);
+        if($rfc_receptor === ''){
+            return $this->error->error(mensaje: 'Error rfc_receptor esta vacio',data: $rfc_receptor);
+        }
+        $uuid = trim($uuid);
+        if($uuid === ''){
+            return $this->error->error(mensaje: 'Error uuid esta vacio',data: $uuid);
+        }
+        $total = trim($total);
+        if($total === ''){
+            return $this->error->error(mensaje: 'Error total esta vacio',data: $total);
+        }
 
         $pac = new pac();
         $keys = array('ruta_pac','usuario_integrador');
@@ -54,8 +70,8 @@ class timbra{
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al integrar pems',data:  $csd);
         }
-        if($uuid_sustitucion!=='') {
 
+        if($uuid_sustitucion!=='') {
             $response = $client->cancelar($usuario_int, $csd->key, $csd->cer, $pass_csd, $uuid, $rfc_emisor, $rfc_receptor,
                 $total, $motivo_cancelacion, $uuid_sustitucion);
 
@@ -95,6 +111,77 @@ class timbra{
 
 
         return $data;
+    }
+
+    final public function consulta_estado_sat(string $rfc_emisor, string $rfc_receptor, string $total, string $uuid){
+
+        $rfc_emisor = trim($rfc_emisor);
+        if($rfc_emisor === ''){
+            return $this->error->error(mensaje: 'Error rfc_emisor esta vacio',data: $rfc_emisor);
+        }
+        $rfc_receptor = trim($rfc_receptor);
+        if($rfc_receptor === ''){
+            return $this->error->error(mensaje: 'Error rfc_receptor esta vacio',data: $rfc_receptor);
+        }
+        $uuid = trim($uuid);
+        if($uuid === ''){
+            return $this->error->error(mensaje: 'Error uuid esta vacio',data: $uuid);
+        }
+        $total = trim($total);
+        if($total === ''){
+            return $this->error->error(mensaje: 'Error total esta vacio',data: $total);
+        }
+
+        $pac = new pac();
+        $keys = array('ruta_pac','usuario_integrador');
+        $valida = $this->valida->valida_existencia_keys(keys: $keys,registro:  $pac);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar pac',data: $valida);
+        }
+
+        $ws= $pac->ruta_pac;
+        $usuario_int = $pac->usuario_integrador;
+        $params = array();
+        try {
+            $client = new SoapClient($ws);
+        }
+        catch (Throwable $e){
+            return $this->error->error('Error al cancelar',array($e,$params));
+        }
+
+        //print_r($usuario_int);exit;
+
+        $response = $client->consultarEstadoSAT($usuario_int,  $uuid, $rfc_emisor, $rfc_receptor,
+            $total);
+
+        //print_r($response);exit;
+
+        $tipo_resultado = $response->CodigoEstatus;
+        $cod_mensaje = $response->Estado;
+        $mensaje = $response->Estado;
+        $cod_error = $response->CodigoEstatus;
+        $mensaje_error = $response->Estado;
+        $status_cancelacion = $response->EstatusCancelacion;
+
+        if(trim($tipo_resultado) === '300' || trim($tipo_resultado) === 'N - 602: Comprobante no encontrado.'){
+            return $this->error->error(mensaje: 'Error al obtener status',data: $response);
+        }
+
+
+
+
+        $data = new stdClass();
+        $data->response = $response;
+        $data->result = $response;
+        $data->tipo_resultado = $tipo_resultado;
+        $data->cod_mensaje = $cod_mensaje;
+        $data->mensaje = $mensaje;
+        $data->cod_error = $cod_error;
+        $data->mensaje_error = $mensaje_error;
+
+        return $data;
+
+
     }
 
     private function csd(string $ruta_cer, string $ruta_key): stdClass
