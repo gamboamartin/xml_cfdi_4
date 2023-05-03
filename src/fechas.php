@@ -129,7 +129,7 @@ class fechas{
         }
         if($es_fecha_hora_min_sec_esp) {
             $hora_ex = explode(' ', $fecha);
-            $fecha_cfdi = $fecha . 'T' . $hora_ex[1];
+            $fecha_cfdi = $hora_ex[0] . 'T' . $hora_ex[1];
         }
         return $fecha_cfdi;
     }

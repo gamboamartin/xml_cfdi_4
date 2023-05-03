@@ -57,7 +57,7 @@ class fechasTest extends test {
         $resultado = $fechas->fecha_hora_min_sec_esp($fecha);
         $this->assertNotTrue(errores::$error);
         $this->assertIsString($resultado);
-        $this->assertEquals('2020-01-01 21:12:45T21:12:45', $resultado);
+        $this->assertEquals('2020-01-01T21:12:45', $resultado);
 
         errores::$error = false;
 
