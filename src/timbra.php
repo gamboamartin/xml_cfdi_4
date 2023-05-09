@@ -184,6 +184,60 @@ class timbra{
 
     }
 
+    final public function consulta_cfdi_sat(string $uuid){
+
+        $uuid = trim($uuid);
+        if($uuid === ''){
+            return $this->error->error(mensaje: 'Error uuid esta vacio',data: $uuid);
+        }
+
+
+        $pac = new pac();
+        $keys = array('ruta_pac','usuario_integrador');
+        $valida = $this->valida->valida_existencia_keys(keys: $keys,registro:  $pac);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar pac',data: $valida);
+        }
+
+        $ws= $pac->ruta_pac;
+        $usuario_int = $pac->usuario_integrador;
+        $params = array();
+        try {
+            $client = new SoapClient($ws);
+        }
+        catch (Throwable $e){
+            return $this->error->error('Error al cancelar',array($e,$params));
+        }
+
+        $response = $client->consultarCFDI($usuario_int,  $uuid);
+
+        $tipo_resultado = $response->code;
+        $cod_mensaje = $response->message;
+        $mensaje = $response->message;
+        $cod_error = $response->code;
+        $mensaje_error = $response->code;
+        $xml = $response->data;
+
+        if(trim($tipo_resultado) === '300' || trim($tipo_resultado) === 'N - 602: Comprobante no encontrado.'){
+            return $this->error->error(mensaje: 'Error al obtener status',data: $response);
+        }
+
+
+        $data = new stdClass();
+        $data->response = $response;
+        $data->result = $response;
+        $data->tipo_resultado = $tipo_resultado;
+        $data->cod_mensaje = $cod_mensaje;
+        $data->mensaje = $mensaje;
+        $data->cod_error = $cod_error;
+        $data->mensaje_error = $mensaje_error;
+        $data->xml = $xml;
+
+        return $data;
+
+
+    }
+
     private function csd(string $ruta_cer, string $ruta_key): stdClass
     {
         $key = file_get_contents($ruta_key);
