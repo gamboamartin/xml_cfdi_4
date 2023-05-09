@@ -67,4 +67,29 @@ class percepcion{
         return $nodo_nominas_percepciones;
     }
 
+    public function nodo_jubilacion_pension_retiro(DOMElement $nodo_nominas_percepciones, stdClass $jubilacion, xml $xml): array|DOMElement
+    {
+        try {
+            $nodo_jubilacion = $xml->dom->createElement('nomina12:JubilacionPensionRetiro');
+        }
+        catch (Throwable $e){
+            return $this->error->error(mensaje: 'Error al crear el elemento percepcion20:percepcion', data: $e);
+        }
+
+        $nodo_nominas_percepciones->appendChild($nodo_jubilacion);
+
+        $total_percepciones = round($jubilacion->importe_gravado, 2) +  round($jubilacion->importe_exento, 2);
+        $total_percepciones = round($total_percepciones,2);
+        if($total_percepciones<=0.0){
+            return $this->error->error(mensaje: 'Error algun importe debe ser mayor a 0', data: $total_percepciones);
+        }
+
+        $nodo_jubilacion->setAttribute('IngresoNoAcumulable',$total_percepciones);
+        $nodo_jubilacion->setAttribute('IngresoAcumulable', '0.00');
+        $nodo_jubilacion->setAttribute('MontoDiario', $total_percepciones);
+        $nodo_jubilacion->setAttribute('TotalParcialidad', $total_percepciones);
+
+        return $nodo_nominas_percepciones;
+    }
+
 }
