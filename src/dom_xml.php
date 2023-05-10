@@ -409,9 +409,19 @@ class dom_xml{
         return $nodo_traslado;
     }
 
-    private function carga_nodo_impuesto_comprobante(DOMElement $nodo_impuestos, stdClass $obj_impuesto, string $tipo_impuesto, xml $xml): array|DOMElement
+    /**
+     * Integra los nodos de tipos de impuestos
+     * @param DOMElement $nodo_impuestos
+     * @param stdClass $obj_impuesto
+     * @param string $tipo_impuesto
+     * @param xml $xml
+     * @return array|DOMElement
+     */
+    private function carga_nodo_impuesto_comprobante(DOMElement $nodo_impuestos, stdClass $obj_impuesto,
+                                                     string $tipo_impuesto, xml $xml): array|DOMElement
     {
-        $nodo_impuesto= $this->crea_nodo_impuesto(nodo_impuestos: $nodo_impuestos,tipo_impuesto: $tipo_impuesto, xml: $xml);
+        $nodo_impuesto= $this->crea_nodo_impuesto(
+            nodo_impuestos: $nodo_impuestos,tipo_impuesto: $tipo_impuesto, xml: $xml);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al generar nodo', data: $nodo_impuesto);
         }
@@ -494,7 +504,9 @@ class dom_xml{
         return $nodo_traslados;
     }
 
-    private function carga_impuestos(stdClass $impuestos,DOMElement $nodo_impuestos, string $tipo_impuesto, string $obj_impuestos, xml $xml):  array|DOMElement{
+    private function carga_impuestos(stdClass $impuestos,DOMElement $nodo_impuestos,
+                                     string $tipo_impuesto, string $obj_impuestos, xml $xml):  array|DOMElement{
+
         foreach ($impuestos->$obj_impuestos as $obj_impuesto){
 
             $valida = $this->valida->valida_nodo_impuesto(obj_impuesto: $obj_impuesto);
@@ -690,10 +702,22 @@ class dom_xml{
         return $nodo_traslados;
     }
 
-    private function crea_nodo_impuesto(DOMElement $nodo_impuestos, string $tipo_impuesto, xml $xml): bool|DOMElement
+    /**
+     * @param DOMElement $nodo_impuestos
+     * @param string $tipo_impuesto
+     * @param xml $xml
+     * @return bool|DOMElement|array
+     */
+    private function crea_nodo_impuesto(
+        DOMElement $nodo_impuestos, string $tipo_impuesto, xml $xml): bool|DOMElement|array
     {
-        $nodo_impuesto = $xml->dom->createElement("cfdi:$tipo_impuesto");
-        $nodo_impuestos->appendChild($nodo_impuesto);
+        try{
+            $nodo_impuesto = $xml->dom->createElement("cfdi:$tipo_impuesto");
+            $nodo_impuestos->appendChild($nodo_impuesto);
+        }
+        catch (Throwable $e){
+            return $this->error->error(mensaje: 'Error al crear elemento', data: $e);
+        }
         return $nodo_impuesto;
     }
 
@@ -1282,12 +1306,14 @@ class dom_xml{
     }
 
     /**
+     * Genera un nodo de tipo impuesto
      * @param DOMElement $nodo_impuesto
      * @param stdClass $obj_impuesto
      * @param string $tipo_impuesto
      * @return DOMElement
      */
-    private function nodo_impuesto(DOMElement $nodo_impuesto, stdClass $obj_impuesto,string  $tipo_impuesto = 'Traslado'): DOMElement
+    private function nodo_impuesto(
+        DOMElement $nodo_impuesto, stdClass $obj_impuesto,string  $tipo_impuesto = 'Traslado'): DOMElement
     {
         if($tipo_impuesto === 'Traslado') {
             $nodo_impuesto->setAttribute('Base', $obj_impuesto->base);

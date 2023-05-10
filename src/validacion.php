@@ -139,7 +139,12 @@ class validacion extends \gamboamartin\validacion\validacion{
         return true;
     }
 
-    public function valida_nodo_impuesto(mixed $obj_impuesto): bool|array
+    /**
+     * Valida que existan los elementos de un nodo de tipo impuesto
+     * @param mixed $obj_impuesto Objeto de tipo impuesto
+     * @return bool|array
+     */
+    final public function valida_nodo_impuesto(mixed $obj_impuesto): bool|array
     {
         if(!is_object($obj_impuesto)){
             return $this->error->error(mensaje: 'Error obj_impuesto  debe ser un objeto', data: $obj_impuesto);
@@ -158,6 +163,7 @@ class validacion extends \gamboamartin\validacion\validacion{
             $keys[] = 'tasa_o_cuota';
             $keys[] = 'importe';
         }
+
         $valida = $this->valida_existencia_keys(keys: $keys,registro:  $obj_impuesto);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al validar obj_impuesto', data: $valida);
