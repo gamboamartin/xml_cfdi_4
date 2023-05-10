@@ -202,6 +202,37 @@ class nomina{
 
         return $nodo_nomina_percepciones;
     }
+    public function nodo_nominas_percepciones_haberes(DOMElement $nodo_nominas, stdClass $nomina, xml $xml): bool|DOMElement|array
+    {
+
+        try {
+            $nodo_nomina_percepciones = $xml->dom->createElement('nomina12:Percepciones');
+        }
+        catch (Throwable $e){
+            return $this->error->error(mensaje: 'Error al crear el elemento nomina12:Emisor', data: $e);
+        }
+
+        $keys = array('percepciones');
+
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $nomina);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar nomina', data: $valida);
+        }
+
+        $keys = array('total_sueldos','total_gravado','total_exento');
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $nomina->percepciones);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar nomina', data: $valida);
+        }
+
+        $nodo_nominas->appendChild($nodo_nomina_percepciones);
+
+        $nodo_nomina_percepciones->setAttribute('TotalJubilacionPensionRetiro', $nomina->percepciones->total_sueldos);
+        $nodo_nomina_percepciones->setAttribute('TotalGravado', $nomina->percepciones->total_gravado);
+        $nodo_nomina_percepciones->setAttribute('TotalExento', $nomina->percepciones->total_exento);
+
+        return $nodo_nomina_percepciones;
+    }
 
     public function nodo_nominas_deducciones(DOMElement $nodo_nominas, stdClass $nomina, xml $xml): bool|DOMElement|array
     {
