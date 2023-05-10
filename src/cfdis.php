@@ -442,7 +442,7 @@ class cfdis{
             return $this->error->error(mensaje: 'Error al asignar nodo', data: $nodo_complemento);
         }
 
-        $nodo_nominas = (new nomina())->nodo_nominas(nodo_complemento: $nodo_complemento, nomina: $nomina_, xml: $xml);
+        $nodo_nominas = (new nomina())->nodo_nominas_haberes(nodo_complemento: $nodo_complemento, nomina: $nomina_, xml: $xml);
         if (errores::$error) {
             return $this->error->error(mensaje: 'Error al asignar nodo', data: $nodo_nominas);
         }
