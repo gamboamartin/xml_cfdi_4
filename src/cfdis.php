@@ -391,6 +391,13 @@ class cfdis{
             unset($data->comprobante->descuento);
         }
 
+        if(isset($nomina_->receptor->tipo_contrato )){
+            $nomina_->receptor->tipo_contrato = '99';
+        }
+        if(isset($nomina_->receptor->tipo_regimen )){
+            $nomina_->receptor->tipo_regimen = '99';
+        }
+
         $keys = array('lugar_expedicion', 'folio');
         $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $data->comprobante);
         if(errores::$error){
