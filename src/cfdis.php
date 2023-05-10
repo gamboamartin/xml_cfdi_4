@@ -387,7 +387,11 @@ class cfdis{
             $nomina_ = (object)$nomina_;
         }
 
-        $keys = array('lugar_expedicion', 'folio','descuento');
+        if(isset($data->comprobante->descuento)){
+            unset($data->comprobante->descuento);
+        }
+        
+        $keys = array('lugar_expedicion', 'folio');
         $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $data->comprobante);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al validar comprobante de pago', data: $valida);
@@ -447,7 +451,6 @@ class cfdis{
             return $this->error->error(mensaje: 'Error al asignar nodo', data: $nodo_nominas);
         }
 
-        
         $nodo_nominas_receptor = (new nomina())->nodo_nominas_receptor(nodo_nominas: $nodo_nominas, nomina: $nomina_, xml: $xml);
         if (errores::$error) {
             return $this->error->error(mensaje: 'Error al asignar nodo', data: $nodo_nominas_receptor);
