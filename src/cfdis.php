@@ -390,7 +390,7 @@ class cfdis{
         if(isset($data->comprobante->descuento)){
             unset($data->comprobante->descuento);
         }
-        
+
         $keys = array('lugar_expedicion', 'folio');
         $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $data->comprobante);
         if(errores::$error){
@@ -431,7 +431,7 @@ class cfdis{
             return $this->error->error(mensaje: 'Error al generar receptor', data: $dom);
         }
 
-        $dom = (new complementos())->conceptos_complemento_nomina_dom(descuento: $comprobante->descuento, xml: $xml,
+        $dom = (new complementos())->conceptos_complemento_nomina_dom_haberes(xml: $xml,
             valor_unitario: $comprobante->sub_total);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al generar receptor', data: $dom);
