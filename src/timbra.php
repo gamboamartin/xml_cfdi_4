@@ -17,10 +17,16 @@ class timbra{
 
     }
 
-    final public function cancela(string $motivo_cancelacion, string $rfc_emisor, string $rfc_receptor, string $uuid,
-                                  string $pass_csd = '', string $ruta_cer = '', string $ruta_key = '',
-                                  string $total = '', $uuid_sustitucion = ''){
-
+    /**
+     * Valida e inicializa los elementos base para consulta y cancelar
+     * @param string $rfc_emisor RFC Emisor
+     * @param string $rfc_receptor RFC Receptor
+     * @param string $total Total de la factura o CFDI
+     * @param string $uuid Folio Fiscal
+     * @return array|stdClass
+     */
+    private function datos_base(string $rfc_emisor, string $rfc_receptor, string $total, string $uuid): array|stdClass
+    {
         $rfc_emisor = trim($rfc_emisor);
         if($rfc_emisor === ''){
             return $this->error->error(mensaje: 'Error rfc_emisor esta vacio',data: $rfc_emisor);
@@ -38,11 +44,25 @@ class timbra{
             return $this->error->error(mensaje: 'Error total esta vacio',data: $total);
         }
 
-        $pac = new pac();
-        $keys = array('ruta_pac','usuario_integrador');
-        $valida = $this->valida->valida_existencia_keys(keys: $keys,registro:  $pac);
+        $datos = new stdClass();
+        $datos->rfc_emisor = $rfc_emisor;
+        $datos->rfc_receptor = $rfc_receptor;
+        $datos->uuid = $uuid;
+        $datos->total = $total;
+
+        return $datos;
+
+    }
+
+    final public function cancela(string $motivo_cancelacion, string $rfc_emisor, string $rfc_receptor, string $uuid,
+                                  string $pass_csd = '', string $ruta_cer = '', string $ruta_key = '',
+                                  string $total = '', $uuid_sustitucion = ''){
+
+
+
+        $datos = $this->integra_datos_base(rfc_emisor: $rfc_emisor,rfc_receptor:  $rfc_receptor,total:  $total,uuid:  $uuid);
         if(errores::$error){
-            return $this->error->error(mensaje: 'Error al validar pac',data: $valida);
+            return $this->error->error(mensaje: 'Error al obtener datos base',data: $datos);
         }
 
         if($motivo_cancelacion === '01'){
@@ -51,8 +71,8 @@ class timbra{
             }
         }
 
-        $ws= $pac->ruta_pac;
-        $usuario_int = $pac->usuario_integrador;
+        $ws= $datos->pac->ruta_pac;
+        $usuario_int = $datos->pac->usuario_integrador;
 
 
         $params = array();
@@ -72,13 +92,14 @@ class timbra{
         }
 
         if($uuid_sustitucion!=='') {
-            $response = $client->cancelar($usuario_int, $csd->key, $csd->cer, $pass_csd, $uuid, $rfc_emisor, $rfc_receptor,
-                $total, $motivo_cancelacion, $uuid_sustitucion);
+
+            $response = $client->cancelar($usuario_int, $csd->key, $csd->cer, $pass_csd, $datos->uuid, $datos->rfc_emisor,
+                $datos->rfc_receptor, $datos->total, $motivo_cancelacion, $uuid_sustitucion);
 
         }
         else{
-            $response = $client->cancelar($usuario_int, $csd->key, $csd->cer, $pass_csd, $uuid, $rfc_emisor, $rfc_receptor,
-                $total, $motivo_cancelacion);
+            $response = $client->cancelar($usuario_int, $csd->key, $csd->cer, $pass_csd, $datos->uuid,
+                $datos->rfc_emisor, $datos->rfc_receptor, $datos->total, $motivo_cancelacion);
 
         }
 
@@ -115,32 +136,14 @@ class timbra{
 
     final public function consulta_estado_sat(string $rfc_emisor, string $rfc_receptor, string $total, string $uuid){
 
-        $rfc_emisor = trim($rfc_emisor);
-        if($rfc_emisor === ''){
-            return $this->error->error(mensaje: 'Error rfc_emisor esta vacio',data: $rfc_emisor);
-        }
-        $rfc_receptor = trim($rfc_receptor);
-        if($rfc_receptor === ''){
-            return $this->error->error(mensaje: 'Error rfc_receptor esta vacio',data: $rfc_receptor);
-        }
-        $uuid = trim($uuid);
-        if($uuid === ''){
-            return $this->error->error(mensaje: 'Error uuid esta vacio',data: $uuid);
-        }
-        $total = trim($total);
-        if($total === ''){
-            return $this->error->error(mensaje: 'Error total esta vacio',data: $total);
-        }
-
-        $pac = new pac();
-        $keys = array('ruta_pac','usuario_integrador');
-        $valida = $this->valida->valida_existencia_keys(keys: $keys,registro:  $pac);
+        $datos = $this->integra_datos_base(rfc_emisor: $rfc_emisor,rfc_receptor:  $rfc_receptor,total:  $total,uuid:  $uuid);
         if(errores::$error){
-            return $this->error->error(mensaje: 'Error al validar pac',data: $valida);
+            return $this->error->error(mensaje: 'Error al obtener datos base',data: $datos);
         }
 
-        $ws= $pac->ruta_pac;
-        $usuario_int = $pac->usuario_integrador;
+
+        $ws= $datos->pac->ruta_pac;
+        $usuario_int = $datos->pac->usuario_integrador;
         $params = array();
         try {
             $client = new SoapClient($ws);
@@ -149,12 +152,10 @@ class timbra{
             return $this->error->error('Error al cancelar',array($e,$params));
         }
 
-        //print_r($usuario_int);exit;
 
-        $response = $client->consultarEstadoSAT($usuario_int,  $uuid, $rfc_emisor, $rfc_receptor,
-            $total);
+        $response = $client->consultarEstadoSAT($usuario_int,  $datos->uuid, $datos->rfc_emisor, $datos->rfc_receptor,
+            $datos->total);
 
-        //print_r($response);exit;
 
         $tipo_resultado = $response->CodigoEstatus;
         $cod_mensaje = $response->Estado;
@@ -282,6 +283,23 @@ class timbra{
             return $this->error->error(mensaje: 'Error al integrar pems',data:  $pems);
         }
         return $pems;
+    }
+
+    private function integra_datos_base(string $rfc_emisor, string $rfc_receptor, string $total, string $uuid){
+        $datos = $this->datos_base(rfc_emisor: $rfc_emisor,rfc_receptor:  $rfc_receptor,total:  $total,uuid:  $uuid);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al obtener datos base',data: $datos);
+        }
+
+        $pac = new pac();
+        $keys = array('ruta_pac','usuario_integrador');
+        $valida = $this->valida->valida_existencia_keys(keys: $keys,registro:  $pac);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar pac',data: $valida);
+        }
+
+        $datos->pac = $pac;
+        return $datos;
     }
 
     private function pems(string $ruta_cer_pem, string $ruta_key_pem): stdClass
