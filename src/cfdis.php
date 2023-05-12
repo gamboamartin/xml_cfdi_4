@@ -267,6 +267,11 @@ class cfdis{
          * COMPLEMENTO
          */
 
+        if(isset($nomina_->uuid_relacionado) && (string)$nomina_->uuid_relacionado !== ''){
+
+        }
+
+
         $nodo_complemento = (new complementos())->nodo_complemento(xml: $xml);
         if (errores::$error) {
             return $this->error->error(mensaje: 'Error al asignar nodo', data: $nodo_complemento);
