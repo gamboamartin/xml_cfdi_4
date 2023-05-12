@@ -205,11 +205,17 @@ class cfdis{
     }
 
     public function complemento_nomina(stdClass|array $comprobante, stdClass|array $emisor, stdClass|array $nomina,
-                                       stdClass|array $receptor): bool|array|string
+                                       stdClass|array $receptor, stdClass|array $relacionados = array()): bool|array|string
     {
         $data = $this->init_base(comprobante: $comprobante,emisor:  $emisor, receptor: $receptor);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al inicializar datos', data: $data);
+        }
+
+        $relacionados_ = $relacionados;
+
+        if(is_array($relacionados_)){
+            $relacionados_ = (object) $relacionados_;
         }
 
         $nomina_ = $nomina;
@@ -246,6 +252,14 @@ class cfdis{
             return $this->error->error(mensaje: 'Error al generar comprobante', data: $dom);
         }
 
+        if(count($relacionados)> 0) {
+            $dom = $xml->cfdi_relacionados(relacionados: $relacionados_);
+            if (errores::$error) {
+                return $this->error->error(mensaje: 'Error al generar relacionados', data: $dom);
+            }
+        }
+
+
         $dom = $xml->cfdi_emisor(emisor:  $data->emisor);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al generar emisor', data: $dom);
@@ -263,13 +277,6 @@ class cfdis{
             return $this->error->error(mensaje: 'Error al generar receptor', data: $dom);
         }
 
-        /**
-         * COMPLEMENTO
-         */
-
-        if(isset($nomina_->uuid_relacionado) && (string)$nomina_->uuid_relacionado !== ''){
-
-        }
 
 
         $nodo_complemento = (new complementos())->nodo_complemento(xml: $xml);

@@ -403,13 +403,14 @@ class xml{
         }
 
         if(!isset($relacionados->relaciones)){
-            return $this->error->error(mensaje: 'Error no existe traslados en impuestos', data: $relacionados);
+            return $this->error->error(mensaje: 'Error no existe relaciones', data: $relacionados);
         }
         if(!is_array($relacionados->relaciones)){
             return $this->error->error(mensaje: 'Error traslados en impuestos debe ser un array', data: $relacionados);
         }
         if(count($relacionados->relaciones)>0){
             foreach ($relacionados->relaciones  as $relacion){
+
                 $keys = array('uuid');
                 $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $relacion);
                 if(errores::$error){

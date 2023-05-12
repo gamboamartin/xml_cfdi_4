@@ -201,10 +201,14 @@ class cfdisTest extends test {
         $nomina->otros_pagos->otro_pago[0]->es_subsidio = true;
         $nomina->otros_pagos->otro_pago[0]->subsidio_causado = 20;
 
+        $relacionados['tipo_relacion'] = '02';
+        $relacionados['relaciones'] = array();
+        $relacionados['relaciones'][0] = new stdClass();
+        $relacionados['relaciones'][0]->uuid = 'a';
 
-        $resultado = $cfdis->complemento_nomina(comprobante: $comprobante,emisor:  $emisor, nomina: $nomina,receptor:  $receptor);
+        $resultado = $cfdis->complemento_nomina(comprobante: $comprobante,emisor:  $emisor, nomina: $nomina,receptor:  $receptor, relacionados: $relacionados);
 
-
+        //print_r($resultado);exit;
 
         $this->assertNotTrue(errores::$error);
         $this->assertIsString($resultado);
