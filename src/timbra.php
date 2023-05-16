@@ -24,6 +24,7 @@ class timbra{
      * @param string $total Total de la factura o CFDI
      * @param string $uuid Folio Fiscal
      * @return array|stdClass
+     * @version 2.44.0
      */
     private function datos_base(string $rfc_emisor, string $rfc_receptor, string $total, string $uuid): array|stdClass
     {
@@ -169,8 +170,6 @@ class timbra{
         }
 
 
-
-
         $data = new stdClass();
         $data->response = $response;
         $data->result = $response;
@@ -285,6 +284,13 @@ class timbra{
         return $pems;
     }
 
+    /**
+     * @param string $rfc_emisor
+     * @param string $rfc_receptor
+     * @param string $total
+     * @param string $uuid
+     * @return array|stdClass
+     */
     private function integra_datos_base(string $rfc_emisor, string $rfc_receptor, string $total, string $uuid){
         $datos = $this->datos_base(rfc_emisor: $rfc_emisor,rfc_receptor:  $rfc_receptor,total:  $total,uuid:  $uuid);
         if(errores::$error){

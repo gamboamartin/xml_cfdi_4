@@ -3,6 +3,7 @@ namespace tests\controllers;
 
 
 use gamboamartin\errores\errores;
+use gamboamartin\test\liberator;
 use gamboamartin\test\test;
 use gamboamartin\xml_cfdi_4\percepcion;
 
@@ -36,6 +37,24 @@ class timbraTest extends test {
         $this->assertIsObject($resultado);
         errores::$error = false;
         //$this->assertNotEmpty($resultado->uuid);
+    }
+
+    public function test_datos_base(): void
+    {
+        errores::$error = false;
+
+        $timbra = new timbra();
+        $timbra = new liberator($timbra);
+
+        $rfc_emisor = 'a';
+        $rfc_receptor = 'b';
+        $total = 'q';
+        $uuid = 'c';
+        $resultado = $timbra->datos_base($rfc_emisor, $rfc_receptor, $total, $uuid);
+        $this->assertNotTrue(errores::$error);
+        $this->assertIsObject($resultado);
+        errores::$error = false;
+
     }
 
     public function test_timbra(): void
@@ -128,7 +147,7 @@ class timbraTest extends test {
         "Version": "4.0",
         "Serie": "LC-P",
         "Folio": "1",
-        "Fecha": "2023-05-09T12:59:59",
+        "Fecha": "2023-05-15T12:59:59",
         "NoCertificado": "30001000000400002434",
         "SubTotal": "0",
         "Moneda": "XXX",
@@ -188,7 +207,7 @@ class timbraTest extends test {
         "Version": "4.0",
         "Serie": "LC-P",
         "Folio": "1005",
-        "Fecha": "2023-05-09T12:37:08",
+        "Fecha": "2023-05-15T12:37:08",
         "NoCertificado": "30001000000400002434",
         "SubTotal": "0",
         "Moneda": "XXX",
