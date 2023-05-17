@@ -285,13 +285,15 @@ class timbra{
     }
 
     /**
-     * @param string $rfc_emisor
-     * @param string $rfc_receptor
-     * @param string $total
-     * @param string $uuid
+     * Integra los elementos base para una llamada al PAC
+     * @param string $rfc_emisor RFC de quien emite el CFDI
+     * @param string $rfc_receptor RFC de quien recibe la factura
+     * @param string $total Total de la factura
+     * @param string $uuid Folio fiscal
      * @return array|stdClass
      */
-    private function integra_datos_base(string $rfc_emisor, string $rfc_receptor, string $total, string $uuid){
+    private function integra_datos_base(string $rfc_emisor, string $rfc_receptor, string $total, string $uuid): array|stdClass
+    {
         $datos = $this->datos_base(rfc_emisor: $rfc_emisor,rfc_receptor:  $rfc_receptor,total:  $total,uuid:  $uuid);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al obtener datos base',data: $datos);
