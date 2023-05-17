@@ -291,6 +291,7 @@ class timbra{
      * @param string $total Total de la factura
      * @param string $uuid Folio fiscal
      * @return array|stdClass
+     * @version
      */
     private function integra_datos_base(string $rfc_emisor, string $rfc_receptor, string $total, string $uuid): array|stdClass
     {
@@ -475,6 +476,8 @@ class timbra{
 
 
     }
+
+
 
     private function valida_ruta(string $file): bool|array
     {

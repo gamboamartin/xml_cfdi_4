@@ -57,6 +57,23 @@ class timbraTest extends test {
 
     }
 
+    public function test_integra_datos_base(): void
+    {
+        errores::$error = false;
+
+        $timbra = new timbra();
+        $timbra = new liberator($timbra);
+
+        $rfc_emisor = 'a';
+        $rfc_receptor = 'b';
+        $total = '4';
+        $uuid = 'r';
+        $resultado = $timbra->integra_datos_base($rfc_emisor, $rfc_receptor, $total, $uuid);
+        $this->assertNotTrue(errores::$error);
+        $this->assertIsObject($resultado);
+        errores::$error = false;
+    }
+
     public function test_timbra(): void
     {
         errores::$error = false;
