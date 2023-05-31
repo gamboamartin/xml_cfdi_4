@@ -164,7 +164,7 @@ class timbraTest extends test {
         "Version": "4.0",
         "Serie": "LC-P",
         "Folio": "1",
-        "Fecha": "2023-05-15T12:59:59",
+        "Fecha": "2023-05-31T10:59:59",
         "NoCertificado": "30001000000400002434",
         "SubTotal": "0",
         "Moneda": "XXX",
@@ -224,7 +224,7 @@ class timbraTest extends test {
         "Version": "4.0",
         "Serie": "LC-P",
         "Folio": "1005",
-        "Fecha": "2023-05-15T12:37:08",
+        "Fecha": "2023-05-31T11:37:08",
         "NoCertificado": "30001000000400002434",
         "SubTotal": "0",
         "Moneda": "XXX",
@@ -291,6 +291,124 @@ class timbraTest extends test {
 
 
         errores::$error = false;
+
+        $contenido_xml_array = new stdClass();
+        $contenido_xml_array->Comprobante = new stdClass();
+        $contenido_xml_array->Comprobante->Version = '4.0';
+        $contenido_xml_array->Comprobante->Serie = '4.0';
+
+        $contenido_xml_array->Comprobante->Folio = '0000179826';
+        $contenido_xml_array->Comprobante->Fecha = '2023-05-31T10:37:08';
+        $contenido_xml_array->Comprobante->NoCertificado = '30001000000400002434';
+        $contenido_xml_array->Comprobante->SubTotal = '0';
+        $contenido_xml_array->Comprobante->Moneda = 'XXX';
+        $contenido_xml_array->Comprobante->Total = '0';
+        $contenido_xml_array->Comprobante->TipoDeComprobante = 'P';
+        $contenido_xml_array->Comprobante->Exportacion = '01';
+        $contenido_xml_array->Comprobante->LugarExpedicion = '55000';
+
+        $contenido_xml_array->Comprobante->CfdiRelacionados[0] = new stdClass();
+
+        $contenido_xml_array->Comprobante->CfdiRelacionados[0]->TipoRelacion = '04';
+        $contenido_xml_array->Comprobante->CfdiRelacionados[0]->CfdiRelacionado[] = '6c76a910-2115-4a2c-bf15-e67c1505dd21';
+        $contenido_xml_array->Comprobante->CfdiRelacionados[0]->CfdiRelacionado[] = '0CE337CF-62BE-4ECC-9EBB-67F7EA1AF6C4';
+
+        $contenido_xml_array->Comprobante->CfdiRelacionados[1] = new stdClass();
+        $contenido_xml_array->Comprobante->CfdiRelacionados[1]->TipoRelacion = '07';
+        $contenido_xml_array->Comprobante->CfdiRelacionados[1]->CfdiRelacionado[] = '6c76a910-2115-4a2c-bf15-e67c1505dd21';
+        $contenido_xml_array->Comprobante->CfdiRelacionados[1]->CfdiRelacionado[] = '0CE337CF-62BE-4ECC-9EBB-67F7EA1AF6C4';
+
+
+        $contenido_xml_array->Comprobante->Emisor = new stdClass();
+
+        $contenido_xml_array->Comprobante->Emisor->Rfc = 'EKU9003173C9';
+        $contenido_xml_array->Comprobante->Emisor->Nombre = 'ESCUELA KEMPER URGATE';
+        $contenido_xml_array->Comprobante->Emisor->RegimenFiscal = '601';
+
+        $contenido_xml_array->Comprobante->Receptor = new stdClass();
+        $contenido_xml_array->Comprobante->Receptor->Rfc = 'XAXX010101000';
+        $contenido_xml_array->Comprobante->Receptor->Nombre = 'PUBLICO GENERAL';
+        $contenido_xml_array->Comprobante->Receptor->DomicilioFiscalReceptor = '55000';
+        $contenido_xml_array->Comprobante->Receptor->RegimenFiscalReceptor = '616';
+        $contenido_xml_array->Comprobante->Receptor->UsoCFDI = 'CP01';
+
+        $contenido_xml_array->Comprobante->Conceptos[0] = new stdClass();
+        $contenido_xml_array->Comprobante->Conceptos[0]->ClaveProdServ = '84111506';
+        $contenido_xml_array->Comprobante->Conceptos[0]->Cantidad = '1';
+        $contenido_xml_array->Comprobante->Conceptos[0]->ClaveUnidad = 'ACT';
+        $contenido_xml_array->Comprobante->Conceptos[0]->Descripcion = 'Pago';
+        $contenido_xml_array->Comprobante->Conceptos[0]->ValorUnitario = '0';
+        $contenido_xml_array->Comprobante->Conceptos[0]->ObjetoImp = '01';
+        $contenido_xml_array->Comprobante->Conceptos[0]->Importe = '0';
+
+
+        $contenido_xml_array->Comprobante->Complemento[0] = new stdClass();
+        $contenido_xml_array->Comprobante->Complemento[0]->Pagos20 = new stdClass();
+
+        $contenido_xml_array->Comprobante->Complemento[0]->Pagos20->Version = '2.0';
+
+        $contenido_xml_array->Comprobante->Complemento[0]->Pagos20->Totales = new stdClass();
+
+        $contenido_xml_array->Comprobante->Complemento[0]->Pagos20->Totales->TotalTrasladosBaseIVA16 = '100';
+        $contenido_xml_array->Comprobante->Complemento[0]->Pagos20->Totales->TotalTrasladosImpuestoIVA16 = '16';
+        $contenido_xml_array->Comprobante->Complemento[0]->Pagos20->Totales->MontoTotalPagos = '116';
+
+        $contenido_xml_array->Comprobante->Complemento[0]->Pagos20->Pago[0] = new stdClass();
+        $contenido_xml_array->Comprobante->Complemento[0]->Pagos20->Pago[0]->FechaPago = '2022-09-09T17:33:38';
+        $contenido_xml_array->Comprobante->Complemento[0]->Pagos20->Pago[0]->FormaDePagoP = '01';
+        $contenido_xml_array->Comprobante->Complemento[0]->Pagos20->Pago[0]->MonedaP = 'MXN';
+        $contenido_xml_array->Comprobante->Complemento[0]->Pagos20->Pago[0]->TipoCambioP = '1';
+        $contenido_xml_array->Comprobante->Complemento[0]->Pagos20->Pago[0]->Monto = '116';
+
+
+        $contenido_xml_array->Comprobante->Complemento[0]->Pagos20->Pago[0]->DoctoRelacionado[0] = new stdClass();
+        $contenido_xml_array->Comprobante->Complemento[0]->Pagos20->Pago[0]->DoctoRelacionado[0]->IdDocumento = 'b7c8d2bf-cb4e-4f84-af89-c68b6731206a';
+        $contenido_xml_array->Comprobante->Complemento[0]->Pagos20->Pago[0]->DoctoRelacionado[0]->Serie = 'FA';
+        $contenido_xml_array->Comprobante->Complemento[0]->Pagos20->Pago[0]->DoctoRelacionado[0]->Folio = 'N0000216349';
+        $contenido_xml_array->Comprobante->Complemento[0]->Pagos20->Pago[0]->DoctoRelacionado[0]->MonedaDR = 'MXN';
+        $contenido_xml_array->Comprobante->Complemento[0]->Pagos20->Pago[0]->DoctoRelacionado[0]->EquivalenciaDR = '1';
+        $contenido_xml_array->Comprobante->Complemento[0]->Pagos20->Pago[0]->DoctoRelacionado[0]->NumParcialidad = '2';
+        $contenido_xml_array->Comprobante->Complemento[0]->Pagos20->Pago[0]->DoctoRelacionado[0]->ImpSaldoAnt = '116';
+        $contenido_xml_array->Comprobante->Complemento[0]->Pagos20->Pago[0]->DoctoRelacionado[0]->ImpPagado = '116';
+        $contenido_xml_array->Comprobante->Complemento[0]->Pagos20->Pago[0]->DoctoRelacionado[0]->ImpSaldoInsoluto = '0.00';
+        $contenido_xml_array->Comprobante->Complemento[0]->Pagos20->Pago[0]->DoctoRelacionado[0]->ObjetoImpDR = '02';
+
+        $contenido_xml_array->Comprobante->Complemento[0]->Pagos20->Pago[0]->DoctoRelacionado[0]->ImpuestosDR = new stdClass();
+        $contenido_xml_array->Comprobante->Complemento[0]->Pagos20->Pago[0]->DoctoRelacionado[0]->ImpuestosDR->TrasladosDR[0] = new stdClass();
+
+        $contenido_xml_array->Comprobante->Complemento[0]->Pagos20->Pago[0]->DoctoRelacionado[0]->ImpuestosDR->TrasladosDR[0]->BaseDR = '100';
+        $contenido_xml_array->Comprobante->Complemento[0]->Pagos20->Pago[0]->DoctoRelacionado[0]->ImpuestosDR->TrasladosDR[0]->ImpuestoDR = '002';
+        $contenido_xml_array->Comprobante->Complemento[0]->Pagos20->Pago[0]->DoctoRelacionado[0]->ImpuestosDR->TrasladosDR[0]->TipoFactorDR = 'Tasa';
+        $contenido_xml_array->Comprobante->Complemento[0]->Pagos20->Pago[0]->DoctoRelacionado[0]->ImpuestosDR->TrasladosDR[0]->TasaOCuotaDR = '0.160000';
+        $contenido_xml_array->Comprobante->Complemento[0]->Pagos20->Pago[0]->DoctoRelacionado[0]->ImpuestosDR->TrasladosDR[0]->ImporteDR = '16';
+
+        $contenido_xml_array->Comprobante->Complemento[0]->Pagos20->Pago[0]->ImpuestosP = new stdClass();
+        $contenido_xml_array->Comprobante->Complemento[0]->Pagos20->Pago[0]->ImpuestosP->TrasladosP[0] = new stdClass();
+
+        $contenido_xml_array->Comprobante->Complemento[0]->Pagos20->Pago[0]->ImpuestosP->TrasladosP[0]->BaseP = '100';
+        $contenido_xml_array->Comprobante->Complemento[0]->Pagos20->Pago[0]->ImpuestosP->TrasladosP[0]->ImpuestoP = '002';
+        $contenido_xml_array->Comprobante->Complemento[0]->Pagos20->Pago[0]->ImpuestosP->TrasladosP[0]->TipoFactorP = 'Tasa';
+        $contenido_xml_array->Comprobante->Complemento[0]->Pagos20->Pago[0]->ImpuestosP->TrasladosP[0]->TasaOCuotaP = '0.160000';
+        $contenido_xml_array->Comprobante->Complemento[0]->Pagos20->Pago[0]->ImpuestosP->TrasladosP[0]->ImporteP = '16';
+
+        $contenido_json = json_encode($contenido_xml_array);
+        //print_r($contenido_json);exit;
+
+       // print_r($contenido_json);exit;
+
+        $ruta_key_pem = '/var/www/html/xml_cfdi_4/tests/files/CSD_EKU9003173C9_key.pem';
+        $ruta_cer_pem = '/var/www/html/xml_cfdi_4/tests/files/CSD_EKU9003173C9_cer.pem';
+        $id_comprobante = '';
+
+        $resultado = $timbra->timbra(contenido_xml: $contenido_json, id_comprobante: $id_comprobante,
+            ruta_cer_pem: $ruta_cer_pem, ruta_key_pem: $ruta_key_pem, pac_prov: 'facturalo');
+
+        $this->assertNotTrue(errores::$error);
+        $this->assertIsObject($resultado);
+        $this->assertNotEmpty($resultado->uuid);
+        $this->assertStringContainsStringIgnoringCase('CfdiRelacionados TipoRelacion="04"><cfdi:CfdiRelacionado UUID="6c76',$resultado->xml_sellado);
+
+
 
 
     }
