@@ -778,7 +778,6 @@ class cfdis{
             return $this->error->error(mensaje: 'Error al generar conceptos', data: $dom);
         }
 
-
         $impuestos_ = $this->impuestos(impuestos_: $impuestos_);
         if (errores::$error) {
             return $this->error->error(mensaje: 'Error al generar traslados', data: $impuestos_);
@@ -850,7 +849,7 @@ class cfdis{
         }
 
         if(count($complemento) > 0) {
-            $json['Complemento'] = (array)$complemento;
+            $json['Comprobante']['Complemento'] = $complemento;
         }
 
         $impuestos_ = $this->impuestos(impuestos_: $impuestos_);

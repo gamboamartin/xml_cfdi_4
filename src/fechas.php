@@ -51,10 +51,12 @@ class fechas{
     }
 
     /**
+     * Obtiene la fecha para un cfdi con el formato especifico
      * @param stdClass $comprobante Datos para nodo comprobante
      * @return array|string
+     *
      */
-    public function fecha_cfdi(stdClass $comprobante): array|string
+    final public function fecha_cfdi(stdClass $comprobante): array|string
     {
         $hora  = date('H:i:s');
         if(!isset($comprobante->fecha) || trim($comprobante->fecha)===''){
