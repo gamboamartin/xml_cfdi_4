@@ -74,6 +74,24 @@ class fechas{
         return $fecha_cfdi;
     }
 
+    private function fecha_cfdi_base(string $fecha){
+        $fecha_cfdi = $fecha;
+        $es_fecha_hora_min_sec_esp = $this->valida->valida_pattern(key:'fecha_hora_min_sec_esp', txt: $fecha);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar fecha', data: $es_fecha_hora_min_sec_esp);
+        }
+        if($es_fecha_hora_min_sec_esp) {
+            $hora_ex = explode(' ', $fecha);
+            $fecha_cfdi = $hora_ex[0] . 'T' . $hora_ex[1];
+        }
+
+        $data = new stdClass();
+        $data->fecha_cfdi = $fecha_cfdi;
+        $data->es_fecha_hora_min_sec_esp = $es_fecha_hora_min_sec_esp;
+
+        return $data;
+    }
+
     /**
      * @param string $fecha Fecha a verificar
      * @param string $hora Hora a integrar
@@ -125,16 +143,12 @@ class fechas{
         if($fecha === ''){
             return $this->error->error(mensaje: 'Error fecha vacia', data: $fecha);
         }
-        $fecha_cfdi = $fecha;
-        $es_fecha_hora_min_sec_esp = $this->valida->valida_pattern(key:'fecha_hora_min_sec_esp', txt: $fecha);
+        $data_fecha = $this->fecha_cfdi_base(fecha: $fecha);
         if(errores::$error){
-            return $this->error->error(mensaje: 'Error al validar fecha', data: $es_fecha_hora_min_sec_esp);
+            return $this->error->error(mensaje: 'Error al obtener fecha', data: $data_fecha);
         }
-        if($es_fecha_hora_min_sec_esp) {
-            $hora_ex = explode(' ', $fecha);
-            $fecha_cfdi = $hora_ex[0] . 'T' . $hora_ex[1];
-        }
-        return $fecha_cfdi;
+
+        return $data_fecha->fecha_cfdi;
     }
 
     /**
@@ -143,25 +157,23 @@ class fechas{
      * @return array|string
      * @version 2.11.0
      */
-    private function fecha_hora_min_sec_t(string $fecha): array|string
+    final public function fecha_hora_min_sec_t(string $fecha): array|string
     {
         $fecha = trim($fecha);
         if($fecha === ''){
             return $this->error->error(mensaje: 'Error fecha esta vacia', data: $fecha);
         }
-        $fecha_cfdi = $fecha;
-        $es_fecha_hora_min_sec_esp = $this->valida->valida_pattern(key:'fecha_hora_min_sec_esp', txt: $fecha);
+
+        $data_fecha = $this->fecha_cfdi_base(fecha: $fecha);
         if(errores::$error){
-            return $this->error->error(mensaje: 'Error al validar fecha', data: $es_fecha_hora_min_sec_esp);
+            return $this->error->error(mensaje: 'Error al obtener fecha', data: $data_fecha);
         }
-        if($es_fecha_hora_min_sec_esp) {
-            $hora_ex = explode(' ', $fecha);
-            $fecha_cfdi = $hora_ex[0] . 'T' . $hora_ex[1];
-        }
+
+        $fecha_cfdi = $data_fecha->fecha_cfdi;
 
         $es_fecha = $this->valida->valida_pattern(key:'fecha', txt: $fecha);
         if(errores::$error){
-            return $this->error->error(mensaje: 'Error al validar fecha', data: $es_fecha_hora_min_sec_esp);
+            return $this->error->error(mensaje: 'Error al validar fecha', data: $es_fecha);
         }
         if($es_fecha) {
 
