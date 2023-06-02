@@ -74,10 +74,11 @@ class fechas{
 
     /**
      * @param string $fecha Fecha a verificar
-     * @param string $hora
+     * @param string $hora Hora a integrar
      * @return array|string
+     * @version 2.49.0
      */
-    private function fecha_cfdi_con_datos(string $fecha, string $hora): array|string
+    PUBLIC function fecha_cfdi_con_datos(string $fecha, string $hora): array|string
     {
         $fecha_cfdi = $this->fecha_base(fecha: $fecha, hora: $hora);
         if(errores::$error){

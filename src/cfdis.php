@@ -852,7 +852,7 @@ class cfdis{
         if(count($complemento) > 0) {
             $json['Complemento'] = (array)$complemento;
         }
-        
+
         $impuestos_ = $this->impuestos(impuestos_: $impuestos_);
         if (errores::$error) {
             return $this->error->error(mensaje: 'Error al generar traslados', data: $impuestos_);
