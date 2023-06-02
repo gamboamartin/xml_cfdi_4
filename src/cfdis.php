@@ -794,7 +794,7 @@ class cfdis{
     }
 
     public function ingreso_json(stdClass|array $comprobante, array $conceptos, stdClass|array $emisor,
-                            array|stdClass $impuestos, stdClass|array $receptor,
+                            array|stdClass $impuestos, stdClass|array $receptor, array $complemento = array(),
                                  stdClass|array $relacionados = array()): bool|array|string
     {
 
@@ -849,7 +849,10 @@ class cfdis{
             return $this->error->error(mensaje: 'Error al generar conceptos', data: $json);
         }
 
-
+        if(count($complemento) > 0) {
+            $json['Complemento'] = (array)$complemento;
+        }
+        
         $impuestos_ = $this->impuestos(impuestos_: $impuestos_);
         if (errores::$error) {
             return $this->error->error(mensaje: 'Error al generar traslados', data: $impuestos_);
