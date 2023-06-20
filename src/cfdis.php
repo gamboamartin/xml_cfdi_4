@@ -453,7 +453,7 @@ class cfdis{
             return $this->error->error(mensaje: 'Error al generar receptor', data: $dom);
         }
 
-        $dom = (new complementos())->conceptos_complemento_nomina_dom(descuento: $comprobante->descuento, xml: $xml,
+        $dom = (new complementos())->conceptos_complemento_nomina_dom_v33(descuento: $comprobante->descuento, xml: $xml,
             valor_unitario: $comprobante->sub_total);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al generar receptor', data: $dom);
