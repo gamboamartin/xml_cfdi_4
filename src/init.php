@@ -143,6 +143,55 @@ class init{
         return $xml->cfdi->comprobante;
     }
 
+    public function inicializa_valores_comprobante_v33(stdClass $comprobante, xml $xml){
+
+        $total = $this->limpia_double(monto: $comprobante->total);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al limpiar monto', data: $total);
+        }
+
+        $sub_total = $this->limpia_double(monto: $comprobante->sub_total);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al limpiar monto', data: $sub_total);
+        }
+
+        $xml->cfdi->comprobante->total = $total;
+        $xml->cfdi->comprobante->sub_total = $sub_total;
+
+        $xml->cfdi->comprobante->tipo_de_comprobante = trim($comprobante->tipo_de_comprobante);
+        $xml->cfdi->comprobante->moneda = trim($comprobante->moneda);
+
+        $xml->cfdi->comprobante->lugar_expedicion = trim($comprobante->lugar_expedicion);
+        $xml->cfdi->comprobante->fecha = trim($comprobante->fecha);
+        $xml->cfdi->comprobante->folio = trim($comprobante->folio);
+        if(isset($comprobante->serie) && (string)$comprobante->serie !== ''){
+            $xml->cfdi->comprobante->serie = trim($comprobante->serie);
+        }
+        if(isset($comprobante->no_certificado) && (string)$comprobante->no_certificado !== ''){
+            $xml->cfdi->comprobante->no_certificado = trim($comprobante->no_certificado);
+        }
+        if(isset($comprobante->forma_pago) && (string)$comprobante->forma_pago !== ''){
+            $xml->cfdi->comprobante->forma_pago = trim($comprobante->forma_pago);
+        }
+        if(isset($comprobante->metodo_pago) && (string)$comprobante->metodo_pago !== ''){
+            $xml->cfdi->comprobante->metodo_pago = trim($comprobante->metodo_pago);
+        }
+        if(isset($comprobante->descuento) && (string)$comprobante->descuento !== ''){
+
+            $descuento = $this->limpia_double(monto: $comprobante->descuento);
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error al limpiar monto', data: $descuento);
+            }
+
+            $xml->cfdi->comprobante->descuento = $descuento;
+        }
+        if(isset($comprobante->tipo_cambio) && (string)$comprobante->tipo_cambio !== ''){
+            $xml->cfdi->comprobante->tipo_cambio = trim($comprobante->tipo_cambio);
+        }
+
+        return $xml->cfdi->comprobante;
+    }
+
     private function limpia_double(int|float|string $monto): string
     {
         $monto = trim($monto);

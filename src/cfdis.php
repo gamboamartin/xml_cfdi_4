@@ -386,6 +386,188 @@ class cfdis{
         return $xml->dom->saveXML();
     }
 
+    public function complemento_nomina_v33(stdClass|array $comprobante, stdClass|array $emisor, stdClass|array $nomina,
+                                       stdClass|array $receptor, stdClass|array $relacionados = array()): bool|array|string
+    {
+        $data = $this->init_base(comprobante: $comprobante,emisor:  $emisor, receptor: $receptor);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al inicializar datos', data: $data);
+        }
+
+        $relacionados_ = $relacionados;
+
+        if(is_array($relacionados_)){
+            $relacionados_ = (object) $relacionados_;
+        }
+
+        $nomina_ = $nomina;
+        if(is_array($nomina_)){
+            $nomina_ = (object)$nomina_;
+        }
+
+        $keys = array('lugar_expedicion', 'folio','descuento');
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $data->comprobante);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar comprobante de pago', data: $valida);
+        }
+
+        $keys = array('rfc','nombre','regimen_fiscal');
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $data->emisor);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar $emisor', data: $valida);
+        }
+
+        $keys = array('rfc','nombre','domicilio_fiscal_receptor','regimen_fiscal_receptor');
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $data->receptor);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar $receptor', data: $valida);
+        }
+
+        $xml = new xml();
+        $comprobante_nm = (new complementos())->comprobante_complemento_nomina(comprobante: $data->comprobante);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al obtener comprobante', data: $comprobante_nm);
+        }
+
+        $dom = $xml->cfdi_comprobante_v33(comprobante: $comprobante_nm);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al generar comprobante', data: $dom);
+        }
+
+        if(count($relacionados)> 0) {
+            $dom = $xml->cfdi_relacionados(relacionados: $relacionados_);
+            if (errores::$error) {
+                return $this->error->error(mensaje: 'Error al generar relacionados', data: $dom);
+            }
+        }
+
+
+        $dom = $xml->cfdi_emisor(emisor:  $data->emisor);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al generar emisor', data: $dom);
+        }
+
+        $receptor->uso_cfdi = 'CN01';
+        $dom = $xml->cfdi_receptor_v33(receptor:  $data->receptor);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al generar receptor', data: $dom);
+        }
+
+        $dom = (new complementos())->conceptos_complemento_nomina_dom(descuento: $comprobante->descuento, xml: $xml,
+            valor_unitario: $comprobante->sub_total);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al generar receptor', data: $dom);
+        }
+
+
+
+        $nodo_complemento = (new complementos())->nodo_complemento(xml: $xml);
+        if (errores::$error) {
+            return $this->error->error(mensaje: 'Error al asignar nodo', data: $nodo_complemento);
+        }
+
+        $nodo_nominas = (new nomina())->nodo_nominas(nodo_complemento: $nodo_complemento, nomina: $nomina_, xml: $xml);
+        if (errores::$error) {
+            return $this->error->error(mensaje: 'Error al asignar nodo', data: $nodo_nominas);
+        }
+
+        $nodo_nominas_emisor = (new nomina())->nodo_nominas_emisor(nodo_nominas: $nodo_nominas, nomina: $nomina_, xml: $xml);
+        if (errores::$error) {
+            return $this->error->error(mensaje: 'Error al asignar nodo', data: $nodo_nominas_emisor);
+        }
+
+        $nodo_nominas_receptor = (new nomina())->nodo_nominas_receptor(nodo_nominas: $nodo_nominas, nomina: $nomina_, xml: $xml);
+        if (errores::$error) {
+            return $this->error->error(mensaje: 'Error al asignar nodo', data: $nodo_nominas_receptor);
+        }
+
+        $nodo_nominas_percepciones = (new nomina())->nodo_nominas_percepciones(nodo_nominas: $nodo_nominas,
+            nomina: $nomina_, xml: $xml);
+        if (errores::$error) {
+            return $this->error->error(mensaje: 'Error al asignar nodo', data: $nodo_nominas_percepciones);
+        }
+
+        $keys = array('percepcion');
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $nomina->percepciones);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar nomina', data: $valida);
+        }
+
+        foreach ($nomina_->percepciones->percepcion as $percep){
+
+            if(!is_array($percep) && !is_object($percep)){
+                return $this->error->error(mensaje: 'Error la percepcion debe ser un array o un objeto',
+                    data: $percep);
+            }
+
+            if(is_array($percep)){
+                $percep = (object)$percep;
+            }
+
+            $nodo_percepcion = (new percepcion())->nodo_percepcion(
+                nodo_nominas_percepciones: $nodo_nominas_percepciones, percepcion: $percep, xml:  $xml);
+            if (errores::$error) {
+                return $this->error->error(mensaje: 'Error al asignar percepcion', data: $nodo_percepcion);
+            }
+        }
+
+        $nodo_nominas_deducciones = (new nomina())->nodo_nominas_deducciones(nodo_nominas: $nodo_nominas,
+            nomina: $nomina_, xml: $xml);
+        if (errores::$error) {
+            return $this->error->error(mensaje: 'Error al asignar nodo', data: $nodo_nominas_deducciones);
+        }
+
+        $keys = array('deduccion');
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $nomina->deducciones);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar nomina', data: $valida);
+        }
+
+        foreach ($nomina_->deducciones->deduccion as $deduc){
+            if(is_array($deduc)){
+                $deduc = (object)$deduc;
+            }
+
+            $nodo_deduccion = (new deduccion())->nodo_deduccion(
+                nodo_nominas_deducciones: $nodo_nominas_deducciones, deduccion: $deduc, xml:  $xml);
+            if (errores::$error) {
+                return $this->error->error(mensaje: 'Error al asignar deduccion', data: $nodo_deduccion);
+            }
+        }
+
+        $keys = array('otro_pago');
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $nomina->otros_pagos);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar nomina', data: $valida);
+        }
+
+        $nodo_nominas_otros_pagos = (new nomina())->nodo_nominas_otros_pagos(nodo_nominas: $nodo_nominas,
+            nomina: $nomina_, xml: $xml);
+        if (errores::$error) {
+            return $this->error->error(mensaje: 'Error al asignar nodo', data: $nodo_nominas_otros_pagos);
+        }
+
+        foreach ($nomina_->otros_pagos->otro_pago as $op){
+            if(is_array($op)){
+                $op = (object)$op;
+            }
+
+            $keys = array('tipo_otro_pago','clave','concepto','importe','es_subsidio');
+            $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $op);
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error al validar otro pago', data: $valida);
+            }
+
+            $nodo_otro_pago = (new otro_pago())->nodo_otro_pago(
+                nodo_nominas_otros_pagos: $nodo_nominas_otros_pagos, otro_pago: $op, xml:  $xml);
+            if (errores::$error) {
+                return $this->error->error(mensaje: 'Error al asignar deduccion', data: $nodo_otro_pago);
+            }
+        }
+
+        return $xml->dom->saveXML();
+    }
+
     public function complemento_nomina_haberes(stdClass|array $comprobante, stdClass|array $emisor, stdClass|array $nomina,
                                        stdClass|array $receptor): bool|array|string
     {

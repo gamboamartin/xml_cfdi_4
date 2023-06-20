@@ -561,6 +561,22 @@ class dom_xml{
         return $comprobante_base;
     }
 
+    public function comprobante_v33(stdClass $comprobante, xml $xml): array|stdClass
+    {
+        $nodo = $this->inicializa_comprobante_v33(comprobante: $comprobante,xml:  $xml);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al inicializar cfdi comprobante', data: $nodo);
+        }
+
+        $comprobante_base = $this->comprobante_base_v33(nodo:$nodo,
+            tipo_de_comprobante: $comprobante->tipo_de_comprobante, xml: $xml);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al inicializar cfdi comprobante', data: $comprobante_base);
+        }
+
+        return $comprobante_base;
+    }
+
     public function comprobante_json(stdClass $comprobante, array $json, xml $xml): array
     {
         $json = $this->inicializa_comprobante_json(comprobante: $comprobante, json: $json, xml: $xml);
@@ -608,6 +624,43 @@ class dom_xml{
 
 
         $data_nodo = $this->init_dom_cfdi_comprobante(nodo: $nodo,xml:  $xml);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al inicializar cfdi comprobante', data: $data_nodo);
+        }
+
+        return $xml->cfdi;
+    }
+
+    private function comprobante_base_v33(DOMElement $nodo, string $tipo_de_comprobante, xml $xml): array|stdClass
+    {
+
+
+        $nodo->setAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
+
+        if(!isset($xml->xml)){
+            return $this->error->error(mensaje: 'Error no esta inicializado el xml', data: $this);
+        }
+
+        if($tipo_de_comprobante === 'P') {
+            $nodo->setAttribute('xmlns:pago20', 'http://www.sat.gob.mx/Pagos20');
+            $nodo->setAttribute('xmlns:cfdi', 'http://www.sat.gob.mx/cfd/4');
+            $nodo->setAttribute('xsi:schemaLocation', 'http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd http://www.sat.gob.mx/Pagos20 http://www.sat.gob.mx/sitio_internet/cfd/Pagos/Pagos20.xsd');
+        }
+        if($tipo_de_comprobante === 'E') {
+            $nodo->setAttribute('xmlns:cfdi', 'http://www.sat.gob.mx/cfd/4');
+            $nodo->setAttribute('xsi:schemaLocation', 'http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd');
+        }
+        if($tipo_de_comprobante === 'I') {
+            $nodo->setAttribute('xmlns:cfdi', 'http://www.sat.gob.mx/cfd/4');
+            $nodo->setAttribute('xsi:schemaLocation', 'http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd');
+        }
+        if($tipo_de_comprobante === 'N') {
+            $nodo->setAttribute('xmlns:nomina12', 'http://www.sat.gob.mx/nomina12');
+            $nodo->setAttribute('xmlns:cfdi', 'http://www.sat.gob.mx/cfd/4');
+            $nodo->setAttribute('xsi:schemaLocation', 'http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd http://www.sat.gob.mx/nomina12 http://www.sat.gob.mx/sitio_internet/cfd/nomina/nomina12.xsd');
+        }
+
+        $data_nodo = $this->init_dom_cfdi_comprobante_v33(nodo: $nodo,xml:  $xml);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al inicializar cfdi comprobante', data: $data_nodo);
         }
@@ -1147,6 +1200,20 @@ class dom_xml{
 
         return $nodo;
     }
+
+    private function inicializa_comprobante_v33(stdClass $comprobante, xml $xml): bool|array|DOMElement
+    {
+        $data_comprobante = (new init())->inicializa_valores_comprobante_v33(comprobante: $comprobante, xml: $xml);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al inicializar comprobante', data: $data_comprobante);
+        }
+
+        $nodo = $xml->dom->createElement('cfdi:Comprobante');
+        $xml->xml = $xml->dom->appendChild($nodo);
+
+
+        return $nodo;
+    }
     private function inicializa_comprobante_json(stdClass $comprobante, array $json, xml $xml): array
     {
         $data_comprobante = (new init())->inicializa_valores_comprobante(comprobante: $comprobante, xml: $xml);
@@ -1164,6 +1231,36 @@ class dom_xml{
         $nodo->setAttribute('Moneda', $xml->cfdi->comprobante->moneda);
         $nodo->setAttribute('Total', $xml->cfdi->comprobante->total);
         $nodo->setAttribute('Exportacion', $xml->cfdi->comprobante->exportacion);
+        $nodo->setAttribute('TipoDeComprobante', $xml->cfdi->comprobante->tipo_de_comprobante);
+        $nodo->setAttribute('SubTotal', $xml->cfdi->comprobante->sub_total);
+        $nodo->setAttribute('LugarExpedicion', $xml->cfdi->comprobante->lugar_expedicion);
+        $nodo->setAttribute('Fecha', $xml->cfdi->comprobante->fecha);
+        $nodo->setAttribute('Folio', $xml->cfdi->comprobante->folio);
+        $nodo->setAttribute('Version', $xml->cfdi->comprobante->version);
+        //$nodo->setAttribute('NoCertificado', $xml->cfdi->comprobante->no_certificado);
+        if(isset($xml->cfdi->comprobante->serie) && (string)$xml->cfdi->comprobante->serie !== ''){
+            $nodo->setAttribute('Serie', $xml->cfdi->comprobante->serie);
+        }
+        if(isset($xml->cfdi->comprobante->forma_pago) && (string)$xml->cfdi->comprobante->forma_pago !== ''){
+            $nodo->setAttribute('FormaPago', $xml->cfdi->comprobante->forma_pago);
+        }
+        if(isset($xml->cfdi->comprobante->metodo_pago) && (string)$xml->cfdi->comprobante->metodo_pago !== ''){
+            $nodo->setAttribute('MetodoPago', $xml->cfdi->comprobante->metodo_pago);
+        }
+        if(isset($xml->cfdi->comprobante->descuento) && (string)$xml->cfdi->comprobante->descuento !== ''){
+            $nodo->setAttribute('Descuento', $xml->cfdi->comprobante->descuento);
+        }
+        if(isset($xml->cfdi->comprobante->tipo_cambio) && (string)$xml->cfdi->comprobante->tipo_cambio !== ''){
+            $nodo->setAttribute('TipoCambio', $xml->cfdi->comprobante->tipo_cambio);
+        }
+
+        return $nodo;
+    }
+
+    private function init_dom_cfdi_comprobante_v33(DOMElement $nodo, xml $xml): DOMElement
+    {
+        $nodo->setAttribute('Moneda', $xml->cfdi->comprobante->moneda);
+        $nodo->setAttribute('Total', $xml->cfdi->comprobante->total);
         $nodo->setAttribute('TipoDeComprobante', $xml->cfdi->comprobante->tipo_de_comprobante);
         $nodo->setAttribute('SubTotal', $xml->cfdi->comprobante->sub_total);
         $nodo->setAttribute('LugarExpedicion', $xml->cfdi->comprobante->lugar_expedicion);

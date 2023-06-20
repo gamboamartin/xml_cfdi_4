@@ -87,6 +87,38 @@ class xml{
         return $this->dom;
     }
 
+    public function cfdi_comprobante_v33(stdClass $comprobante): DOMDocument|array
+    {
+
+        $keys = array('tipo_de_comprobante','moneda','total','sub_total','lugar_expedicion',
+            'folio');
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $comprobante);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar comprobante', data: $valida);
+        }
+
+        $fecha_cfdi = (new fechas())->fecha_cfdi(comprobante: $comprobante);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al calcular fecha', data: $fecha_cfdi);
+        }
+
+        $this->cfdi->comprobante->fecha = $fecha_cfdi;
+        $comprobante->fecha = $fecha_cfdi;
+
+
+        $comprobante_base = (new dom_xml())->comprobante_v33(comprobante: $comprobante,xml:  $this);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al inicializar cfdi comprobante', data: $comprobante_base);
+        }
+
+        $complemento = (new complementos())->aplica_complemento_cfdi_comprobante(comprobante: $comprobante, xml: $this);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al inicializar complementos', data: $complemento);
+        }
+
+        return $this->dom;
+    }
+
     public function cfdi_comprobante_json(stdClass $comprobante, array $json): array
     {
 
@@ -328,6 +360,29 @@ class xml{
     public function cfdi_receptor(stdClass $receptor): bool|string|array
     {
         $keys = array('rfc','nombre','domicilio_fiscal_receptor','regimen_fiscal_receptor','uso_cfdi');
+        $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $receptor);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar $receptor', data: $valida);
+        }
+
+        if(!isset($this->xml)){
+            return $this->error->error(mensaje: 'Error no esta inicializado el xml', data: $this);
+        }
+
+        $keys_especial = array('uso_cfdi'=>'UsoCFDI');
+
+        $data_nodo = (new dom_xml())->nodo(keys: $keys, keys_especial: $keys_especial,
+            local_name: 'cfdi:Receptor', nodo_key: 'receptor', object:  $receptor,xml:  $this);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al setear $receptor', data: $data_nodo);
+        }
+
+        return $this->dom->saveXML();
+    }
+
+    public function cfdi_receptor_v33(stdClass $receptor): bool|string|array
+    {
+        $keys = array('rfc','nombre','uso_cfdi');
         $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $receptor);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al validar $receptor', data: $valida);
