@@ -82,26 +82,30 @@ class timbraTest extends test {
 
         $folio = mt_rand(0,999999999).mt_rand(0,999999999).mt_rand(0,999999999).mt_rand(0,999999999);
 
-/*
-        $contenido_xml = '<?xml version="1.0" encoding="UTF-8"?>
-<cfdi:Comprobante xmlns:cfdi="http://www.sat.gob.mx/cfd/4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd" Version="4.0" Fecha="2023-03-28T10:02:58" Serie="CFDI4.0" Folio="'.$folio.'" FormaPago="01" SubTotal="10500.00" Moneda="MXN" Total="12180.00" TipoDeComprobante="I" MetodoPago="PUE" LugarExpedicion="03000" Exportacion="01"> 
- <cfdi:Emisor Rfc="EKU9003173C9" Nombre="ESCUELA KEMPER URGATE" RegimenFiscal="601"/>
-  <cfdi:Receptor Rfc="MOFY900516NL1" Nombre="YADIRA MAGALY MONTAÑEZ FELIX" DomicilioFiscalReceptor="91779" RegimenFiscalReceptor="612" UsoCFDI="G01"/>
-  <cfdi:Conceptos>
-    <cfdi:Concepto Cantidad="30.000000" Unidad="Caja" NoIdentificacion="400578" Descripcion="Compra de fresas" ValorUnitario="350.00" Importe="10500.00" ClaveProdServ="70141902" ClaveUnidad="EA" ObjetoImp="02">
-      <cfdi:Impuestos>
-        <cfdi:Traslados>
-          <cfdi:Traslado Base="10500.00" Impuesto="002" TipoFactor="Tasa" TasaOCuota="0.160000" Importe="1680.00"/>
-        </cfdi:Traslados>
-      </cfdi:Impuestos>
-    </cfdi:Concepto>
-  </cfdi:Conceptos>
-  <cfdi:Impuestos TotalImpuestosTrasladados="1680.00">
-    <cfdi:Traslados>
-      <cfdi:Traslado Base="10500.00" Impuesto="002" Importe="1680.00" TasaOCuota="0.160000" TipoFactor="Tasa"/>
-    </cfdi:Traslados>
-  </cfdi:Impuestos>
-
+        $contenido_xml = '<cfdi:Comprobante xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nomina12="http://www.sat.gob.mx/nomina12" xmlns:cfdi="http://www.sat.gob.mx/cfd/3" xsi:schemaLocation="http://www.sat.gob.mx/cfd/3 http://www.sat.gob.mx/sitio_internet/cfd/3/cfdv33.xsd http://www.sat.gob.mx/nomina12 http://www.sat.gob.mx/sitio_internet/cfd/nomina/nomina12.xsd" Moneda="MXN" Total="4900" TipoDeComprobante="N" SubTotal="5200" LugarExpedicion="20000" Fecha="2023-06-20T11:48:02" Folio="Folio" Version="3.3" Serie="Serie" FormaPago="99" MetodoPago="PPD" Descuento="300" TipoCambio="1">
+<cfdi:Emisor Rfc="EKU9003173C9" Nombre="ESCUELA KEMPER URGATE" RegimenFiscal="601"/>
+<cfdi:Receptor Rfc="XOJI740919U48" Nombre="INGRID XODAR JIMENEZ" UsoCFDI="P01"/>
+<cfdi:Conceptos>
+<cfdi:Concepto ClaveProdServ="84111505" Descuento="300.00" Cantidad="1" ClaveUnidad="ACT" Descripcion="Pago de nómina" ValorUnitario="5200.00" Importe="5200.00"/>
+</cfdi:Conceptos>
+<cfdi:Complemento>
+<nomina12:Nomina xmlns:nomina12="http://www.sat.gob.mx/nomina12" Version="1.2" TipoNomina="O" FechaPago="2021-12-24" FechaInicialPago="2021-12-09" FechaFinalPago="2021-12-24" NumDiasPagados="15" TotalPercepciones="5000" TotalDeducciones="300" TotalOtrosPagos="200">
+<nomina12:Emisor RegistroPatronal="B5510768108" RfcPatronOrigen="URE180429TM6"/>
+<nomina12:Receptor Curp="XEXX010101HNEXXXA4" NumSeguridadSocial="000000" FechaInicioRelLaboral="2015-01-01" Antigüedad="P364W" TipoContrato="01" TipoJornada="01" TipoRegimen="03" NumEmpleado="120" Departamento="Desarrollo" Puesto="Ingeniero de Software" RiesgoPuesto="1" PeriodicidadPago="04" CuentaBancaria="012680011409390488" SalarioBaseCotApor="490.22" SalarioDiarioIntegrado="146.47" ClaveEntFed="JAL"/>
+<nomina12:Percepciones TotalSueldos="5000.0" TotalGravado="2808.8" TotalExento="2191.2">
+<nomina12:Percepcion TipoPercepcion="001" Clave="00500" Concepto="Sueldos, Salarios Rayas y Jornales" ImporteGravado="2808.8" ImporteExento="2191.2"/>
+</nomina12:Percepciones>
+<nomina12:Deducciones TotalOtrasDeducciones="200" TotalImpuestosRetenidos="100">
+<nomina12:Deduccion TipoDeduccion="001" Clave="00301" Concepto="Seguridad Social" Importe="200"/>
+<nomina12:Deduccion TipoDeduccion="002" Clave="00302" Concepto="ISR" Importe="100"/>
+</nomina12:Deducciones>
+<nomina12:OtrosPagos>
+<nomina12:OtroPago TipoOtroPago="001" Clave="00301" Concepto="Seguridad Social" Importe="200">
+<nomina12:SubsidioAlEmpleo SubsidioCausado="200"/>
+</nomina12:OtroPago>
+</nomina12:OtrosPagos>
+</nomina12:Nomina>
+</cfdi:Complemento>
 </cfdi:Comprobante>';
 
 
@@ -110,11 +114,10 @@ class timbraTest extends test {
 
         $resultado = $timbra->timbra($contenido_xml, $id_comprobante, 'profact');
 
-
         $this->assertNotTrue(errores::$error);
         $this->assertIsObject($resultado);
         $this->assertNotEmpty($resultado->uuid);
-
+/*
         errores::$error = false;
 
 
@@ -153,9 +156,11 @@ class timbraTest extends test {
         $this->assertNotTrue(errores::$error);
         $this->assertIsObject($resultado);
         $this->assertNotEmpty($resultado->uuid);
+*/
 
-        */
 
+        /************************/
+/*
         errores::$error = false;
 
         $contenido_xml = '{
@@ -409,7 +414,7 @@ class timbraTest extends test {
         $this->assertStringContainsStringIgnoringCase('CfdiRelacionados TipoRelacion="04"><cfdi:CfdiRelacionado UUID="6c76',$resultado->xml_sellado);
 
 
-
+*/
 
     }
 

@@ -216,6 +216,122 @@ class cfdisTest extends test {
         //print_r($resultado);exit;
     }
 
+    public function test_complemento_nomina_v33(): void
+    {
+        errores::$error = false;
+
+        $cfdis = new cfdis();
+        //$com = new liberator($com);
+        $comprobante = new stdClass();
+        $comprobante->lugar_expedicion = 20000;
+        $comprobante->folio = 'Folio';
+        $comprobante->total = '4900';
+        $comprobante->sub_total = '5200';
+        $comprobante->serie = 'Serie';
+        $comprobante->descuento = '300';
+        $comprobante->tipo_cambio = '1';
+        $comprobante->metodo_pago = 'PPD';
+        $comprobante->forma_pago = '99';
+
+        $emisor = new stdClass();
+
+        $emisor->rfc = 'EKU9003173C9';
+        $emisor->nombre = 'ESCUELA KEMPER URGATE';
+        $emisor->regimen_fiscal = '601';
+
+        $receptor = new stdClass();
+        $receptor->rfc = 'XOJI740919U48';
+        $receptor->nombre = 'INGRID XODAR JIMENEZ';
+        $receptor->domicilio_fiscal_receptor = '88965';
+        $receptor->regimen_fiscal_receptor = '605';
+
+
+        $nomina = new stdClass();
+        $nomina->tipo_nomina = 'O';
+        $nomina->fecha_pago = '2021-12-24';
+        $nomina->fecha_inicial_pago = '2021-12-09';
+        $nomina->fecha_final_pago = '2021-12-24';
+        $nomina->num_dias_pagados = '15';
+        $nomina->total_percepciones = '5000';
+        $nomina->total_deducciones = '300';
+        $nomina->total_otros_pagos = '200';
+        $nomina->emisor = new stdClass();
+        $nomina->emisor->registro_patronal = 'B5510768108';
+        $nomina->emisor->rfc_patron_origen = 'URE180429TM6';
+
+        $nomina->receptor = new stdClass();
+        $nomina->receptor->curp = 'XEXX010101HNEXXXA4';
+        $nomina->receptor->num_seguridad_social = '000000';
+        $nomina->receptor->fecha_inicio_rel_laboral = '2015-01-01';
+        $nomina->receptor->antiguedad = 'P364W';
+        $nomina->receptor->tipo_contrato = '01';
+        $nomina->receptor->tipo_jornada = '01';
+        $nomina->receptor->tipo_regimen = '03';
+        $nomina->receptor->num_empleado = '120';
+        $nomina->receptor->departamento = 'Desarrollo';
+        $nomina->receptor->puesto = 'Ingeniero de Software';
+        $nomina->receptor->riesgo_puesto = '1';
+        $nomina->receptor->periodicidad_pago = '04';
+        $nomina->receptor->cuenta_bancaria = '012680011409390488';
+        $nomina->receptor->banco = '002';
+        $nomina->receptor->salario_base_cot_apor = '490.22';
+        $nomina->receptor->salario_diario_integrado = '146.47';
+        $nomina->receptor->clave_ent_fed = 'JAL';
+
+        $nomina->percepciones = new stdClass();
+        $nomina->percepciones->total_sueldos = '5000.0';
+        $nomina->percepciones->total_gravado = '2808.8';
+        $nomina->percepciones->total_exento = '2191.2';
+
+        $nomina->percepciones->percepcion = array();
+        $nomina->percepciones->percepcion[0] = new stdClass();
+        $nomina->percepciones->percepcion[0]->tipo_percepcion = '001';
+        $nomina->percepciones->percepcion[0]->clave = '00500';
+        $nomina->percepciones->percepcion[0]->concepto = 'Sueldos, Salarios Rayas y Jornales';
+        $nomina->percepciones->percepcion[0]->importe_gravado = '2808.8';
+        $nomina->percepciones->percepcion[0]->importe_exento = '2191.2';
+
+        $nomina->deducciones = new stdClass();
+        $nomina->deducciones->total_otras_deducciones = '200';
+        $nomina->deducciones->total_impuestos_retenidos = '100';
+
+        $nomina->deducciones->deduccion = array();
+        $nomina->deducciones->deduccion[0] = new stdClass();
+        $nomina->deducciones->deduccion[0]->tipo_deduccion = '001';
+        $nomina->deducciones->deduccion[0]->clave = '00301';
+        $nomina->deducciones->deduccion[0]->concepto = 'Seguridad Social';
+        $nomina->deducciones->deduccion[0]->importe = '200';
+
+        $nomina->deducciones->deduccion[1] = new stdClass();
+        $nomina->deducciones->deduccion[1]->tipo_deduccion = '002';
+        $nomina->deducciones->deduccion[1]->clave = '00302';
+        $nomina->deducciones->deduccion[1]->concepto = 'ISR';
+        $nomina->deducciones->deduccion[1]->importe = '100';
+
+
+        $nomina->otros_pagos = new stdClass();
+        $nomina->otros_pagos->otro_pago = array();
+        $nomina->otros_pagos->otro_pago[0] = new stdClass();
+        $nomina->otros_pagos->otro_pago[0]->tipo_otro_pago = '001';
+        $nomina->otros_pagos->otro_pago[0]->clave = '00301';
+        $nomina->otros_pagos->otro_pago[0]->concepto = 'Seguridad Social';
+        $nomina->otros_pagos->otro_pago[0]->importe = '200';
+        $nomina->otros_pagos->otro_pago[0]->es_subsidio = true;
+        $nomina->otros_pagos->otro_pago[0]->subsidio_causado = 200;
+/*
+        $relacionados['tipo_relacion'] = '02';
+        $relacionados['relaciones'] = array();
+        $relacionados['relaciones'][0] = new stdClass();
+        $relacionados['relaciones'][0]->uuid = '';*/
+
+        $resultado = $cfdis->complemento_nomina_v33(comprobante: $comprobante,emisor:  $emisor, nomina: $nomina,receptor:  $receptor);
+
+        $this->assertNotTrue(errores::$error);
+        $this->assertIsString($resultado);
+
+        //print_r($resultado);exit;
+    }
+
     public function test_complemento_pago(): void
     {
         errores::$error = false;
