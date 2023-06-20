@@ -417,7 +417,7 @@ class cfdis{
             return $this->error->error(mensaje: 'Error al validar $emisor', data: $valida);
         }
 
-        $keys = array('rfc','nombre','domicilio_fiscal_receptor','regimen_fiscal_receptor');
+        $keys = array('rfc','nombre');
         $valida = $this->valida->valida_existencia_keys(keys: $keys, registro: $data->receptor);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al validar $receptor', data: $valida);
