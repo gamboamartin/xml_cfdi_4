@@ -447,7 +447,7 @@ class cfdis{
             return $this->error->error(mensaje: 'Error al generar emisor', data: $dom);
         }
 
-        $receptor->uso_cfdi = 'CN01';
+        $receptor->uso_cfdi = 'P01';
         $dom = $xml->cfdi_receptor_v33(receptor:  $data->receptor);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al generar receptor', data: $dom);

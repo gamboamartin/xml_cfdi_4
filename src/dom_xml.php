@@ -679,8 +679,6 @@ class dom_xml{
 
     private function comprobante_base_v33(DOMElement $nodo, string $tipo_de_comprobante, xml $xml): array|stdClass
     {
-
-
         $nodo->setAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
 
         if(!isset($xml->xml)){
@@ -702,8 +700,8 @@ class dom_xml{
         }
         if($tipo_de_comprobante === 'N') {
             $nodo->setAttribute('xmlns:nomina12', 'http://www.sat.gob.mx/nomina12');
-            $nodo->setAttribute('xmlns:cfdi', 'http://www.sat.gob.mx/cfd/4');
-            $nodo->setAttribute('xsi:schemaLocation', 'http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd http://www.sat.gob.mx/nomina12 http://www.sat.gob.mx/sitio_internet/cfd/nomina/nomina12.xsd');
+            $nodo->setAttribute('xmlns:cfdi', 'http://www.sat.gob.mx/cfd/3');
+            $nodo->setAttribute('xsi:schemaLocation', 'http://www.sat.gob.mx/cfd/3 http://www.sat.gob.mx/sitio_internet/cfd/3/cfdv33.xsd http://www.sat.gob.mx/nomina12 http://www.sat.gob.mx/sitio_internet/cfd/nomina/nomina12.xsd');
         }
 
         $data_nodo = $this->init_dom_cfdi_comprobante_v33(nodo: $nodo,xml:  $xml);

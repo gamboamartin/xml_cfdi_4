@@ -104,7 +104,7 @@ class xml{
 
         $this->cfdi->comprobante->fecha = $fecha_cfdi;
         $comprobante->fecha = $fecha_cfdi;
-
+        $this->cfdi->comprobante->version = "3.3";
 
         $comprobante_base = (new dom_xml())->comprobante_v33(comprobante: $comprobante,xml:  $this);
         if(errores::$error){
