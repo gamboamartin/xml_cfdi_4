@@ -98,6 +98,34 @@ class dom_xml{
         return $nodo_concepto;
     }
 
+    private function attrs_concepto_v33(stdClass $concepto, DOMElement $nodo_concepto): DOMElement|array
+    {
+        $valida = $this->valida->valida_data_concepto_v33(concepto: $concepto);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar concepto', data: $valida);
+        }
+        $nodo_concepto->setAttribute('ClaveProdServ', $concepto->clave_prod_serv);
+
+        if(isset($concepto->no_identificacion) && $concepto->no_identificacion!==''){
+            $nodo_concepto->setAttribute('NoIdentificacion', $concepto->no_identificacion);
+        }
+
+        if(isset($concepto->unidad) && $concepto->unidad!==''){
+            $nodo_concepto->setAttribute('Unidad', $concepto->unidad);
+        }
+        if(isset($concepto->descuento) && $concepto->descuento!==''){
+            $nodo_concepto->setAttribute('Descuento', $concepto->descuento);
+        }
+
+        $nodo_concepto->setAttribute('Cantidad', $concepto->cantidad);
+        $nodo_concepto->setAttribute('ClaveUnidad', $concepto->clave_unidad);
+        $nodo_concepto->setAttribute('Descripcion', $concepto->descripcion);
+        $nodo_concepto->setAttribute('ValorUnitario', $concepto->valor_unitario);
+        $nodo_concepto->setAttribute('Importe', $concepto->importe);
+
+        return $nodo_concepto;
+    }
+
     private function attrs_concepto_json(stdClass $concepto): array
     {
         $valida = $this->valida->valida_data_concepto(concepto: $concepto);
@@ -263,6 +291,24 @@ class dom_xml{
                 return $this->error->error(mensaje: 'Error el concepto debe ser un objeto', data: $concepto);
             }
             $elementos_concepto = (new dom_xml())->elementos_concepto(concepto: $concepto,
+                nodo_conceptos: $nodo_conceptos,xml:  $xml);
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error al asignar atributos', data: $elementos_concepto);
+            }
+        }
+        return $xml;
+    }
+
+    final public function carga_conceptos_v33(array $conceptos, DOMElement $nodo_conceptos, xml $xml): xml|array
+    {
+        foreach ($conceptos as $concepto){
+            if(is_array($concepto)){
+                $concepto = (object)$concepto;
+            }
+            if(!is_object($concepto)){
+                return $this->error->error(mensaje: 'Error el concepto debe ser un objeto', data: $concepto);
+            }
+            $elementos_concepto = (new dom_xml())->elementos_concepto_v33(concepto: $concepto,
                 nodo_conceptos: $nodo_conceptos,xml:  $xml);
             if(errores::$error){
                 return $this->error->error(mensaje: 'Error al asignar atributos', data: $elementos_concepto);
@@ -845,6 +891,63 @@ class dom_xml{
         return $nodo_conceptos;
     }
 
+    private function elemento_concepto_v33(stdClass $concepto, DOMElement $nodo_conceptos, xml $xml): array|DOMElement
+    {
+        $valida = $this->valida->valida_data_concepto_v33(concepto: $concepto);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar concepto', data: $valida);
+        }
+
+        if(!isset($concepto->impuestos)){
+            return $this->error->error(mensaje: 'Error debe existir impuestos en concepto', data: $concepto);
+        }
+        if(!is_array($concepto->impuestos)){
+            return $this->error->error(mensaje: 'Error impuestos debe ser un array de objetos', data: $concepto);
+        }
+        try {
+            $nodo_concepto = $xml->dom->createElement('cfdi:Concepto');
+        }
+        catch (Throwable $e){
+            return $this->error->error(mensaje: 'Error al crear el atributo cfdi:Concepto', data: $e);
+        }
+
+        $nodo_conceptos->appendChild($nodo_concepto);
+
+        $nodo_concepto = $this->attrs_concepto_v33(concepto: $concepto, nodo_concepto: $nodo_concepto);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al asignar atributos', data: $nodo_concepto);
+        }
+
+
+        $nodo_impuestos = $this->genera_nodo_concepto_impuestos(impuestos: $concepto->impuestos,
+            nodo_concepto: $nodo_concepto,xml: $xml);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al cargar nodo impuestos', data: $nodo_impuestos);
+        }
+
+        if(isset($concepto->a_cuanta_terceros)){
+            $nodo_a_cuenta_terceros = $this->genera_nodo_a_cuenta_terceros(
+                a_cuanta_terceros: $concepto->a_cuanta_terceros, nodo_concepto: $nodo_concepto, xml: $xml);
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error al cargar nodo a cuenta terceros',
+                    data: $nodo_a_cuenta_terceros);
+            }
+        }
+
+        if(isset($concepto->cuenta_predial)){
+            try {
+                $nodo_cuenta_predial = $xml->dom->createElement('cfdi:CuentaPredial');
+                $nodo_cuenta_predial->setAttribute('Numero', $concepto->cuenta_predial);
+            }
+            catch (Throwable $e){
+                return $this->error->error(mensaje: 'Error al crear el elemento cfdi:CuentaPredial', data: $e);
+            }
+            $nodo_concepto->appendChild($nodo_cuenta_predial);
+        }
+
+        return $nodo_conceptos;
+    }
+
     private function elemento_concepto_json(stdClass $concepto): array|DOMElement
     {
         $valida = $this->valida->valida_data_concepto(concepto: $concepto);
@@ -961,6 +1064,75 @@ class dom_xml{
         }
 
         $elemento_concepto = $this->elemento_concepto(concepto: $concepto, nodo_conceptos: $nodo_conceptos,xml:  $xml);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al asignar atributos', data: $elemento_concepto);
+        }
+        return $xml;
+    }
+    private function elementos_concepto_v33(stdClass $concepto, DOMElement $nodo_conceptos, xml $xml): xml|array
+    {
+
+        /**
+         * REFCATORIZAR
+         */
+
+
+        $attrs = array('valor_unitario','importe');
+        foreach ($attrs as $attr){
+            $concepto = $this->limpia_monto_attr(key: $attr, obj: $concepto);
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error al limpiar objeto', data: $concepto);
+            }
+        }
+
+        if(isset($concepto->impuestos)){
+            foreach ($concepto->impuestos as $impuesto){
+                if(isset($impuesto->traslados)){
+                    foreach ($impuesto->traslados as $indice=>$traslado){
+
+                        $attrs = array('base','importe');
+                        foreach ($attrs as $attr){
+                            $traslado = $this->limpia_attr_existente(key: $attr,obj:  $traslado);
+                            if(errores::$error){
+                                return $this->error->error(mensaje: 'Error al limpiar objeto', data: $traslado);
+                            }
+                        }
+
+                        $impuesto->traslados[$indice] = $traslado;
+
+                    }
+                }
+
+                if(isset($impuesto->retenciones)){
+                    foreach ($impuesto->retenciones as $indice=>$retencion){
+
+                        $attrs = array('base','importe');
+                        foreach ($attrs as $attr){
+                            $retencion = $this->limpia_attr_existente(key: $attr,obj:  $retencion);
+                            if(errores::$error){
+                                return $this->error->error(mensaje: 'Error al limpiar objeto', data: $retencion);
+                            }
+                        }
+
+                        $impuesto->retenciones[$indice] = $retencion;
+
+                    }
+                }
+
+            }
+        }
+
+        $xml->cfdi->conceptos[] = new stdClass();
+        $valida = $this->valida->valida_concepto(concepto: $concepto);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar $concepto', data: $valida);
+        }
+        $valida = $this->valida->valida_data_concepto_v33(concepto: $concepto);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar $concepto', data: $valida);
+        }
+
+        $elemento_concepto = $this->elemento_concepto_v33(concepto: $concepto, nodo_conceptos: $nodo_conceptos,xml:  $xml);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al asignar atributos', data: $elemento_concepto);
         }

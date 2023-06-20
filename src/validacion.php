@@ -62,6 +62,27 @@ class validacion extends \gamboamartin\validacion\validacion{
         return  true;
     }
 
+    final public function valida_data_concepto_v33(mixed $concepto): bool|array
+    {
+        $keys = array('clave_prod_serv','cantidad','importe','clave_unidad','descripcion',
+            'valor_unitario');
+        $valida = $this->valida_existencia_keys(keys: $keys, registro: $concepto);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar $concepto', data: $valida);
+        }
+        $keys_ids = array('clave_prod_serv');
+        $valida = $this->valida_ids(keys: $keys_ids, registro: $concepto);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar $concepto', data: $valida);
+        }
+        $keys_numerics = array('clave_prod_serv','cantidad','valor_unitario','importe');
+        $valida = $this->valida_numerics(keys: $keys_numerics, row: $concepto);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar $concepto', data: $valida);
+        }
+        return  true;
+    }
+
     public function valida_data_importe_concepto(mixed $concepto): bool|array
     {
         $keys = array('cantidad','valor_unitario');

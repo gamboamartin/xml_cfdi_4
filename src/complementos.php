@@ -174,7 +174,7 @@ class complementos{
             return $this->error->error(mensaje: 'Error al obtener conceptos', data: $conceptos);
         }
 
-        $dom = $xml->cfdi_conceptos(conceptos: $conceptos);
+        $dom = $xml->cfdi_conceptos_v33(conceptos: $conceptos);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al generar receptor', data: $dom);
         }
