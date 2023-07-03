@@ -334,7 +334,7 @@ class xml{
 
                 $aplica_impuestos_trasladados = true;
                 $aplica_impuestos = true;
-                $keys[] = 'total_impuestos_trasladados';
+                //$keys[] = 'total_impuestos_trasladados';
 
             }
         }
