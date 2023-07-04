@@ -82,7 +82,7 @@ class timbraTest extends test {
 
         $folio = mt_rand(0,999999999).mt_rand(0,999999999).mt_rand(0,999999999).mt_rand(0,999999999);
 
-        $contenido_xml = '<cfdi:Comprobante xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nomina12="http://www.sat.gob.mx/nomina12" xmlns:cfdi="http://www.sat.gob.mx/cfd/3" xsi:schemaLocation="http://www.sat.gob.mx/cfd/3 http://www.sat.gob.mx/sitio_internet/cfd/3/cfdv33.xsd http://www.sat.gob.mx/nomina12 http://www.sat.gob.mx/sitio_internet/cfd/nomina/nomina12.xsd" Moneda="MXN" Total="4900" TipoDeComprobante="N" SubTotal="5200" LugarExpedicion="20000" Fecha="2023-06-20T11:48:02" Folio="Folio" Version="3.3" Serie="Serie" FormaPago="99" MetodoPago="PPD" Descuento="300" TipoCambio="1">
+        /*$contenido_xml = '<cfdi:Comprobante xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nomina12="http://www.sat.gob.mx/nomina12" xmlns:cfdi="http://www.sat.gob.mx/cfd/3" xsi:schemaLocation="http://www.sat.gob.mx/cfd/3 http://www.sat.gob.mx/sitio_internet/cfd/3/cfdv33.xsd http://www.sat.gob.mx/nomina12 http://www.sat.gob.mx/sitio_internet/cfd/nomina/nomina12.xsd" Moneda="MXN" Total="4900" TipoDeComprobante="N" SubTotal="5200" LugarExpedicion="20000" Fecha="2023-06-20T11:48:02" Folio="Folio" Version="3.3" Serie="Serie" FormaPago="99" MetodoPago="PPD" Descuento="300" TipoCambio="1">
 <cfdi:Emisor Rfc="EKU9003173C9" Nombre="ESCUELA KEMPER URGATE" RegimenFiscal="601"/>
 <cfdi:Receptor Rfc="XOJI740919U48" Nombre="INGRID XODAR JIMENEZ" UsoCFDI="P01"/>
 <cfdi:Conceptos>
@@ -113,11 +113,12 @@ class timbraTest extends test {
         $id_comprobante = '';
 
         $resultado = $timbra->timbra($contenido_xml, $id_comprobante, 'profact');
+        //print_r($resultado);exit;
 
         $this->assertNotTrue(errores::$error);
         $this->assertIsObject($resultado);
         $this->assertNotEmpty($resultado->uuid);
-/*
+
         errores::$error = false;
 
 
@@ -160,7 +161,7 @@ class timbraTest extends test {
 
 
         /************************/
-/*
+
         errores::$error = false;
 
         $contenido_xml = '{
@@ -169,14 +170,14 @@ class timbraTest extends test {
         "Version": "4.0",
         "Serie": "LC-P",
         "Folio": "1",
-        "Fecha": "2023-05-31T10:59:59",
-        "NoCertificado": "30001000000400002434",
+        "Fecha": "2023-07-04T09:00:59",
+        "NoCertificado": "30001000000500003416",
         "SubTotal": "0",
         "Moneda": "XXX",
         "Total": "0",
         "TipoDeComprobante": "T",
         "Exportacion": "01",
-        "LugarExpedicion": "55000",
+        "LugarExpedicion": "80349",
         "Emisor":
         {
             "Rfc": "EKU9003173C9",
@@ -185,10 +186,10 @@ class timbraTest extends test {
         },
         "Receptor":
         {
-            "Rfc": "EKU9003173C9",
-            "Nombre": "ESCUELA KEMPER URGATE",
-            "DomicilioFiscalReceptor": "26015",
-            "RegimenFiscalReceptor": "601",
+            "Rfc": "XAXX010101000",
+            "Nombre": "PUBLICO EN GENERAL",
+            "DomicilioFiscalReceptor": "80349",
+            "RegimenFiscalReceptor": "616",
             "UsoCFDI": "S01"
         },
         "Conceptos":
@@ -208,13 +209,12 @@ class timbraTest extends test {
     }
 }';
 
-        $ruta_key_pem = '/var/www/html/xml_cfdi_4/tests/files/CSD_EKU9003173C9_key.pem';
-        $ruta_cer_pem = '/var/www/html/xml_cfdi_4/tests/files/CSD_EKU9003173C9_cer.pem';
+        $ruta_key_pem = '/var/www/html/xml_cfdi_4/tests/files/CSD_Sucursal_1_EKU9003173C9_20230517_223850.key.pem';
+        $ruta_cer_pem = '/var/www/html/xml_cfdi_4/tests/files/CSD_Sucursal_1_EKU9003173C9_20230517_223850.cer.pem';
         $id_comprobante = '';
 
         $resultado = $timbra->timbra(contenido_xml: $contenido_xml, id_comprobante: $id_comprobante,
             ruta_cer_pem: $ruta_cer_pem, ruta_key_pem: $ruta_key_pem, pac_prov: 'facturalo');
-
 
 
         $this->assertNotTrue(errores::$error);
@@ -229,8 +229,8 @@ class timbraTest extends test {
         "Version": "4.0",
         "Serie": "LC-P",
         "Folio": "1005",
-        "Fecha": "2023-05-31T11:37:08",
-        "NoCertificado": "30001000000400002434",
+        "Fecha": "2023-07-04T09:00:08",
+        "NoCertificado": "30001000000500003416",
         "SubTotal": "0",
         "Moneda": "XXX",
         "Total": "0",
@@ -257,10 +257,10 @@ class timbraTest extends test {
         },
         "Receptor":
         {
-            "Rfc": "EKU9003173C9",
-            "Nombre": "ESCUELA KEMPER URGATE",
-            "DomicilioFiscalReceptor": "26015",
-            "RegimenFiscalReceptor": "601",
+            "Rfc": "XAXX010101000",
+            "Nombre": "PUBLICO EN GENERAL",
+            "DomicilioFiscalReceptor": "55000",
+            "RegimenFiscalReceptor": "616",
             "UsoCFDI": "S01"
         },
         "Conceptos":
@@ -280,8 +280,8 @@ class timbraTest extends test {
     }
 }';
 
-        $ruta_key_pem = '/var/www/html/xml_cfdi_4/tests/files/CSD_EKU9003173C9_key.pem';
-        $ruta_cer_pem = '/var/www/html/xml_cfdi_4/tests/files/CSD_EKU9003173C9_cer.pem';
+        $ruta_key_pem = '/var/www/html/xml_cfdi_4/tests/files/CSD_Sucursal_1_EKU9003173C9_20230517_223850.key.pem';
+        $ruta_cer_pem = '/var/www/html/xml_cfdi_4/tests/files/CSD_Sucursal_1_EKU9003173C9_20230517_223850.cer.pem';
         $id_comprobante = '';
 
         $resultado = $timbra->timbra(contenido_xml: $contenido_xml, id_comprobante: $id_comprobante,
@@ -303,8 +303,8 @@ class timbraTest extends test {
         $contenido_xml_array->Comprobante->Serie = '4.0';
 
         $contenido_xml_array->Comprobante->Folio = '0000179826';
-        $contenido_xml_array->Comprobante->Fecha = '2023-05-31T10:37:08';
-        $contenido_xml_array->Comprobante->NoCertificado = '30001000000400002434';
+        $contenido_xml_array->Comprobante->Fecha = '2023-07-04T09:00:08';
+        $contenido_xml_array->Comprobante->NoCertificado = '30001000000500003416';
         $contenido_xml_array->Comprobante->SubTotal = '0';
         $contenido_xml_array->Comprobante->Moneda = 'XXX';
         $contenido_xml_array->Comprobante->Total = '0';
@@ -401,12 +401,13 @@ class timbraTest extends test {
 
        // print_r($contenido_json);exit;
 
-        $ruta_key_pem = '/var/www/html/xml_cfdi_4/tests/files/CSD_EKU9003173C9_key.pem';
-        $ruta_cer_pem = '/var/www/html/xml_cfdi_4/tests/files/CSD_EKU9003173C9_cer.pem';
+        $ruta_key_pem = '/var/www/html/xml_cfdi_4/tests/files/CSD_Sucursal_1_EKU9003173C9_20230517_223850.key.pem';
+        $ruta_cer_pem = '/var/www/html/xml_cfdi_4/tests/files/CSD_Sucursal_1_EKU9003173C9_20230517_223850.cer.pem';
         $id_comprobante = '';
 
         $resultado = $timbra->timbra(contenido_xml: $contenido_json, id_comprobante: $id_comprobante,
             ruta_cer_pem: $ruta_cer_pem, ruta_key_pem: $ruta_key_pem, pac_prov: 'facturalo');
+
 
         $this->assertNotTrue(errores::$error);
         $this->assertIsObject($resultado);
@@ -414,7 +415,10 @@ class timbraTest extends test {
         $this->assertStringContainsStringIgnoringCase('CfdiRelacionados TipoRelacion="04"><cfdi:CfdiRelacionado UUID="6c76',$resultado->xml_sellado);
 
 
-*/
+        errores::$error = false;
+
+
+
 
     }
 

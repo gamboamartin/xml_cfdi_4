@@ -55,6 +55,36 @@ class xml{
 
     }
 
+
+    private function aplica_impuestos(bool $aplica_impuestos_retenidos, bool $aplica_impuestos_trasladados): bool
+    {
+        $aplica_impuestos = false;
+        if($aplica_impuestos_retenidos || $aplica_impuestos_trasladados){
+            $aplica_impuestos = true;
+        }
+        return $aplica_impuestos;
+    }
+    private function aplica_impuestos_retenidos(stdClass $impuestos): bool
+    {
+        $aplica_impuestos_retenidos = false;
+        if(isset($impuestos->retenciones)){
+            if(count($impuestos->retenciones ) > 0){
+                $aplica_impuestos_retenidos = true;
+            }
+        }
+        return $aplica_impuestos_retenidos;
+    }
+    private function aplica_impuestos_trasladados(stdClass $impuestos): bool
+    {
+        $aplica_impuestos_trasladados = false;
+        if(isset($impuestos->traslados)){
+            if(count($impuestos->traslados ) > 0){
+                $aplica_impuestos_trasladados = true;
+            }
+        }
+        return $aplica_impuestos_trasladados;
+    }
+
     public function cfdi_comprobante(stdClass $comprobante): DOMDocument|array
     {
 
@@ -326,26 +356,32 @@ class xml{
     public function cfdi_impuestos_json(stdClass $impuestos, array $json): array
     {
 
-        $aplica_impuestos = false;
-        $aplica_impuestos_trasladados = false;
-        $keys = array();
-        if(isset($impuestos->traslados)){
-            if(count($impuestos->traslados ) > 0){
-
-                $aplica_impuestos_trasladados = true;
-                $aplica_impuestos = true;
-                //$keys[] = 'total_impuestos_trasladados';
-
-            }
+        $aplica_impuestos_trasladados = $this->aplica_impuestos_trasladados(impuestos: $impuestos);
+        if (errores::$error) {
+            return $this->error->error(mensaje: 'Error al validar aplicacion de impuestos', data: $aplica_impuestos_trasladados);
         }
-        $aplica_impuestos_retenidos = false;
-        if(isset($impuestos->retenciones)){
-            if(count($impuestos->retenciones ) > 0){
-                $aplica_impuestos_retenidos = true;
-                $aplica_impuestos = true;
-                $keys[] = 'total_impuestos_retenidos';
-            }
 
+        $aplica_impuestos_retenidos = $this->aplica_impuestos_retenidos(impuestos: $impuestos);
+        if (errores::$error) {
+            return $this->error->error(mensaje: 'Error al validar aplicacion de impuestos', data: $aplica_impuestos_retenidos);
+        }
+
+        $aplica_impuestos = $this->aplica_impuestos(aplica_impuestos_retenidos: $aplica_impuestos_retenidos,aplica_impuestos_trasladados:  $aplica_impuestos_trasladados);
+        if (errores::$error) {
+            return $this->error->error(mensaje: 'Error al validar aplicacion de impuestos', data: $aplica_impuestos);
+        }
+
+        $tiene_tasa = $this->tiene_tasa(aplica_impuestos_trasladados: $aplica_impuestos_trasladados,impuestos:  $impuestos);
+        if (errores::$error) {
+            return $this->error->error(mensaje: 'Error al validar si tiene tasa', data: $tiene_tasa);
+        }
+
+        
+
+        $keys = $this->keys_valida_impuesto(aplica_impuestos_retenidos: $aplica_impuestos_retenidos,
+            aplica_impuestos_trasladados:  $aplica_impuestos_trasladados, tiene_tasa: $tiene_tasa);
+        if (errores::$error) {
+            return $this->error->error(mensaje: 'Error al integrar keys de validacion', data: $keys);
         }
 
         if($aplica_impuestos) {
@@ -537,4 +573,39 @@ class xml{
         }
         return $xml_data;
     }
+
+    /**
+     * Integra los keys para validar la integracion de impuestos trasladados
+     * @param bool $aplica_impuestos_retenidos Existen impuestos retenidos
+     * @param bool $aplica_impuestos_trasladados Existen impuestos trasladados
+     * @param bool $tiene_tasa Si tiene tasa integra el total
+     * @return array
+     */
+    private function keys_valida_impuesto(bool $aplica_impuestos_retenidos, bool $aplica_impuestos_trasladados,
+                                          bool $tiene_tasa): array
+    {
+        $keys = array();
+        if($aplica_impuestos_trasladados && $tiene_tasa){
+            $keys[] = 'total_impuestos_trasladados';
+        }
+        if($aplica_impuestos_retenidos){
+            $keys[] = 'total_impuestos_retenidos';
+        }
+        return $keys;
+    }
+
+    private function tiene_tasa(bool $aplica_impuestos_trasladados, stdClass $impuestos): bool
+    {
+        $tiene_tasa = false;
+        if($aplica_impuestos_trasladados){
+            foreach ($impuestos->traslados as $imp_traslado){
+                if($imp_traslado->tipo_factor === 'Tasa' || $imp_traslado->tipo_factor === 'Cuota'){
+                    $tiene_tasa = true;
+                    break;
+                }
+            }
+        }
+        return $tiene_tasa;
+    }
+
 }
