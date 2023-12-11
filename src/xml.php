@@ -376,7 +376,7 @@ class xml{
             return $this->error->error(mensaje: 'Error al validar si tiene tasa', data: $tiene_tasa);
         }
 
-        
+
 
         $keys = $this->keys_valida_impuesto(aplica_impuestos_retenidos: $aplica_impuestos_retenidos,
             aplica_impuestos_trasladados:  $aplica_impuestos_trasladados, tiene_tasa: $tiene_tasa);

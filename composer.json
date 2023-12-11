@@ -17,11 +17,11 @@
         }
     ],
     "require": {
-        "php": " >=8.1",
-        "gamboa.martin/errores": "^2.0.0",
-        "gamboa.martin/test": "^2.0.0",
-        "gamboa.martin/validacion": "^2.0.0",
-        "gamboa.martin/calculo": "^2.0.0",
+        "php": "^8.3",
+        "gamboa.martin/errores": "^4.0.0",
+        "gamboa.martin/test": "^3.0.0",
+        "gamboa.martin/validacion": "^3.0.0",
+        "gamboa.martin/calculo": "^3.0.0",
       "ext-dom": "*",
       "ext-curl": "*",
         "ext-soap": "*",
