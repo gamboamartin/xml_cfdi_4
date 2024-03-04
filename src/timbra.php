@@ -24,7 +24,6 @@ class timbra{
      * @param string $total Total de la factura o CFDI
      * @param string $uuid Folio Fiscal
      * @return array|stdClass
-     * @version 2.44.0
      */
     private function datos_base(string $rfc_emisor, string $rfc_receptor, string $total, string $uuid): array|stdClass
     {

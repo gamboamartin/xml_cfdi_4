@@ -170,7 +170,7 @@ class timbraTest extends test {
         "Version": "4.0",
         "Serie": "LC-P",
         "Folio": "1",
-        "Fecha": "2023-12-11T09:00:59",
+        "Fecha": "2024-03-04T09:00:59",
         "NoCertificado": "30001000000500003416",
         "SubTotal": "0",
         "Moneda": "XXX",
@@ -229,7 +229,7 @@ class timbraTest extends test {
         "Version": "4.0",
         "Serie": "LC-P",
         "Folio": "1005",
-        "Fecha": "2023-12-11T09:00:08",
+        "Fecha": "2024-03-04T09:00:08",
         "NoCertificado": "30001000000500003416",
         "SubTotal": "0",
         "Moneda": "XXX",
@@ -287,7 +287,7 @@ class timbraTest extends test {
         $resultado = $timbra->timbra(contenido_xml: $contenido_xml, id_comprobante: $id_comprobante,
             ruta_cer_pem: $ruta_cer_pem, ruta_key_pem: $ruta_key_pem, pac_prov: 'facturalo');
 
-
+        //print_r($resultado);exit;
 
         $this->assertNotTrue(errores::$error);
         $this->assertIsObject($resultado);
@@ -303,7 +303,7 @@ class timbraTest extends test {
         $contenido_xml_array->Comprobante->Serie = '4.0';
 
         $contenido_xml_array->Comprobante->Folio = '0000179826';
-        $contenido_xml_array->Comprobante->Fecha = '2023-12-11T09:00:08';
+        $contenido_xml_array->Comprobante->Fecha = '2024-03-04T09:00:08';
         $contenido_xml_array->Comprobante->NoCertificado = '30001000000500003416';
         $contenido_xml_array->Comprobante->SubTotal = '0';
         $contenido_xml_array->Comprobante->Moneda = 'XXX';
