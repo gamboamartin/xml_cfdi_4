@@ -18,12 +18,14 @@ class timbra{
     }
 
     /**
-     * Valida e inicializa los elementos base para consulta y cancelar
-     * @param string $rfc_emisor RFC Emisor
-     * @param string $rfc_receptor RFC Receptor
-     * @param string $total Total de la factura o CFDI
-     * @param string $uuid Folio Fiscal
-     * @return array|stdClass
+     * POR DOCUMENTAR EN WIKI
+     * Esta función valida e inicializa los elementos base para consulta y cancelación.
+     * @param string $rfc_emisor es el RFC del emisor. No puede estar vacío.
+     * @param string $rfc_receptor es el RFC del receptor. No puede estar vacío.
+     * @param string $total es el total de la factura o CFDI. No puede estar vacío.
+     * @param string $uuid es el Folio Fiscal. No puede estar vacío.
+     * @return array|stdClass devuelve un objeto con los datos validados o un array con los detalles del error.
+     * @version 3.2.0
      */
     private function datos_base(string $rfc_emisor, string $rfc_receptor, string $total, string $uuid): array|stdClass
     {
