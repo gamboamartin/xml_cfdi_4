@@ -14,9 +14,9 @@ use stdClass;
 class timbraTest extends test {
     public errores $errores;
 
-    public function __construct(?string $name = null, array $data = [], $dataName = '')
+    public function __construct(?string $name = null)
     {
-        parent::__construct($name, $data, $dataName);
+        parent::__construct($name);
         $this->errores = new errores();
 
     }
@@ -170,7 +170,7 @@ class timbraTest extends test {
         "Version": "4.0",
         "Serie": "LC-P",
         "Folio": "1",
-        "Fecha": "2024-03-04T09:00:59",
+        "Fecha": "2024-03-13T09:00:59",
         "NoCertificado": "30001000000500003416",
         "SubTotal": "0",
         "Moneda": "XXX",
@@ -229,7 +229,7 @@ class timbraTest extends test {
         "Version": "4.0",
         "Serie": "LC-P",
         "Folio": "1005",
-        "Fecha": "2024-03-04T09:00:08",
+        "Fecha": "2024-03-13T09:00:08",
         "NoCertificado": "30001000000500003416",
         "SubTotal": "0",
         "Moneda": "XXX",
@@ -303,7 +303,7 @@ class timbraTest extends test {
         $contenido_xml_array->Comprobante->Serie = '4.0';
 
         $contenido_xml_array->Comprobante->Folio = '0000179826';
-        $contenido_xml_array->Comprobante->Fecha = '2024-03-04T09:00:08';
+        $contenido_xml_array->Comprobante->Fecha = '2024-03-13T09:00:08';
         $contenido_xml_array->Comprobante->NoCertificado = '30001000000500003416';
         $contenido_xml_array->Comprobante->SubTotal = '0';
         $contenido_xml_array->Comprobante->Moneda = 'XXX';
