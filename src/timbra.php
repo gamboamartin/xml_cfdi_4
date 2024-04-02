@@ -330,7 +330,7 @@ class timbra{
 
         $contenido_xml = trim($contenido_xml);
         if($contenido_xml === ''){
-            return $this->error->error('xml no puede venir vacio',$contenido_xml);
+            return $this->error->error(mensaje: 'xml no puede venir vacio',data: $contenido_xml,es_final: true);
         }
 
         $pac = new pac();
@@ -375,7 +375,8 @@ class timbra{
             }
         }
         catch (Throwable $e){
-            return $this->error->error('Error al timbrar',array($e,htmlentities($contenido_xml)));
+            return $this->error->error(mensaje: 'Error al timbrar',data: array($e,htmlentities($contenido_xml)),
+                es_final: true);
         }
 
         if($aplica_params){
@@ -445,7 +446,7 @@ class timbra{
         $txt = $result[5];
 
         if((string)$cod_error !=='0'){
-            return $this->error->error(mensaje: 'Error al timbrar',data: $result);
+            return $this->error->error(mensaje: 'Error al timbrar',data: $result,es_final: true);
         }
 
         $xml_sellado = $result[3];
@@ -484,10 +485,10 @@ class timbra{
     {
         $file = trim($file);
         if($file === ''){
-            return $this->error->error(mensaje: 'Error file esta vacio',data: $file);
+            return $this->error->error(mensaje: 'Error file esta vacio',data: $file, es_final: true);
         }
         if(!file_exists($file)){
-            return $this->error->error(mensaje: 'Error file no existe',data: $file);
+            return $this->error->error(mensaje: 'Error file no existe',data: $file, es_final: true);
         }
         return true;
     }
