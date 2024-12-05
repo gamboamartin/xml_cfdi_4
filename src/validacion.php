@@ -49,11 +49,12 @@ class validacion extends \gamboamartin\validacion\validacion{
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al validar $concepto', data: $valida);
         }
-        $keys_ids = array('clave_prod_serv');
+        /**Revisar no es valido con producto SAT 01010101**/
+        /*$keys_ids = array('clave_prod_serv');
         $valida = $this->valida_ids(keys: $keys_ids, registro: $concepto);
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al validar $concepto', data: $valida);
-        }
+        }*/
         $keys_numerics = array('clave_prod_serv','cantidad','valor_unitario','importe');
         $valida = $this->valida_numerics(keys: $keys_numerics, row: $concepto);
         if(errores::$error){
