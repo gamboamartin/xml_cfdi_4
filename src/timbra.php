@@ -113,7 +113,7 @@ class timbra{
         $salida = $response->data;
 
         if(trim($tipo_resultado) !== 'success'){
-            return $this->error->error(mensaje: 'Error al timbrar',data: $response);
+            return $this->error->error(mensaje: $mensaje,data: $response);
         }
 
         $data_acuse = json_decode($response->data,TRUE);
